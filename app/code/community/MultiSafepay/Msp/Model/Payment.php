@@ -21,6 +21,49 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
     public $api;
     public $payafterapi;
     public $pay_factor = 1;
+	public $_configCode= 'msp';
+	
+	
+	public $giftcards = array(
+        'msp_webgift',
+        'msp_ebon',
+        'msp_babygiftcard',
+        'msp_boekenbon',
+        'msp_erotiekbon',
+        'msp_parfumnl',
+        'msp_parfumcadeaukaart',
+        'msp_degrotespeelgoedwinkel',
+        'msp_yourgift',
+        'msp_wijncadeau',
+        'msp_lief',
+        'msp_gezondheidsbon',
+        'msp_fashioncheque',
+        'msp_fashiongiftcard',
+        'msp_podium',
+        'msp_vvvgiftcard',
+        'msp_sportenfit',
+        'msp_beautyandwellness',
+    );
+
+    
+    public $gateways = array(
+        'msp_ideal',
+        'msp_payafter',
+        'msp_klarna',
+        'msp_mistercash',
+        'msp_visa',
+        'msp_mastercard',
+        'msp_banktransfer',
+        'msp_maestro',
+        'msp_paypal',
+        'msp_giropay',
+        'msp_multisafepay',
+        'msp_directebanking',
+        'msp_directdebit',
+        'msp_amex',
+     
+    );
+
 
     /**
      * Set some vars
@@ -216,7 +259,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
 
         // currency check
         $isAllowConvert = Mage::getStoreConfigFlag('msp/settings/allow_convert_currency');
-        $currencies = explode(',', Mage::getStoreConfig('msp/' . strtolower($gateway_data['method']) . '/allowed_currency'));
+        $currencies = explode(',', Mage::getStoreConfig('msp_gateways/' . strtolower($gateway_data['method']) . '/allowed_currency'));
         $canUseCurrentCurrency = in_array(Mage::app()->getStore()->getCurrentCurrencyCode(), $currencies);
 
         $currentCurrencyCode = Mage::app()->getStore()->getCurrentCurrencyCode();
@@ -272,7 +315,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
         $this->api->test = $isTestMode;
         $this->api->merchant['notification_url'] = $this->_notification_url . "?type=initial";
         $this->api->merchant['cancel_url'] = $this->_cancel_url;
-        $this->api->merchant['redirect_url'] = ($this->getConfigData('use_redirect')) ? $this->_return_url : '';
+        $this->api->merchant['redirect_url'] = $this->_return_url;
         //$this->api->merchant['redirect_url']     		= 	($this->getConfigData('use_redirect')) ? $this->_return_url.'?transactionid='.$orderId : '';
         $this->api->parseCustomerAddress($billing->getStreet(1));
 
@@ -303,6 +346,16 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
 
         $this->api->gatewayinfo['email'] = $this->getOrder()->getCustomerEmail();
         $this->api->gatewayinfo['phone'] = $billing->getTelephone();
+
+		if (isset($_GET['gender'])) {
+			$this->api->customer['gender'] 		= $_GET['gender'];
+			$this->api->gatewayinfo['gender'] 	= $_GET['gender'];
+		} else {
+			$this->api->customer['gender'] 		= ''; //not available
+			$this->api->gatewayinfo['gender'] 	= ''; //not available
+		}
+
+
         if (isset($_GET['accountnumber'])) {
             $this->api->gatewayinfo['bankaccount'] = $_GET['accountnumber'];
             $this->api->customer['bankaccount'] = $_GET['accountnumber'];
@@ -357,7 +410,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
         }
 
 
-        $taxClass = Mage::getStoreConfig('msp/msp_' . strtolower($this->_gateway) . '/fee_tax_class');
+        $taxClass = Mage::getStoreConfig('msp_gateways/msp_' . strtolower($this->_gateway) . '/fee_tax_class');
 
         if ($taxClass == 0) {
             $this->_rate = 1;
@@ -391,7 +444,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
           $fee = number_format($fee, 4, '.', ''); */
 
         $total_fee = 0;
-        $fee = Mage::getStoreConfig('msp/msp_' . strtolower($this->_gateway) . '/fee_amount');
+        $fee = Mage::getStoreConfig('msp_gateways/msp_' . strtolower($this->_gateway) . '/fee_amount');
         $fee_array = explode(':', $fee);
 
         //fee is not configured
@@ -419,7 +472,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
             //add pay after delivery fee if enabled
             if (Mage::getStoreConfig('msp/msp_' . strtolower($this->_gateway) . '/fee')) {
                 $c_item = new MspItem('Fee', 'Fee', 1, $fee, 'KG', 0); // Todo adjust the amount to cents, and round it up.
-                $c_item->SetMerchantItemId('Fee');
+                $c_item->SetMerchantItemId('msp-fee');
                 $c_item->SetTaxTableSelector('FEE');
                 $this->api->cart->AddItem($c_item);
             }
@@ -490,7 +543,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
             // raise error
             //Mage::throwException(Mage::helper("msp")->__("An error occured: ") . $this->api->error_code . " - " . $this->api->error);
             if ($this->api->error_code == '1024') {
-                $errorMessage = Mage::helper("msp")->__("An error occured: ") . $this->api->error_code . /*" - " . $this->api->error .*/ '<br />' . Mage::helper("msp")->__('We are sorry to inform you that your request for payment after delivery has been denied by Multifactor.<BR /> If you have questions about this rejection, you can checkout the FAQ on the website of Multifactor'). '<a href="http://www.multifactor.nl/contact" target="_blank">http://www.multifactor.nl/faq</a>'. Mage::helper("msp")->__('You can also contact Multifactor by calling 020-8500533 (at least 2 hours after this rejection) or by sending an email to ').' <a href="mailto:support@multifactor.nl">support@multifactor.nl</a>.'.Mage::helper("msp")->__('Please retry placing your order and select a different payment method.');
+                $errorMessage = Mage::helper("msp")->__("An error occured: ") . $this->api->error_code . /* " - " . $this->api->error . */ '<br />' . Mage::helper("msp")->__('We are sorry to inform you that your request for payment after delivery has been denied by Multifactor.<BR /> If you have questions about this rejection, you can checkout the FAQ on the website of Multifactor') . '<a href="http://www.multifactor.nl/contact" target="_blank">http://www.multifactor.nl/faq</a>' . Mage::helper("msp")->__('You can also contact Multifactor by calling 020-8500533 (at least 2 hours after this rejection) or by sending an email to ') . ' <a href="mailto:support@multifactor.nl">support@multifactor.nl</a>.' . Mage::helper("msp")->__('Please retry placing your order and select a different payment method.');
             } else {
                 $errorMessage = Mage::helper("msp")->__("An error occured: ") . $this->api->error_code . " - " . $this->api->error . '<br />' . Mage::helper("msp")->__("Please retry placing your order and select a different payment method.");
             }
@@ -541,12 +594,23 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
             return true;
         }
 
-        if ($ips = Mage::getStoreConfig('msp/' . $gateway . '/ip_filter_test_for_live_mode')) {
+        if ($ips = Mage::getStoreConfig('msp_gateways/' . $gateway . '/ip_filter_test_for_live_mode')) {
             if (in_array($_SERVER["REMOTE_ADDR"], explode(';', $ips))) {
                 return true;
             }
         }
 
+        return false;
+    }
+    
+    /**
+     * @return bool
+     */
+    protected function _isTestGiftcard($gateway) {
+        $isTest = ($this->getConfigData('test_api_pad') == MultiSafepay_Msp_Model_Config_Sources_Accounts::TEST_MODE);
+        if ($isTest) {
+            return true;
+        }
         return false;
     }
 
@@ -747,6 +811,11 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
                         $price = number_format($this->_convertCurrency($price, $currentCurrencyCode, $targetCurrencyCode), 4, '.', '');
                     }
                 }
+                
+                // Fix for 1027 with catalog prices including tax 
+                if (Mage::getStoreConfig('tax/calculation/price_includes_tax')) {
+                    $price = ($item->getRowTotalInclTax() / $item->getQtyOrdered() / (1 + ($item->getTaxPercent() / 100)));
+                }
 
 
                 // create item
@@ -797,13 +866,20 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
         $gateway = strtoupper(str_replace("msp_", '', $gateway_data['method']));
 
 
+		if(in_array($gateway_data['method'], $this->gateways)){
+		    $this->_configCode = 'msp_gateways';
+		}elseif(in_array($gateway_data['method'], $this->giftcards)){   
+			$this->_configCode = 'msp_giftcards';  
+		}
+
+
         // currency check
         $isAllowConvert = Mage::getStoreConfigFlag('msp/settings/allow_convert_currency');
 
         if ($gateway_data['method'] == 'msp') {
             $currencies = explode(',', Mage::getStoreConfig('payment/msp/allowed_currency'));
         } else {
-            $currencies = explode(',', Mage::getStoreConfig('msp/' . strtolower($gateway_data['method']) . '/allowed_currency'));
+            $currencies = explode(',', Mage::getStoreConfig($this->_configCode.'/' . strtolower($gateway_data['method']) . '/allowed_currency'));
         }
 
         $canUseCurrentCurrency = in_array(Mage::app()->getStore()->getCurrentCurrencyCode(), $currencies);
@@ -845,18 +921,23 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
                 $gateway_data['method'] == 'msp_degrotespeelgoedwinkel' ||
                 $gateway_data['method'] == 'msp_erotiekbon' ||
                 $gateway_data['method'] == 'msp_fashioncheque' ||
+                $gateway_data['method'] == 'msp_fashiongiftcard' ||
                 $gateway_data['method'] == 'msp_gezondheidsbon' ||
                 $gateway_data['method'] == 'msp_lief' ||
                 $gateway_data['method'] == 'msp_parfumcadeaukaart' ||
                 $gateway_data['method'] == 'msp_parfumnl' ||
                 $gateway_data['method'] == 'msp_wijncadeau' ||
+                $gateway_data['method'] == 'msp_podium' ||
+                $gateway_data['method'] == 'msp_vvvgiftcard' ||
+                $gateway_data['method'] == 'msp_sportenfit' ||
+                $gateway_data['method'] == 'msp_beautyandwellness' ||
                 $gateway_data['method'] == 'msp_yourgift'
         ) {
             $api = $this->getGatewaysApi(null, $order, $gateway_data['method']);
         } else {
             $api = $this->getApi();
         }
-        $this->api->test = ($this->getConfigData("test_api") == 'test');
+        //$api->test = ($this->getConfigData("test_api") == 'test');
         $api->merchant['notification_url'] = $this->_notification_url . "?type=initial";
         $api->merchant['cancel_url'] = $this->_cancel_url;
         $api->merchant['redirect_url'] = ($this->getConfigData('use_redirect')) ? $this->_return_url : '';
@@ -891,11 +972,11 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
 
         //add shipping details, used for PayPal
         if (is_object($shipping)) {
-            $this->api->parseDeliveryAddress($shipping->getStreet(1));
+            $api->parseDeliveryAddress($shipping->getStreet(1));
 
-            if ($this->api->delivery['housenumber'] == '') {
-                $this->api->delivery['housenumber'] = $shipping->getStreet(2);
-                $this->api->delivery['address1'] = $shipping->getStreet(1);
+            if ($api->delivery['housenumber'] == '') {
+                $api->delivery['housenumber'] = $shipping->getStreet(2);
+                $api->delivery['address1'] = $shipping->getStreet(1);
             }
 
             $api->delivery['firstname'] = $shipping->getFirstname();
@@ -924,7 +1005,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
         $api->transaction['gateway'] = $gateway;
         $api->transaction['daysactive'] = $this->getConfigData("daysactive");
         if ($api->transaction['gateway'] == '') {
-            $api->transaction['gateway'] = 'connect';
+            $api->transaction['gateway'] = $this->_gateway;
         }
 
         if ($this->_gateway == 'BANKTRANS') {
@@ -933,7 +1014,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
 
 
         $ideal_issuer = "";
-        $session = Mage::getSingleton('core/session');
+        $session = Mage::getSingleton('checkout/session');
         $payment_data = $session->getData('payment_additional');
 
 
@@ -944,10 +1025,11 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
 
         if ($this->_gateway == 'IDEAL' && $ideal_issuer) {
             $api->transaction['issuer'] = $ideal_issuer;
+            $api->transaction['gateway'] = 'IDEAL';
             $api->merchant['redirect_url'] = $this->_return_url;
             $api->extravars = $ideal_issuer;
             $url = $api->startDirectXMLTransaction();
-        } elseif ($this->_gateway == 'BANKTRANS' && Mage::getStoreConfig('msp/msp_banktransfer/direct_transfer')) {
+        } elseif ($this->_gateway == 'BANKTRANS' && Mage::getStoreConfig('msp_gateways/msp_banktransfer/direct_transfer')) {
             $data = $api->startDirectBankTransfer();
 
             if (!$api->error) {
@@ -955,7 +1037,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
                 Mage::getSingleton('checkout/session')->getQuote()->save();
             }
 
-            $url = Mage::getUrl("checkout/onepage/success?utm_nooverride=1", array("_secure" => true));
+            $url = Mage::getUrl("checkout/onepage/success/", array("_secure" => true));
         } else {
             //$url = $this->api->startCheckout();
             $url = $api->startTransaction();
@@ -1063,10 +1145,15 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
                 $payment_method_code == 'msp_degrotespeelgoedwinkel' ||
                 $payment_method_code == 'msp_erotiekbon' ||
                 $payment_method_code == 'msp_fashioncheque' ||
+                $payment_method_code == 'msp_fashiongiftcard' ||
                 $payment_method_code == 'msp_gezondheidsbon' ||
                 $payment_method_code == 'msp_lief' ||
                 $payment_method_code == 'msp_parfumcadeaukaart' ||
                 $payment_method_code == 'msp_parfumnl' ||
+                $payment_method_code == 'msp_podium' ||
+                $payment_method_code == 'msp_vvvgiftcard' ||
+                $payment_method_code == 'msp_sportenfit' ||
+                $payment_method_code == 'msp_beautyandwellness' ||
                 $payment_method_code == 'msp_wijncadeau' ||
                 $payment_method_code == 'msp_yourgift'
         ) {

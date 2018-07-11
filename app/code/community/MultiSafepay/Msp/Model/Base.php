@@ -111,7 +111,7 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
             return $this->api;
         }
 
-        $isTestMode = (Mage::getStoreConfig('msp/' . $order->getPayment()->getMethodInstance()->getCode() . '/test_api_pad', $order->getStoreId()) == MultiSafepay_Msp_Model_Config_Sources_Accounts::TEST_MODE);
+        $isTestMode = (Mage::getStoreConfig('msp_gateways/' . $order->getPayment()->getMethodInstance()->getCode() . '/test_api_pad', $order->getStoreId()) == MultiSafepay_Msp_Model_Config_Sources_Accounts::TEST_MODE);
         $suffix = '';
 
         if ($isTestMode) {
@@ -123,9 +123,9 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
         $this->api->version = Mage::getConfig()->getNode('modules/MultiSafepay_Msp/version');
         $this->api->use_shipping_notification = false;
         $this->api->test = $isTestMode;
-        $this->api->merchant['account_id'] = Mage::getStoreConfig('msp/' . $order->getPayment()->getMethodInstance()->getCode() . '/account_id_pad' . $suffix, $order->getStoreId());
-        $this->api->merchant['site_id'] = Mage::getStoreConfig('msp/' . $order->getPayment()->getMethodInstance()->getCode() . '/site_id_pad' . $suffix, $order->getStoreId());
-        $this->api->merchant['site_code'] = Mage::getStoreConfig('msp/' . $order->getPayment()->getMethodInstance()->getCode() . '/secure_code_pad' . $suffix, $order->getStoreId());
+        $this->api->merchant['account_id'] = Mage::getStoreConfig('msp_gateways/' . $order->getPayment()->getMethodInstance()->getCode() . '/account_id_pad' . $suffix, $order->getStoreId());
+        $this->api->merchant['site_id'] = Mage::getStoreConfig('msp_gateways/' . $order->getPayment()->getMethodInstance()->getCode() . '/site_id_pad' . $suffix, $order->getStoreId());
+        $this->api->merchant['site_code'] = Mage::getStoreConfig('msp_gateways/' . $order->getPayment()->getMethodInstance()->getCode() . '/secure_code_pad' . $suffix, $order->getStoreId());
         $this->api->plugin['shop'] = 'Magento';
         $this->api->plugin['shop_version'] = Mage::getVersion();
         $this->api->plugin['plugin_version'] = $this->api->version;
@@ -141,7 +141,7 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
             return $this->api;
         }
 
-        $isTestMode = (Mage::getStoreConfig('msp/' . $gateway_code . '/test_api_pad', $order->getStoreId()) == MultiSafepay_Msp_Model_Config_Sources_Accounts::TEST_MODE);
+        $isTestMode = (Mage::getStoreConfig('msp_giftcards/' . $gateway_code . '/test_api_pad', $order->getStoreId()) == MultiSafepay_Msp_Model_Config_Sources_Accounts::TEST_MODE);
         $suffix = '';
 
         if ($isTestMode) {
@@ -153,9 +153,9 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
         $this->api->version = Mage::getConfig()->getNode('modules/MultiSafepay_Msp/version');
         $this->api->use_shipping_notification = false;
         $this->api->test = $isTestMode;
-        $this->api->merchant['account_id'] = Mage::getStoreConfig('msp/' . $gateway_code . '/account_id_pad' . $suffix, $order->getStoreId());
-        $this->api->merchant['site_id'] = Mage::getStoreConfig('msp/' . $gateway_code . '/site_id_pad' . $suffix, $order->getStoreId());
-        $this->api->merchant['site_code'] = Mage::getStoreConfig('msp/' . $gateway_code . '/secure_code_pad' . $suffix, $order->getStoreId());
+        $this->api->merchant['account_id'] = Mage::getStoreConfig('msp_giftcards/' . $gateway_code . '/account_id_pad' . $suffix, $order->getStoreId());
+        $this->api->merchant['site_id'] = Mage::getStoreConfig('msp_giftcards/' . $gateway_code . '/site_id_pad' . $suffix, $order->getStoreId());
+        $this->api->merchant['site_code'] = Mage::getStoreConfig('msp_giftcards/' . $gateway_code . '/secure_code_pad' . $suffix, $order->getStoreId());
         $this->api->plugin['shop'] = 'Magento';
         $this->api->plugin['shop_version'] = Mage::getVersion();
         $this->api->plugin['plugin_version'] = $this->api->version;
@@ -363,7 +363,7 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
             case "partial_refunded":
 
                 $statusMessage = Mage::helper("msp")->__("Transaction partially refunded");
-                $newState = Mage_Sales_Model_Order::STATE_CANCELED;
+                $newState = Mage_Sales_Model_Order::STATE_PROCESSING;
                 $newStatus = $statusPartialRefunded;
                 $payment = $order->getPayment();
                 $payment->setTransactionId($mspDetails['ewallet']['id']);
@@ -403,16 +403,20 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
 
             $products = $order->getAllItems();
 
-            foreach ($products as $itemId => $product) {
-                $id = $product->getProductId();
-                $stock_obj = Mage::getModel('cataloginventory/stock_item')->loadByProduct($id);
-                $stockData = $stock_obj->getData();
+            if(Mage::getStoreConfigFlag('cataloginventory/options/can_subtract')){
+				$products = $order->getAllItems();
+				
+				foreach ($products as $itemId => $product) {
+					$id = $product->getProductId();
+					$stock_obj = Mage::getModel('cataloginventory/stock_item')->loadByProduct($id);
+					$stockData = $stock_obj->getData();
 
-                $new = $stockData['qty'] - $product->getQtyOrdered();
-                $stockData['qty'] = $new;
-                $stock_obj->setData($stockData);
-                $stock_obj->save();
-            }
+					$new = $stockData['qty'] - $product->getQtyOrdered();
+					$stockData['qty'] = $new;
+					$stock_obj->setData($stockData);
+					$stock_obj->save();
+				}
+			}
 
             $order->setBaseDiscountCanceled(0)
                     ->setBaseShippingCanceled(0)
@@ -503,6 +507,10 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
                         $order->setEmailSent(true);
                         $order->save();
                         $orderSaved = true;
+                    } elseif (!$order->getEmailSent() && $mspDetails['paymentdetails']['type'] == 'BANKTRANS') {
+                        $order->sendNewOrderEmail();
+                        $order->setEmailSent(true);
+                        $order->save();
                     }
                 } elseif ($send_order_email == 'after_notify_without_cancel' && (ucfirst($order->getState()) != ucfirst(Mage_Sales_Model_Order::STATE_CANCELED))) {
                     if (!$order->getEmailSent()) {

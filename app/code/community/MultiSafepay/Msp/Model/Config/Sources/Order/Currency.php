@@ -11,20 +11,15 @@ class MultiSafepay_Msp_Model_Config_Sources_Order_Currency {
      * @return array
      */
     public function toOptionArray() {
-        return array(
-            array(
-                "value" => "EUR",
-                "label" => Mage::helper("msp")->__("EUR")
-            ),
-            array(
-                "value" => "USD",
-                "label" => Mage::helper("msp")->__("USD")
-            ),
-            array(
-                "value" => "GBP",
-                "label" => Mage::helper("msp")->__("GBP")
-            )
-        );
+		$currencies = array();
+		$codes = Mage::app()->getStore()->getAvailableCurrencyCodes(true);
+		foreach($codes as $code){
+			$currencies[] = array(
+                "value" => $code,
+                "label" => Mage::helper("msp")->__($code),
+            );
+		}
+		return $currencies;
     }
 
 }

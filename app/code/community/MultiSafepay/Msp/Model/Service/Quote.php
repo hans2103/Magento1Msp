@@ -37,6 +37,11 @@ class MultiSafepay_Msp_Model_Service_Quote extends Mage_Sales_Model_Service_Quot
         'msp_paypal',
         'msp_gezondheidsbon',
         'msp_fashioncheque',
+        'msp_fashiongiftcard',
+        'msp_podium',
+        'msp_vvvgiftcard',
+        'msp_sportenfit',
+        'msp_beautyandwellness',
     );
 
     /**

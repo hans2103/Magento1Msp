@@ -6,7 +6,81 @@
 
 <body>
 	<div id="container" style="width:900px; margin-left:100">
+	
+		<div id="version" style="background-color:#E0E0E0 ;">
+			<b>Release Notes - Magento 2.2.0 (Aug 20th, 2015)</b>
+		</div>
+		<p>
+			<b>New features</b>
+			<hr size=1 color="#E0E0E0";>
+			<ul>
+				<li>Added Klarna as payment method.</li>
+				<li>Giftcard now have their own API key config.</li> 
+				<li>Refunds now work for Klarna, Coupons and Pay After Delivery.</li>
+				<li>Success page now visible when using a payment link or pay using second chance.</li>
+				<li>FCO button now also language based.</li>
+				<li>Fallback to configured gateway code if gateway is not available within the quote.</li>
+				<li>Fallback if issuer is set but no gateway, then somehow we lost the gateway although iDEAL was selected. We now default to iDEAL.</li>
+				<li>Added Beauty and Wellness Giftcard.</li>
+				<li>Added Sport&Fit Giftcard.</li>
+				<li>Added VVV Giftcard.</li>
+				<li>Added PODIUM Giftcard.</li>
+				<li>Added missing Gifcard logos.</li>
+				<li>All available currencies can be selected when configuring the gateway.</li>
+				<li>Added option to remove all buttons to the normal checkout for when only FCO is enabled.</li>
+			</ul>
+			<br/>			
+			
+			<b>Improvements</b>
+			<hr size=1 color="#E0E0E0";>
+			<ul>
+				<li>Updated order of FastCheckout in menu.</li>
+				<li>MultiSafepay menu added.</li>
+				<li>Separated some configurations.</li>
+			</ul>
+			<br/>			
 
+			<b>Changes</b>
+			<hr size=1 color="#E0E0E0";>
+			<ul>
+				<li>Disabled giftcard Ebon.</li>
+				<li>Return-urls are now always ending with only /success/ for better support for GUA module.</li>
+				<li>Disabled FastCheckout payment method in normal checkout as this is causing confusion for merchants.</li>
+				<li>Don't set state to cancelled when partial refunded as it still has to be processed partially.</li>
+				<li>Disabled some giftcards that are for one merchant.</li>
+				<li>Added FCO button on login/register page.</li>
+				<li>Redirect url always added for PAD.</li>
+				<li>Check for stock settings before processing stock.</li>
+				<li>Now use current selected currency to recalculate fee. Fee is always configured in EUR.</li>
+				<li>Removed old package file.</li>
+				<li>Removed unused code.</li>
+				<li>Set checkout session to be used instead of core for storing issuer data.</li>
+				<li>Update xmlescape function.</li>
+			</ul>
+			<br/>			
+			
+			<b>Fixes</b>
+			<hr size=1 color="#E0E0E0";>
+			<ul>
+				<li>Fixed Store name from order is used for manual paylink, not the admin site.</li>
+				<li>Fixed some undefined fields causing a Notice error when PHP use a STRICT error logging.</li>
+				<li>Fixed success url for direct banktransfer.</li>
+				<li>Fixed some issues with the customer groups selected in the configuration of the gateways.</li>
+				<li>Fixed prices including tax (Solved error 1027).</li>
+				<li>Fixed some encoding issue.</li>
+				<li>Fixed When sending the order confirmation after a payment, then this is ignored for a banktransfer.</li>
+				<li>Fixed fee now displayed correctly when using multicurrency.</li>
+				<li>Fixed bug with giftcard data and delivery data.</li>
+			</ul>
+			
+		</p>
+		<br/>
+		<br/>
+
+	
+
+	
+	
 	
 	<!--  Version 2.1.2 --->
 	

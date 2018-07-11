@@ -12,23 +12,79 @@ class MultiSafepay_Msp_Model_Gateway_PayAfter extends MultiSafepay_Msp_Model_Gat
     public $_gateway = "PAYAFTER";
     protected $_formBlockType = 'msp/bno';
     protected $_canUseCheckout = true;
+    
+    public $giftcards = array(
+        'msp_webgift',
+        'msp_ebon',
+        'msp_babygiftcard',
+        'msp_boekenbon',
+        'msp_erotiekbon',
+        'msp_parfumnl',
+        'msp_parfumcadeaukaart',
+        'msp_degrotespeelgoedwinkel',
+        'msp_yourgift',
+        'msp_wijncadeau',
+        'msp_lief',
+        'msp_gezondheidsbon',
+        'msp_fashioncheque',
+        'msp_fashiongiftcard',
+        'msp_podium',
+        'msp_vvvgiftcard',
+        'msp_sportenfit',
+        'msp_beautyandwellness',
+    );
+
+    
+    public $gateways = array(
+        'msp_ideal',
+        'msp_payafter',
+        'msp_klarna',
+        'msp_mistercash',
+        'msp_visa',
+        'msp_mastercard',
+        'msp_banktransfer',
+        'msp_maestro',
+        'msp_paypal',
+        'msp_giropay',
+        'msp_multisafepay',
+        'msp_directebanking',
+        'msp_directdebit',
+        'msp_amex',
+     
+    );
+
+    
+    
 
     public function __construct() {
         $availableByIP = true;
-        if (Mage::getStoreConfig('msp/msp_payafter/ip_check')) {
+
+        if (Mage::getStoreConfig('msp_gateways/msp_payafter/ip_check')) {
             if ($this->_isTestMode()) {
-                $data = Mage::getStoreConfig('msp/msp_payafter/ip_filter_test');
+                $data = Mage::getStoreConfig('msp_gateways/msp_payafter/ip_filter_test');
             } else {
-                $data = Mage::getStoreConfig('msp/msp_payafter/ip_filter');
+                $data = Mage::getStoreConfig('msp_gateways/msp_payafter/ip_filter');
             }
 
             if (!in_array($_SERVER["REMOTE_ADDR"], explode(';', $data))) {
                 $availableByIP = false;
             }
         }
+        
+        
+        
+	        if(in_array($this->_code, $this->gateways)){
+		        $this->_configCode = 'msp_gateways';
+		        $this->_module = 'msp_gateways';
+            	$currencies = explode(',', Mage::getStoreConfig('msp_gateways/' . $this->_code . '/allowed_currency'));
+				$isAllowConvert = Mage::getStoreConfigFlag('msp/settings/allow_convert_currency');
+			}elseif(in_array($this->_code, $this->giftcards)){   
+				$this->_configCode = 'msp_giftcards';  
+				$this->_module = 'msp_giftcards';       	
+				$currencies = explode(',', Mage::getStoreConfig('msp_giftcards/' . $this->_code . '/allowed_currency'));
+				$isAllowConvert = Mage::getStoreConfigFlag('msp/settings/allow_convert_currency');
+			}
 
-        $currencies = explode(',', Mage::getStoreConfig('msp/' . $this->_code . '/allowed_currency'));
-        $isAllowConvert = Mage::getStoreConfigFlag('msp/settings/allow_convert_currency');
 
         if ($isAllowConvert) {
             $availableByCurrency = true;
@@ -39,7 +95,9 @@ class MultiSafepay_Msp_Model_Gateway_PayAfter extends MultiSafepay_Msp_Model_Gat
                 $availableByCurrency = false;
             }
         }
+       
         $this->_canUseCheckout = $availableByIP && $availableByCurrency;
+        
     }
 
     public function getOrderPlaceRedirectUrl() {
@@ -70,7 +128,7 @@ class MultiSafepay_Msp_Model_Gateway_PayAfter extends MultiSafepay_Msp_Model_Gat
      * @return bool
      */
     protected function _isTestMode($store = null) {
-        $mode = Mage::getStoreConfig('msp/msp_payafter/test_api_pad', $store);
+        $mode = Mage::getStoreConfig('msp_gateways/msp_payafter/test_api_pad', $store);
 
         return $mode == MultiSafepay_Msp_Model_Config_Sources_Accounts::TEST_MODE;
     }
