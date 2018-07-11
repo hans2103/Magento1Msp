@@ -7,14 +7,16 @@
  */
 require_once(Mage::getBaseDir('lib') . DS . 'multisafepay' . DS . 'MultiSafepay.combined.php');
 
-class MultiSafepay_Msp_CheckoutController extends Mage_Core_Controller_Front_Action {
+class MultiSafepay_Msp_CheckoutController extends Mage_Core_Controller_Front_Action
+{
 
     protected $base;
 
     /**
      * Checkout redirect -> start checkout transaction
      */
-    public function redirectAction() {
+    public function redirectAction()
+    {
         /** @var $session Mage_Checkout_Model_Session */
         $session = Mage::getSingleton('checkout/session');
 
@@ -56,7 +58,8 @@ class MultiSafepay_Msp_CheckoutController extends Mage_Core_Controller_Front_Act
     /**
      * Agreements page
      */
-    public function agreementsAction() {
+    public function agreementsAction()
+    {
         $this->loadLayout();
         $block = $this->getLayout()->createBlock(
                 'Mage_Checkout_Block_Agreements', '', array('template' => 'msp/agreements.phtml')
@@ -67,7 +70,8 @@ class MultiSafepay_Msp_CheckoutController extends Mage_Core_Controller_Front_Act
     /**
      * Return after transaction
      */
-    public function returnAction() {
+    public function returnAction()
+    {
         $this->notificationAction(true);
         $transactionId = $this->getRequest()->getQuery('transactionid');
 
@@ -107,14 +111,16 @@ class MultiSafepay_Msp_CheckoutController extends Mage_Core_Controller_Front_Act
     /**
      * Cancel action
      */
-    public function cancelAction() {
+    public function cancelAction()
+    {
         $this->_redirect("checkout", array("_secure" => true));
     }
 
     /**
      * Checks if this is a fastcheckout notification
      */
-    public function isFCONotification($transId) {
+    public function isFCONotification($transId)
+    {
         $storeId = Mage::app()->getStore()->getStoreId();
         $config = Mage::getStoreConfig('mspcheckout/settings', $storeId);
 
@@ -136,7 +142,8 @@ class MultiSafepay_Msp_CheckoutController extends Mage_Core_Controller_Front_Act
     /**
      * Status notification
      */
-    function notificationAction($return = false) {
+    function notificationAction($return = false)
+    {
         $transactionId = $this->getRequest()->getQuery('transactionid');
         $isInitial = ($this->getRequest()->getQuery('type') == 'initial') ? true : false;
         $isShipping = ($this->getRequest()->getQuery('type') == 'shipping') ? true : false;
@@ -191,7 +198,8 @@ class MultiSafepay_Msp_CheckoutController extends Mage_Core_Controller_Front_Act
     /**
      * @return bool
      */
-    public function isShippingMethodsNotification() {
+    public function isShippingMethodsNotification()
+    {
         // Check for mandatory parameters
         $country = $this->getRequest()->getQuery('country');
         $countryCode = $this->getRequest()->getQuery('countrycode');
@@ -207,7 +215,8 @@ class MultiSafepay_Msp_CheckoutController extends Mage_Core_Controller_Front_Act
     /**
      * @param $model
      */
-    public function handleShippingMethodsNotification($model) {
+    public function handleShippingMethodsNotification($model)
+    {
         $country = $this->getRequest()->getQuery('country');
         $countryCode = $this->getRequest()->getQuery('countrycode');
         $transactionId = $this->getRequest()->getQuery('transactionid');
@@ -221,7 +230,8 @@ class MultiSafepay_Msp_CheckoutController extends Mage_Core_Controller_Front_Act
     /**
      * @param $model MultiSafepay_Msp_Model_Checkout
      */
-    public function handleShippingRatesNotification($model) {
+    public function handleShippingRatesNotification($model)
+    {
         $transactionId = $this->getRequest()->getQuery('transactionid');
         $countryCode = $this->getRequest()->getQuery('countrycode');
         $zipCode = $this->getRequest()->getQuery('zipcode');

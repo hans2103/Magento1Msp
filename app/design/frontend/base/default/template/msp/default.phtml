@@ -35,25 +35,25 @@ $_code = $_method->getCode()
         <dd>
           <ul  class="form-list" id="payment_form_<?php echo $_code ?>" style="display: none;">
             <li>
-        <?php echo $instruction ?>
+              <?php echo $instruction ?>
             </li>
           </ul>
         </dd>
-      <?php } elseif ($html = $this->getPaymentMethodFormHtml($_method)) { ?>
+    <?php } elseif ($html = $this->getPaymentMethodFormHtml($_method)) { ?>
         <dd>
-        <?php echo $html; ?>
+          <?php echo $html; ?>
         </dd>
     <?php } ?>
 <?php } elseif ($_code == 'msp_banktransfer') { ?>
     <dd>
       <ul class="form-list" id="payment_form_<?php echo $_code ?>" style="display: none;">
         <li>
-    <?php if ($_code == 'msp_banktransfer') { ?>
+          <?php if ($_code == 'msp_banktransfer') { ?>
               <input name='payment[accountid]'            value=""   id="accountid"/>            <label for="accountid"            style="width:200px!important;">Rekeningnummer:</label><br />
               <input name='payment[accountholdername]'    value=""   id="accountholdername"/>    <label for="accountholdername"    style="width:200px!important;">Naam rekeninghouder:</label><br />
               <input name='payment[accountholdercity]'    value=""   id="accountholdercity"/>    <label for="accountholdercity"    style="width:200px!important;">Plaats Bank:</label><br />
               <input name='payment[accountholdercountry]' value="NL" id="accountholdercountry"/> <label for="accountholdercountry" style="width:200px!important;">Landcode bank:</label><br />
-    <?php } ?>
+          <?php } ?>
         </li>
       </ul>
     </dd>
@@ -68,7 +68,7 @@ $_code = $_method->getCode()
         <dd>
           <ul class="form-list" id="payment_form_<?php echo $_code ?>" style="display: none;">
             <li>
-        <?php echo $instruction ?>
+              <?php echo $instruction ?>
             </li>
           </ul>
         </dd>

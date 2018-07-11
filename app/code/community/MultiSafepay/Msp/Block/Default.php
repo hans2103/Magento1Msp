@@ -5,7 +5,8 @@
  * @category MultiSafepay
  * @package  MultiSafepay_Msp
  */
-class MultiSafepay_Msp_Block_Default extends Mage_Payment_Block_Form {
+class MultiSafepay_Msp_Block_Default extends Mage_Payment_Block_Form
+{
 
     public $_code;
     public $_issuer;
@@ -16,7 +17,8 @@ class MultiSafepay_Msp_Block_Default extends Mage_Payment_Block_Form {
     /**
      * Construct
      */
-    protected function _construct() {
+    protected function _construct()
+    {
         $this->setTemplate('msp/default.phtml');
         parent::_construct();
     }

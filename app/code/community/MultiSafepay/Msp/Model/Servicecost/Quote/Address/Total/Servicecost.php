@@ -1,6 +1,7 @@
 <?php
 
-class MultiSafepay_Msp_Model_Servicecost_Quote_Address_Total_Servicecost extends Mage_Sales_Model_Quote_Address_Total_Abstract {
+class MultiSafepay_Msp_Model_Servicecost_Quote_Address_Total_Servicecost extends Mage_Sales_Model_Quote_Address_Total_Abstract
+{
 
     protected $_method = '';
     protected $_rate = '';
@@ -17,9 +18,13 @@ class MultiSafepay_Msp_Model_Servicecost_Quote_Address_Total_Servicecost extends
         'msp_klarna',
         'msp_mistercash',
         'msp_visa',
+        'msp_paysafecard',
         'msp_eps',
         'msp_ferbuy',
         'msp_mastercard',
+        'msp_ing',
+        'msp_kbc',
+        'msp_belfius',
         'msp_banktransfer',
         'msp_maestro',
         'msp_paypal',
@@ -29,7 +34,7 @@ class MultiSafepay_Msp_Model_Servicecost_Quote_Address_Total_Servicecost extends
         'msp_babygiftcard',
         'msp_boekenbon',
         'msp_erotiekbon',
-        'msp_giveacard',
+        'msp_givacard',
         'msp_parfumnl',
         'msp_parfumcadeaukaart',
         'msp_degrotespeelgoedwinkel',
@@ -55,7 +60,7 @@ class MultiSafepay_Msp_Model_Servicecost_Quote_Address_Total_Servicecost extends
         'msp_babygiftcard',
         'msp_boekenbon',
         'msp_erotiekbon',
-        'msp_giveacard',
+        'msp_givacard',
         'msp_parfumnl',
         'msp_parfumcadeaukaart',
         'msp_degrotespeelgoedwinkel',
@@ -79,6 +84,7 @@ class MultiSafepay_Msp_Model_Servicecost_Quote_Address_Total_Servicecost extends
         'msp_klarna',
         'msp_mistercash',
         'msp_visa',
+        'msp_paysafecard',
         'msp_eps',
         'msp_ferbuy',
         'msp_mastercard',
@@ -90,24 +96,32 @@ class MultiSafepay_Msp_Model_Servicecost_Quote_Address_Total_Servicecost extends
         'msp_directebanking',
         'msp_directdebit',
         'msp_amex',
+        'msp_ing',
+        'msp_kbc',
+        'msp_belfius',
     );
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->setCode('servicecost');
     }
 
-    public function collect(Mage_Sales_Model_Quote_Address $address) {
+    public function collect(Mage_Sales_Model_Quote_Address $address)
+    {
         if (Mage::app()->getFrontController()->getRequest()->isSecure())
             $protocol = 'https://';
         else {
             $protocol = 'http://';
         }
-        $currentUrl = $protocol . $_SERVER["SERVER_NAME"] . $_SERVER["REQUEST_URI"];
+
+        if (isset($_SERVER["SERVER_NAME"]) && isset($_SERVER["REQUEST_URI"])) {
+            $currentUrl = $protocol . $_SERVER["SERVER_NAME"] . $_SERVER["REQUEST_URI"];
+        } else {
+            $currentUrl = null;
+        }
 
         if ($currentUrl != Mage::helper('checkout/cart')->getCartUrl()) {
             $quote = $address->getQuote();
-            $quoteData = $quote->getData();
-            $grandTotal = $quoteData['grand_total'];
             $code = $quote->getPayment()->getMethod();
 
 
@@ -179,7 +193,8 @@ class MultiSafepay_Msp_Model_Servicecost_Quote_Address_Total_Servicecost extends
         }
     }
 
-    public function fetch(Mage_Sales_Model_Quote_Address $address) {
+    public function fetch(Mage_Sales_Model_Quote_Address $address)
+    {
         $this->_method = $address->getQuote()->getPayment()->getMethod();
         $label = Mage::helper('msp')->getFeeLabel($this->_method);
         $quote = $address->getQuote();
@@ -210,7 +225,8 @@ class MultiSafepay_Msp_Model_Servicecost_Quote_Address_Total_Servicecost extends
         return $this;
     }
 
-    public function getServicecostAmount($code, $address) {
+    public function getServicecostAmount($code, $address)
+    {
 
 
         if (in_array($code, $this->gateways)) {
@@ -249,7 +265,8 @@ class MultiSafepay_Msp_Model_Servicecost_Quote_Address_Total_Servicecost extends
         return (float) $this->_convertFeeCurrency($total_fee, MultiSafepay_Msp_Helper_Data::CONVERT_TO_CURRENCY_CODE, Mage::app()->getStore()->getCurrentCurrencyCode());
     }
 
-    public function getServicecostTaxAmount($code, $address) {
+    public function getServicecostTaxAmount($code, $address)
+    {
 
 
         if (in_array($code, $this->gateways)) {
@@ -285,7 +302,8 @@ class MultiSafepay_Msp_Model_Servicecost_Quote_Address_Total_Servicecost extends
         return $tax;
     }
 
-    protected function _convertFeeCurrency($amount, $currentCurrencyCode, $targetCurrencyCode) {
+    protected function _convertFeeCurrency($amount, $currentCurrencyCode, $targetCurrencyCode)
+    {
         if ($currentCurrencyCode == $targetCurrencyCode) {
             return $amount;
         }

@@ -1,8 +1,10 @@
 <?php
 
-class MultiSafepay_Msp_Model_Servicecost_Invoice_Totals extends Mage_Sales_Model_Order_Invoice_Total_Subtotal {
+class MultiSafepay_Msp_Model_Servicecost_Invoice_Totals extends Mage_Sales_Model_Order_Invoice_Total_Subtotal
+{
 
-    public function collect(Mage_Sales_Model_Order_Invoice $invoice) {
+    public function collect(Mage_Sales_Model_Order_Invoice $invoice)
+    {
         $order = $invoice->getOrder();
         $invoice->setServicecost($order->getServicecost());
         $invoice->setBaseServicecost($order->getBaseServicecost());

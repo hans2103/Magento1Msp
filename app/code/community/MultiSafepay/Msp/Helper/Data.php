@@ -5,7 +5,8 @@
  * @category MultiSafepay
  * @package  MultiSafepay_Msp
  */
-class MultiSafepay_Msp_Helper_Data extends Mage_Core_Helper_Abstract {
+class MultiSafepay_Msp_Helper_Data extends Mage_Core_Helper_Abstract
+{
 
     const CONVERT_TO_CURRENCY_CODE = 'EUR';
 
@@ -15,7 +16,8 @@ class MultiSafepay_Msp_Helper_Data extends Mage_Core_Helper_Abstract {
      * @param $method Mage_Payment_Model_Method_Abstract
      * @return string
      */
-    public function getPaymentTitle($method) {
+    public function getPaymentTitle($method)
+    {
         $return = '';
 
         $paymentCode = strtolower($method->getCode());
@@ -47,7 +49,8 @@ class MultiSafepay_Msp_Helper_Data extends Mage_Core_Helper_Abstract {
      *
      * @return string
      */
-    public function getFeeLabel($code) {
+    public function getFeeLabel($code)
+    {
         $feeDescription = Mage::getStoreConfig('msp_gateways/' . $code . '/fee_description');
 
         return $feeDescription ? $feeDescription : $this->__('MultiSafepay servicekosten');
@@ -58,7 +61,8 @@ class MultiSafepay_Msp_Helper_Data extends Mage_Core_Helper_Abstract {
      *
      * @return bool
      */
-    public function isAdmin() {
+    public function isAdmin()
+    {
         if (Mage::app()->getStore()->isAdmin() || Mage::getDesign()->getArea() == 'adminhtml') {
             return true;
         }
@@ -71,7 +75,8 @@ class MultiSafepay_Msp_Helper_Data extends Mage_Core_Helper_Abstract {
      *
      * @return bool
      */
-    public function isEnterprise() {
+    public function isEnterprise()
+    {
         return (bool) Mage::getConfig()->getModuleConfig('Enterprise_Enterprise')->version;
     }
 
@@ -82,7 +87,8 @@ class MultiSafepay_Msp_Helper_Data extends Mage_Core_Helper_Abstract {
      * @param $status string
      * @return bool
      */
-    public function restoreCart(Mage_Sales_Model_Quote $quote, $status) {
+    public function restoreCart(Mage_Sales_Model_Quote $quote, $status)
+    {
         $storeId = $quote->getStoreId();
         $gatewayMethod = $quote->getPayment()->getMethod();
 
@@ -114,7 +120,8 @@ class MultiSafepay_Msp_Helper_Data extends Mage_Core_Helper_Abstract {
      *
      * @return string
      */
-    protected function _getLangISO2() {
+    protected function _getLangISO2()
+    {
         $locale = explode('_', Mage::app()->getLocale()->getLocale());
         if (is_array($locale) && isset($locale[0])) {
             return strtolower($locale[0]);

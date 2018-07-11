@@ -5,7 +5,8 @@
  * @category MultiSafepay
  * @package  MultiSafepay_Msp
  */
-class MultiSafepay_Msp_Model_Service_Quote extends Mage_Sales_Model_Service_Quote {
+class MultiSafepay_Msp_Model_Service_Quote extends Mage_Sales_Model_Service_Quote
+{
 
     public $availablePaymentMethodCodes = array(
         'msp',
@@ -18,8 +19,12 @@ class MultiSafepay_Msp_Model_Service_Quote extends Mage_Sales_Model_Service_Quot
         'msp_mistercash',
         'msp_visa',
         'msp_eps',
+        'msp_paysafecard',
         'msp_ferbuy',
         'msp_mastercard',
+        'msp_ing',
+        'msp_kbc',
+        'msp_belfius',
         'msp_banktransfer',
         'msp_maestro',
         'msp_paypal',
@@ -28,7 +33,7 @@ class MultiSafepay_Msp_Model_Service_Quote extends Mage_Sales_Model_Service_Quot
         'msp_babygiftcard',
         'msp_boekenbon',
         'msp_erotiekbon',
-        'msp_giveacard',
+        'msp_givacard',
         'msp_parfumnl',
         'msp_parfumcadeaukaart',
         'msp_degrotespeelgoedwinkel',
@@ -53,7 +58,8 @@ class MultiSafepay_Msp_Model_Service_Quote extends Mage_Sales_Model_Service_Quot
     /**
      * @return Mage_Sales_Model_Order
      */
-    public function submitOrder() {
+    public function submitOrder()
+    {
         $order = parent::submitOrder();
 
         if (Mage::app()->getStore()->isAdmin()) {

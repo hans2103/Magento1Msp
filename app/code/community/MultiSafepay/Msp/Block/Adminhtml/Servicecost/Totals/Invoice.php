@@ -1,6 +1,7 @@
 <?php
 
-class MultiSafepay_Msp_Block_Adminhtml_Servicecost_Totals_Invoice extends Mage_Adminhtml_Block_Sales_Order_Invoice_Totals {
+class MultiSafepay_Msp_Block_Adminhtml_Servicecost_Totals_Invoice extends Mage_Adminhtml_Block_Sales_Order_Invoice_Totals
+{
     /* protected function _initTotals() {
       parent::_initTotals();
 
@@ -23,7 +24,8 @@ class MultiSafepay_Msp_Block_Adminhtml_Servicecost_Totals_Invoice extends Mage_A
       return $this;
       } */
 
-    protected function _initTotals() {
+    protected function _initTotals()
+    {
         parent::_initTotals();
 
         $source = $this->getSource();
@@ -45,7 +47,8 @@ class MultiSafepay_Msp_Block_Adminhtml_Servicecost_Totals_Invoice extends Mage_A
         return $this;
     }
 
-    protected function _convertFeeCurrency($amount, $currentCurrencyCode, $targetCurrencyCode) {
+    protected function _convertFeeCurrency($amount, $currentCurrencyCode, $targetCurrencyCode)
+    {
         if ($currentCurrencyCode == $targetCurrencyCode) {
             return $amount;
         }

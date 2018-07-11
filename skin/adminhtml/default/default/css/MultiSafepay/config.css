@@ -104,6 +104,33 @@
   padding-top: 12px;
 }
 
+#msp_gateways_msp_ing-head{
+  background-image: url("../../images/msp/nl/msp_ing.png");
+  background-position-x: 0px;
+  background-repeat: no-repeat;
+  padding-left: 60px;
+  min-height: 30px;
+  padding-top: 12px;
+}
+
+#msp_gateways_msp_kbc-head{
+  background-image: url("../../images/msp/nl/msp_kbc.png");
+  background-position-x: 0px;
+  background-repeat: no-repeat;
+  padding-left: 60px;
+  min-height: 30px;
+  padding-top: 12px;
+}
+
+#msp_gateways_msp_belfius-head{
+  background-image: url("../../images/msp/nl/msp_belfius.png");
+  background-position-x: 0px;
+  background-repeat: no-repeat;
+  padding-left: 60px;
+  min-height: 30px;
+  padding-top: 12px;
+}
+
 #msp_gateways_msp_banktransfer-head{
   background-image: url("../../images/msp/nl/msp_banktransfer.png");
   background-position-x: 0px;
@@ -122,6 +149,16 @@
   padding-top: 12px;
 }
 
+/* Start Paysafecard */
+#msp_gateways_msp_paysafecard-head{
+  background-image: url("../../images/msp/nl/msp_paysafecard.png");
+  background-position-x: 0px;
+  background-repeat: no-repeat;
+  padding-left: 60px;
+  min-height: 30px;
+  padding-top: 12px;
+}
+/* End Paysafecard */
 #msp_gateways_msp_maestro-head{
   background-image: url("../../images/msp/nl/msp_maestro.png");
   background-position-x: 0px;
@@ -229,8 +266,8 @@
   min-height: 30px;
   padding-top: 12px;
 }
-#msp_giftcards_msp_giveacard-head{
-  background-image: url("../../images/msp/nl/msp_giveacard.png");
+#msp_giftcards_msp_givacard-head{
+  background-image: url("../../images/msp/nl/msp_givacard.png");
   background-position-x: 0px;
   background-repeat: no-repeat;
   padding-left: 60px;

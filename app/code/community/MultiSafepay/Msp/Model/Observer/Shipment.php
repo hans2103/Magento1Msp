@@ -5,7 +5,8 @@
  * @category MultiSafepay
  * @package  MultiSafepay_Msp
  */
-class MultiSafepay_Msp_Model_Observer_Shipment extends MultiSafepay_Msp_Model_Observer_Abstract {
+class MultiSafepay_Msp_Model_Observer_Shipment extends MultiSafepay_Msp_Model_Observer_Abstract
+{
 
     public $availablePaymentMethodCodes = array(
         'msp_payafter',
@@ -13,7 +14,8 @@ class MultiSafepay_Msp_Model_Observer_Shipment extends MultiSafepay_Msp_Model_Ob
         'msp_klarna',
     );
 
-    public function sales_order_shipment_save_after(Varien_Event_Observer $observer) {
+    public function sales_order_shipment_save_after(Varien_Event_Observer $observer)
+    {
         /** @var $event Varien_Event */
         $event = $observer->getEvent();
 

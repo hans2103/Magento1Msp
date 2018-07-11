@@ -5,12 +5,14 @@
  * @category MultiSafepay
  * @package  MultiSafepay_Msp
  */
-class MultiSafepay_Msp_Model_Config_Sources_Order_Currency {
+class MultiSafepay_Msp_Model_Config_Sources_Order_Currency
+{
 
     /**
      * @return array
      */
-    public function toOptionArray() {
+    public function toOptionArray()
+    {
         $currencies = array();
         //$storeId = Mage::app()->getRequest()->getParam('store', 0);
         //$codes = Mage::app()->getStore($storeId)->getAvailableCurrencyCodes(true);

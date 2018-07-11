@@ -7,7 +7,8 @@
  */
 require_once(Mage::getBaseDir('lib') . DS . 'multisafepay' . DS . 'MultiSafepay.combined.php');
 
-class MultiSafepay_Msp_Model_Api_Paylink {
+class MultiSafepay_Msp_Model_Api_Paylink
+{
 
     public $test = false;
     public $custom_api;
@@ -26,7 +27,6 @@ class MultiSafepay_Msp_Model_Api_Paylink {
         'id' => '',
         'currency' => '',
         'amount' => '',
-        'days_active' => '',
         "gateway_reset"
     );
     public $signature;
@@ -49,7 +49,11 @@ class MultiSafepay_Msp_Model_Api_Paylink {
         //'msp_einvoice', for now we dont allow einvoice manual transaction requests
         'msp_mistercash' => 'MISTERCASH',
         'msp_visa' => 'VISA',
+        'msp_paysafecard => PSAFECARD',
         'msp_eps' => 'EPS',
+        'msp_ing' => 'ING',
+        'msp_kbc' => 'KBC',
+        'msp_belfius' => 'Belfius',
         'msp_ferbuy' => 'FERBUY',
         'msp_mastercard' => 'MASTERCARD',
         'msp_banktransfer' => 'BANKTRANS',
@@ -60,7 +64,7 @@ class MultiSafepay_Msp_Model_Api_Paylink {
         'msp_babygiftcard' => 'BABYGIFTCARD',
         'msp_boekenbon' => 'BOEKENBON',
         'msp_erotiekbon' => 'EROTIEKBON',
-        'msp_giveacard' => 'GIVEACARD',
+        'msp_givacard' => 'GIVACARD',
         'msp_parfumnl' => 'PARFUMNL',
         'msp_parfumcadeaukaart' => 'PARFUMCADEAUKAART',
         'msp_degrotespeelgoedwinkel' => 'DEGROTESPEELGOEDWINKEL',
@@ -68,7 +72,7 @@ class MultiSafepay_Msp_Model_Api_Paylink {
         'msp_multisafepay' => 'WALLET',
         'msp_directebanking' => 'DIRECTBANK',
         'msp_directdebit' => 'DIRDEB',
-        'msp_amex',
+        'msp_amex'=> 'AMEX',
         'msp_yourgift',
         'msp_wijncadeau',
         'msp_lief',
@@ -86,7 +90,8 @@ class MultiSafepay_Msp_Model_Api_Paylink {
      *
      * @return string
      */
-    public function getPaymentLink($order) {
+    public function getPaymentLink($order)
+    {
         $this->log('Request payment link for manual order');
 
         $this->checkSettings();
@@ -151,8 +156,7 @@ class MultiSafepay_Msp_Model_Api_Paylink {
             $mapi->transaction['gateway'] = $this->availablePaymentMethodCodes[$pm_code];
         }
         $mapi->transaction['items'] = $items;
-        $mapi->transaction['daysactive'] = $this->transaction['days_active'];
-
+        
         $url = $mapi->startTransaction();
 
         if ($mapi->error) {
@@ -171,7 +175,8 @@ class MultiSafepay_Msp_Model_Api_Paylink {
      *
      * @return void
      */
-    public function checkSettings() {
+    public function checkSettings()
+    {
         $this->merchant['account_id'] = trim($this->merchant['account_id']);
         $this->merchant['site_id'] = trim($this->merchant['site_id']);
         $this->merchant['api_key'] = trim($this->merchant['api_key']);
@@ -183,7 +188,8 @@ class MultiSafepay_Msp_Model_Api_Paylink {
      *
      * @return void
      */
-    public function createSignature() {
+    public function createSignature()
+    {
         $this->signature = sha1(
                 $this->merchant['site_id'] .
                 $this->merchant['security_code'] .
@@ -196,7 +202,8 @@ class MultiSafepay_Msp_Model_Api_Paylink {
      *
      * @return string
      */
-    public function getApiUrl() {
+    public function getApiUrl()
+    {
         if ($this->custom_api) {
             return $this->custom_api;
         }
@@ -211,7 +218,8 @@ class MultiSafepay_Msp_Model_Api_Paylink {
     /**
      * Check if a certain MultiSafepay status is already in the order history (to prevent doubles)
      */
-    public function isPaymentLinkCreated($order) {
+    public function isPaymentLinkCreated($order)
+    {
         $history = $order->getAllStatusHistory();
         foreach ($history as $status) {
             if (strpos($status->getComment(), 'Manual Payment link') !== false) {
@@ -226,14 +234,16 @@ class MultiSafepay_Msp_Model_Api_Paylink {
      *
      * @return mixed
      */
-    public function isDebug() {
+    public function isDebug()
+    {
         return $this->getConfigData('debug');
     }
 
     /**
      * @return void
      */
-    public function log() {
+    public function log()
+    {
         $argv = func_get_args();
         $data = array_shift($argv);
 

@@ -9,7 +9,7 @@
 <config>
   <modules>
     <MultiSafepay_Msp>
-      <version>2.3.3</version>
+      <version>2.3.4</version>
     </MultiSafepay_Msp>
   </modules>
   <global>
@@ -325,6 +325,21 @@
         <model>msp/gateway_visa</model>
         <title>MSP Visa</title>
       </msp_visa>
+       <msp_ing>
+        <active>1</active>
+        <model>msp/gateway_ing</model>
+        <title>MSP ING HomePay</title>
+      </msp_ing>
+       <msp_kbc>
+        <active>1</active>
+        <model>msp/gateway_kbc</model>
+        <title>MSP KBC/CBC</title>
+      </msp_kbc>
+       <msp_belfius>
+        <active>1</active>
+        <model>msp/gateway_belfius</model>
+        <title>MSP Belfius</title>
+      </msp_belfius>
       <msp_mastercard>
         <active>1</active>
         <model>msp/gateway_mastercard</model>
@@ -345,6 +360,13 @@
         <model>msp/gateway_paypal</model>
         <title>MSP PayPal</title>
       </msp_paypal>
+      <!-- Start Paysafecard -->
+      <msp_paysafecard>
+        <active>1</active>
+        <model>msp/gateway_paysafecard</model>
+        <title>MSP paysafecard</title>
+      </msp_paysafecard>      
+      <!-- End Paysafecard -->
       <msp_webgift>
         <active>1</active>
         <model>msp/gateway_webgift</model>
@@ -380,11 +402,11 @@
         <model>msp/gateway_erotiekbon</model>
         <title>MSP Erotiekbon</title>
       </msp_erotiekbon>
-      <msp_giveacard>
+      <msp_givacard>
         <active>1</active>
-        <model>msp/gateway_giveacard</model>
-        <title>MSP Giveacard</title>
-      </msp_giveacard>
+        <model>msp/gateway_givacard</model>
+        <title>MSP Givacard</title>
+      </msp_givacard>
       <msp_parfumnl>
         <active>1</active>
         <model>msp/gateway_parfumnl</model>
@@ -569,7 +591,7 @@
       <msp_mistercash translate="title" module="msp">
         <active>0</active>
         <model>msp/gateway_mistercash</model>
-        <title>MisterCash</title>
+        <title>Bancontact</title>
         <allowed_currency>EUR</allowed_currency>
         <lang>nl</lang>
       </msp_mistercash>
@@ -580,6 +602,27 @@
         <allowed_currency>EUR</allowed_currency>
         <lang>nl</lang>
       </msp_visa>
+      <msp_ing translate="title" module="msp">
+        <active>0</active>
+        <model>msp/gateway_ing</model>
+        <title>ING HomePay</title>
+        <allowed_currency>EUR</allowed_currency>
+        <lang>nl</lang>
+      </msp_ing>
+      <msp_kbc translate="title" module="msp">
+        <active>0</active>
+        <model>msp/gateway_kbc</model>
+        <title>KBC/CBC</title>
+        <allowed_currency>EUR</allowed_currency>
+        <lang>nl</lang>
+      </msp_kbc>
+      <msp_belfius translate="title" module="msp">
+        <active>0</active>
+        <model>msp/gateway_belfius</model>
+        <title>Belfius</title>
+        <allowed_currency>EUR</allowed_currency>
+        <lang>nl</lang>
+      </msp_belfius>
       <msp_mastercard translate="title" module="msp">
         <active>0</active>
         <model>msp/gateway_mastercard</model>
@@ -608,6 +651,15 @@
         <allowed_currency>EUR</allowed_currency>
         <lang>nl</lang>
       </msp_paypal>
+      <!-- Start Paysafecard -->
+      <msp_paysafecard translate="title" module="msp">
+        <active>0</active>
+        <model>msp/gateway_paysafecard</model>
+        <title>paysafecard</title>
+        <allowed_currency>EUR</allowed_currency>
+        <lang>nl</lang>
+      </msp_paysafecard>      
+      <!-- End Paysafecard -->
       <msp_giropay translate="title" module="msp">
         <active>0</active>
         <model>msp/gateway_giroPay</model>
@@ -688,13 +740,13 @@
         <allowed_currency>EUR</allowed_currency>
         <lang>nl</lang>
       </msp_erotiekbon>
-      <msp_giveacard translate="title" module="msp">
+      <msp_givacard translate="title" module="msp">
         <active>0</active>
-        <model>msp/gateway_giveacard</model>
-        <title>Giveacard</title>
+        <model>msp/gateway_givacard</model>
+        <title>Givacard</title>
         <allowed_currency>EUR</allowed_currency>
         <lang>nl</lang>
-      </msp_giveacard>
+      </msp_givacard>
       <msp_parfumnl translate="title" module="msp">
         <active>0</active>
         <model>msp/gateway_parfumnl</model>

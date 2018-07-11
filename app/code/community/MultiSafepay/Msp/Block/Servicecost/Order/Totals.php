@@ -1,8 +1,10 @@
 <?php
 
-class MultiSafepay_Msp_Block_Servicecost_Order_Totals extends Mage_Sales_Block_Order_Totals {
+class MultiSafepay_Msp_Block_Servicecost_Order_Totals extends Mage_Sales_Block_Order_Totals
+{
 
-    protected function _initTotals() {
+    protected function _initTotals()
+    {
         parent::_initTotals();
 
         $order = $this->getSource();

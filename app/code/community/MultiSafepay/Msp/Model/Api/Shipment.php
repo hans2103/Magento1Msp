@@ -7,12 +7,14 @@
  */
 require_once(Mage::getBaseDir('lib') . DS . 'multisafepay' . DS . 'MultiSafepay.combined.php');
 
-class MultiSafepay_Msp_Model_Api_Shipment extends MultiSafepay {
+class MultiSafepay_Msp_Model_Api_Shipment extends MultiSafepay
+{
 
     /**
      * Send update transaction
      */
-    function updateTransaction() {
+    function updateTransaction()
+    {
         $this->checkSettings();
 
         // generate request
@@ -49,7 +51,8 @@ class MultiSafepay_Msp_Model_Api_Shipment extends MultiSafepay {
     /**
      * Create the update transaction request xml
      */
-    function createUpdateTransactionRequest() {
+    function createUpdateTransactionRequest()
+    {
         $request = '<?xml version="1.0" encoding="UTF-8"?>
     <updatetransaction>
         <merchant>
@@ -79,7 +82,8 @@ class MultiSafepay_Msp_Model_Api_Shipment extends MultiSafepay {
         return $request;
     }
 
-    public function log() {
+    public function log()
+    {
         $argv = func_get_args();
         $data = array_shift($argv);
 

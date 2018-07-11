@@ -5,7 +5,8 @@
  * @category MultiSafepay
  * @package  MultiSafepay_Msp
  */
-class MultiSafepay_Msp_Model_Gateway_Einvoice extends MultiSafepay_Msp_Model_Gateway_Abstract {
+class MultiSafepay_Msp_Model_Gateway_Einvoice extends MultiSafepay_Msp_Model_Gateway_Abstract
+{
 
     protected $_code = "msp_einvoice";
     public $_model = "einvoice";
@@ -18,7 +19,7 @@ class MultiSafepay_Msp_Model_Gateway_Einvoice extends MultiSafepay_Msp_Model_Gat
         'msp_babygiftcard',
         'msp_boekenbon',
         'msp_erotiekbon',
-        'msp_giveacard',
+        'msp_givacard',
         'msp_parfumnl',
         'msp_parfumcadeaukaart',
         'msp_degrotespeelgoedwinkel',
@@ -39,12 +40,16 @@ class MultiSafepay_Msp_Model_Gateway_Einvoice extends MultiSafepay_Msp_Model_Gat
         'msp_dotpay',
         'msp_payafter',
         'msp_einvoice',
+        'msp_paysafecard',
         'msp_klarna',
         'msp_mistercash',
         'msp_visa',
         'msp_eps',
         'msp_ferbuy',
         'msp_mastercard',
+        'msp_ing',
+        'msp_kbc',
+        'msp_belfius',
         'msp_banktransfer',
         'msp_maestro',
         'msp_paypal',
@@ -55,7 +60,8 @@ class MultiSafepay_Msp_Model_Gateway_Einvoice extends MultiSafepay_Msp_Model_Gat
         'msp_amex',
     );
 
-    public function __construct() {
+    public function __construct()
+    {
         $availableByIP = true;
 
         if (Mage::getStoreConfig('msp_gateways/msp_einvoice/ip_check')) {
@@ -69,9 +75,9 @@ class MultiSafepay_Msp_Model_Gateway_Einvoice extends MultiSafepay_Msp_Model_Gat
                 $availableByIP = false;
             }
         }
-        
-        
-        
+
+
+
 
 
 
@@ -86,8 +92,8 @@ class MultiSafepay_Msp_Model_Gateway_Einvoice extends MultiSafepay_Msp_Model_Gat
             $currencies = explode(',', Mage::getStoreConfig('msp_giftcards/' . $this->_code . '/allowed_currency'));
             $isAllowConvert = Mage::getStoreConfigFlag('msp/settings/allow_convert_currency');
         }
-        
-        
+
+
 
 
         if ($isAllowConvert) {
@@ -99,7 +105,7 @@ class MultiSafepay_Msp_Model_Gateway_Einvoice extends MultiSafepay_Msp_Model_Gat
                 $availableByCurrency = false;
             }
         }
-        $isavailablebygroup= true;
+        $isavailablebygroup = true;
         $group_id = 0; // If not logged in, customer group id is 0
         if (Mage::getSingleton('customer/session')->isLoggedIn()) { // If logged in, set customer group id
             $group_id = Mage::getSingleton('customer/session')->getCustomer()->getGroupId();
@@ -114,7 +120,8 @@ class MultiSafepay_Msp_Model_Gateway_Einvoice extends MultiSafepay_Msp_Model_Gat
         $this->_canUseCheckout = $availableByIP && $availableByCurrency && $isavailablebygroup;
     }
 
-    public function getOrderPlaceRedirectUrl() {
+    public function getOrderPlaceRedirectUrl()
+    {
         if (isset($_POST['payment']['birthday'])) {
             $birthday = $_POST['payment']['birthday'];
         } else {
@@ -148,7 +155,8 @@ class MultiSafepay_Msp_Model_Gateway_Einvoice extends MultiSafepay_Msp_Model_Gat
      * @param null|integer|Mage_Core_Model_Store $store
      * @return bool
      */
-    protected function _isTestMode($store = null) {
+    protected function _isTestMode($store = null)
+    {
         $mode = Mage::getStoreConfig('msp_gateways/msp_einvoice/test_api_pad', $store);
 
         return $mode == MultiSafepay_Msp_Model_Config_Sources_Accounts::TEST_MODE;

@@ -7,7 +7,8 @@
  */
 require_once(Mage::getBaseDir('lib') . DS . 'multisafepay' . DS . 'MultiSafepay.combined.php');
 
-abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Model_Method_Abstract {
+abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Model_Method_Abstract
+{
 
     protected $_module = "msp"; // config root (msp or payment)
     protected $_settings = "msp"; // config root for settings (always msp for now)
@@ -49,9 +50,15 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
         'msp_eps',
         'msp_ferbuy',
         'msp_mastercard',
+        'msp_ing',
+        'msp_kbc',
+        'msp_belfius',
         'msp_banktransfer',
         'msp_maestro',
         'msp_paypal',
+        /* Start Paysafecard */
+        'msp_paysafecard',
+        /* End Paysafecard */
         'msp_webgift',
         'msp_ebon',
         'msp_babygiftcard',
@@ -61,7 +68,7 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
         'msp_beautyandwellness',
         'msp_boekenbon',
         'msp_erotiekbon',
-        'msp_giveacard',
+        'msp_givacard',
         'msp_parfumnl',
         'msp_parfumcadeaukaart',
         'msp_degrotespeelgoedwinkel',
@@ -84,7 +91,7 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
         'msp_babygiftcard',
         'msp_boekenbon',
         'msp_erotiekbon',
-        'msp_giveacard',
+        'msp_givacard',
         'msp_parfumnl',
         'msp_parfumcadeaukaart',
         'msp_degrotespeelgoedwinkel',
@@ -118,10 +125,17 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
         'msp_multisafepay',
         'msp_directebanking',
         'msp_directdebit',
+        'msp_ing',
+        'msp_kbc',
+        'msp_belfius',
         'msp_amex',
+        /* Start Paysafecard */
+        'msp_paysafecard'
+            /* End Paysafecard */
     );
 
-    public function __construct() {
+    public function __construct()
+    {
 
         if ($this->_code == 'msp') {
             $currencies = explode(',', $this->getConfigData('allowed_currency'));
@@ -183,7 +197,8 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
       return $this->getConfigData('active');
       } */
 
-    public function setSortOrder($order) {
+    public function setSortOrder($order)
+    {
         // Magento tries to set the order from payment/, instead of our msp/
 
         $this->sort_order = Mage::getStoreConfig($this->_configCode . '/' . $this->_code . '/sort_order');
@@ -192,7 +207,8 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
     /**
      * Append the current model to the URL
      */
-    public function getModelUrl($url) {
+    public function getModelUrl($url)
+    {
         if (!empty($this->_model)) {
             $url .= "/model/" . $this->_model;
         }
@@ -203,14 +219,16 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
     /**
      * Magento will use this for payment redirection
      */
-    public function getOrderPlaceRedirectUrl() {
+    public function getOrderPlaceRedirectUrl()
+    {
         return $this->getModelUrl("msp/standard/redirect");
     }
 
     /**
      * Get the payment object and set the right config values
      */
-    public function getPayment($storeId = null) {
+    public function getPayment($storeId = null)
+    {
         $payment = Mage::getSingleton("msp/payment");
 
         // get store id
@@ -258,7 +276,8 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
     /**
      * Start fco xml transaction transaction
      */
-    public function startPayAfterTransaction() {
+    public function startPayAfterTransaction()
+    {
         // pass store (from this getLastOrderId) to the getPayment?
         $payment = $this->getPayment();
 
@@ -268,7 +287,8 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
     /**
      * Start a transaction
      */
-    public function startTransaction() {
+    public function startTransaction()
+    {
         // pass store (from this getLastOrderId) to the getPayment?
         $payment = $this->getPayment();
 
@@ -281,7 +301,8 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
      * @param $id integer|string
      * @return mixed
      */
-    public function notification($id) {
+    public function notification($id)
+    {
         /** @var $order Mage_Sales_Model_Order */
         $order = Mage::getSingleton('sales/order')->loadByIncrementId($id);
 
@@ -294,7 +315,8 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
     /**
      * @return mixed
      */
-    public function getIdealIssuersHTML() {
+    public function getIdealIssuersHTML()
+    {
         $storeId = Mage::app()->getStore()->getStoreId();
         $configSettings = array();
         if ($this->_loadSettingsConfig) {
@@ -326,46 +348,53 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
     /**
      * Notification URL of the model
      */
-    public function getNotificationUrl() {
+    public function getNotificationUrl()
+    {
         return $this->getModelUrl("msp/standard/notification");
     }
 
     /**
      * Return URL of the model
      */
-    public function getReturnUrl() {
+    public function getReturnUrl()
+    {
         return Mage::getUrl("msp/standard/return", array("_secure" => true));
     }
 
     /**
      * Cancel URL of the model
      */
-    public function getCancelUrl() {
+    public function getCancelUrl()
+    {
         return Mage::getUrl("msp/standard/cancel", array("_secure" => true));
     }
 
     /**
      * Selected 'gateway'
      */
-    public function getGateway() {
+    public function getGateway()
+    {
         return $this->_gateway;
     }
 
-    public function getIdealIssuer() {
+    public function getIdealIssuer()
+    {
         return $this->_idealissuer;
     }
 
     /**
      * Pass params to the model
      */
-    public function setParams($params) {
+    public function setParams($params)
+    {
         $this->_params = $params;
     }
 
     /**
      * Get config data
      */
-    public function getConfigData($field, $storeId = null) {
+    public function getConfigData($field, $storeId = null)
+    {
         if (null === $storeId) {
             //$storeId = Mage::app()->getStore()->getStoreId();//$this->getStore();
             $storeId = $this->getStore();
@@ -375,23 +404,20 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
         return Mage::getStoreConfig($path, $storeId);
     }
 
-
-
-
-
-    public function refund(Varien_Object $payment, $amount) {
+    public function refund(Varien_Object $payment, $amount)
+    {
         $order = $payment->getOrder();
         $payment = $order->getPayment()->getMethodInstance();
-       
-	    $data = Mage::app()->getRequest()->getPost('creditmemo');
-	    
-	    
-	    if(isset($data['servicecost'])){
-	    	$refunded_servicecost = $data['servicecost'];
-			if ($refunded_servicecost != $order->getServicecost()) {
-		       	$amount = $amount - $order->getServicecost() + $refunded_servicecost;
-		   	}
-	    }
+
+        $data = Mage::app()->getRequest()->getPost('creditmemo');
+
+
+        if (isset($data['servicecost'])) {
+            $refunded_servicecost = $data['servicecost'];
+            if ($refunded_servicecost != $order->getServicecost()) {
+                $amount = $amount - $order->getServicecost() + $refunded_servicecost;
+            }
+        }
 
 
         switch ($payment->getCode()) {
@@ -453,126 +479,124 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
                 $config['api_key'] = $config['api_key_pad'];
             }
         }
-        
+
         //This is a PAD/Klarna/Einvoice refund so we need to update the checkout data. We will be using the JSON API instead
-        if($payment->getCode() == self::MSP_GENERAL_PAD_CODE || $payment->getCode() == self::MSP_GENERAL_KLARNA_CODE || $payment->getCode() == self::MSP_GENERAL_EINVOICE_CODE){
-	        if($config['test_api'] == 'test'){
-		    	$mspurl = 'https://testapi.multisafepay.com/v1/json/';
-			}else{
-                    $mspurl = 'https://api.multisafepay.com/v1/json/';
-            }	        
-	    
-	        	require_once dirname(__FILE__) . "/../Api/Client.php";
-	        
-	        	$msp = new Client;
-	        	$msp->setApiKey($config['api_key']);
-                $msp->setApiUrl($mspurl);
-	        	$msporder = $msp->orders->get($type = 'orders', $order->getIncrementId(), $body = array(), $query_string = false);
-	        	
-	        	
-	        	$originalCart = $msporder->shopping_cart;
-                
-                $refundData = array();
-                //$refundData['checkout_data']['items'];
-                
-             
-                foreach ($originalCart->items as $key => $item) {
-                    if ($item->unit_price > 0) {
-                        $refundData['checkout_data']['items'][] = $item;
-                    }
-                    
-                    foreach ($order->getCreditmemosCollection() as $creditmemo) {
-	                    foreach($creditmemo->getAllItems() as $product){
-		                   
-	                        $product_id = $product->getData('order_item_id');
-	                        
-	                        if ($product_id == $item->merchant_item_id) {
-	                            $qty_refunded = $product->getData('qty');
-	                            if ($qty_refunded > 0) {
-	                                if ($item->unit_price > 0) {
-	                                    $refundItem = (OBJECT) Array();
-	                                    $refundItem->name = $item->name;
-	                                    $refundItem->description = $item->description;
-	                                    $refundItem->unit_price = '-' . $item->unit_price;
-	                                    $refundItem->quantity = round($qty_refunded);
-	                                    $refundItem->merchant_item_id = $item->merchant_item_id;
-	                                    $refundItem->tax_table_selector = $item->tax_table_selector;
-	                                    $refundData['checkout_data']['items'][] = $refundItem;
-	                                }
-	                            }
-	                        }
-	                    }
-                    }
-                    
-                    foreach($data['items'] as $productid => $proddata){
-	                    if($item->merchant_item_id == $productid){
-		                    if($proddata['qty'] > 0){
-			                    $refundItem = (OBJECT) Array();
-		                        $refundItem->name = $item->name;
-		                        $refundItem->description = $item->description;
-		                        $refundItem->unit_price = '-' . $item->unit_price;
-		                        $refundItem->quantity = round($proddata['qty']);
-		                        $refundItem->merchant_item_id = $item->merchant_item_id;
-		                        $refundItem->tax_table_selector = $item->tax_table_selector;
-		                        $refundData['checkout_data']['items'][] = $refundItem;
-		                    }
-	                    }
-                    }
-                    
-                    //The complete shipping cost is refunded also so we can remove it from the checkout data and refund it
-                    if($item->merchant_item_id == 'msp-shipping'){
-	                    if($data['shipping_amount'] == $order->getShippingAmount()){
-		                    $refundItem = (OBJECT) Array();
-			                $refundItem->name = $item->name;
-			                $refundItem->description = $item->description;
-			                $refundItem->unit_price = '-' . $item->unit_price;
-			                $refundItem->quantity = '1';
-			                $refundItem->merchant_item_id = $item->merchant_item_id;
-			                $refundItem->tax_table_selector = $item->tax_table_selector;
-			                $refundData['checkout_data']['items'][] = $refundItem;
-		                }else{
-			                if($data['shipping_amount'] != 0){
-				                Mage::getSingleton('adminhtml/session')->addError('MultiSafepay: Refund not processed online as it did not match the complete shipping cost');
-			                	$order->addStatusHistoryComment('MultiSafepay: Refund not processed online as it did not match the complete shipping cost', false);
-			                	$order->save();
-				                return $this;
-				            }
-		                }
-		            }
-		            if($item->name == $order->getShippingDescription() && $item->unit_price <0){
-			            $refundItem = (OBJECT) Array();
-			                $refundItem->name = $item->name;
-			                $refundItem->description = $item->description;
-			                $refundItem->unit_price = $item->unit_price;
-			                $refundItem->quantity = '1';
-			                $refundItem->merchant_item_id = $item->merchant_item_id;
-			                $refundItem->tax_table_selector = $item->tax_table_selector;
-			                $refundData['checkout_data']['items'][] = $refundItem;
-		            }
-                }
-                
-                
-                
+        if ($payment->getCode() == self::MSP_GENERAL_PAD_CODE || $payment->getCode() == self::MSP_GENERAL_KLARNA_CODE || $payment->getCode() == self::MSP_GENERAL_EINVOICE_CODE) {
+            if ($config['test_api'] == 'test') {
+                $mspurl = 'https://testapi.multisafepay.com/v1/json/';
+            } else {
+                $mspurl = 'https://api.multisafepay.com/v1/json/';
+            }
 
-				//print_r($originalCart);
-				//print_r($refundData);exit;
+            require_once dirname(__FILE__) . "/../Api/Client.php";
 
-                $endpoint = 'orders/' . $order->getIncrementId() . '/refunds';
-                try {
-                    $mspreturn = $msp->orders->post($refundData, $endpoint);
-                    Mage::log($mspreturn, null, 'MultiSafepay-Refunds.log');
-                    Mage::getSingleton('adminhtml/session')->addNotice(Mage::helper('msp')->__('Refund request has been sent successfully to MultiSafepay, your transaction has been refunded.'));
-                } catch (Exception $e) {
-                    Mage::log($mspreturn, null, 'MultiSafepay-Refunds.log');
-                   
-					Mage::getSingleton('adminhtml/session')->addError('Online processing of the refund failed, reason: ' . $e->getMessage());
-					$order->addStatusHistoryComment('Online processing of the refund failed, reason: ' . $e->getMessage(), false);
-			        $order->save();
+            $msp = new Client;
+            $msp->setApiKey($config['api_key']);
+            $msp->setApiUrl($mspurl);
+            $msporder = $msp->orders->get($type = 'orders', $order->getIncrementId(), $body = array(), $query_string = false);
+
+
+            $originalCart = $msporder->shopping_cart;
+
+            $refundData = array();
+            //$refundData['checkout_data']['items'];
+
+
+            foreach ($originalCart->items as $key => $item) {
+                if ($item->unit_price > 0) {
+                    $refundData['checkout_data']['items'][] = $item;
                 }
-                return $this;
+
+                foreach ($order->getCreditmemosCollection() as $creditmemo) {
+                    foreach ($creditmemo->getAllItems() as $product) {
+
+                        $product_id = $product->getData('order_item_id');
+
+                        if ($product_id == $item->merchant_item_id) {
+                            $qty_refunded = $product->getData('qty');
+                            if ($qty_refunded > 0) {
+                                if ($item->unit_price > 0) {
+                                    $refundItem = (OBJECT) Array();
+                                    $refundItem->name = $item->name;
+                                    $refundItem->description = $item->description;
+                                    $refundItem->unit_price = '-' . $item->unit_price;
+                                    $refundItem->quantity = round($qty_refunded);
+                                    $refundItem->merchant_item_id = $item->merchant_item_id;
+                                    $refundItem->tax_table_selector = $item->tax_table_selector;
+                                    $refundData['checkout_data']['items'][] = $refundItem;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                foreach ($data['items'] as $productid => $proddata) {
+                    if ($item->merchant_item_id == $productid) {
+                        if ($proddata['qty'] > 0) {
+                            $refundItem = (OBJECT) Array();
+                            $refundItem->name = $item->name;
+                            $refundItem->description = $item->description;
+                            $refundItem->unit_price = '-' . $item->unit_price;
+                            $refundItem->quantity = round($proddata['qty']);
+                            $refundItem->merchant_item_id = $item->merchant_item_id;
+                            $refundItem->tax_table_selector = $item->tax_table_selector;
+                            $refundData['checkout_data']['items'][] = $refundItem;
+                        }
+                    }
+                }
+
+                //The complete shipping cost is refunded also so we can remove it from the checkout data and refund it
+                if ($item->merchant_item_id == 'msp-shipping') {
+                    if ($data['shipping_amount'] == $order->getShippingAmount()) {
+                        $refundItem = (OBJECT) Array();
+                        $refundItem->name = $item->name;
+                        $refundItem->description = $item->description;
+                        $refundItem->unit_price = '-' . $item->unit_price;
+                        $refundItem->quantity = '1';
+                        $refundItem->merchant_item_id = $item->merchant_item_id;
+                        $refundItem->tax_table_selector = $item->tax_table_selector;
+                        $refundData['checkout_data']['items'][] = $refundItem;
+                    } else {
+                        if ($data['shipping_amount'] != 0) {
+                            Mage::getSingleton('adminhtml/session')->addError('MultiSafepay: Refund not processed online as it did not match the complete shipping cost');
+                            $order->addStatusHistoryComment('MultiSafepay: Refund not processed online as it did not match the complete shipping cost', false);
+                            $order->save();
+                            return $this;
+                        }
+                    }
+                }
+                if ($item->name == $order->getShippingDescription() && $item->unit_price < 0) {
+                    $refundItem = (OBJECT) Array();
+                    $refundItem->name = $item->name;
+                    $refundItem->description = $item->description;
+                    $refundItem->unit_price = $item->unit_price;
+                    $refundItem->quantity = '1';
+                    $refundItem->merchant_item_id = $item->merchant_item_id;
+                    $refundItem->tax_table_selector = $item->tax_table_selector;
+                    $refundData['checkout_data']['items'][] = $refundItem;
+                }
+            }
+
+
+
+
+            //print_r($originalCart);
+            //print_r($refundData);exit;
+
+            $endpoint = 'orders/' . $order->getIncrementId() . '/refunds';
+            try {
+                $mspreturn = $msp->orders->post($refundData, $endpoint);
+                Mage::log($mspreturn, null, 'MultiSafepay-Refunds.log');
+                Mage::getSingleton('adminhtml/session')->addNotice(Mage::helper('msp')->__('Refund request has been sent successfully to MultiSafepay, your transaction has been refunded.'));
+            } catch (Exception $e) {
+                Mage::log($mspreturn, null, 'MultiSafepay-Refunds.log');
+
+                Mage::getSingleton('adminhtml/session')->addError('Online processing of the refund failed, reason: ' . $e->getMessage());
+                $order->addStatusHistoryComment('Online processing of the refund failed, reason: ' . $e->getMessage(), false);
+                $order->save();
+            }
+            return $this;
         }
-        
-        
 
         // build request
         $mapi = new MultiSafepay();
@@ -581,15 +605,20 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
         $mapi->merchant['site_id'] = $config['site_id'];
         $mapi->merchant['site_code'] = $config['secure_code'];
         $mapi->merchant['api_key'] = $config['api_key'];
+
+        if ($config['custom_refund_desc'] !== '' && isset($config['custom_refund_desc'])) {
+            $mapi->transaction['description'] = $config['custom_refund_desc'];
+        }
+
         $mapi->transaction['id'] = $order->getIncrementId();
         $mapi->transaction['amount'] = $amount * 100; //$order->getGrandTotal() * 100;
         $mapi->transaction['currency'] = Mage::app()->getStore()->getCurrentCurrencyCode();
         $mapi->signature = sha1($config['site_id'] . $config['secure_code'] . $mapi->transaction['id']);
 
         Mage::log($mapi, null, 'MultiSafepay-Refunds.log');
-              
+
         $response = $mapi->refundTransaction();
-        
+
         Mage::log($response, null, 'MultiSafepay-Refunds.log');
 
         if ($mapi->error) {

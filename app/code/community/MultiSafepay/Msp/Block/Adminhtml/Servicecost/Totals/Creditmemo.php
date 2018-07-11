@@ -1,6 +1,7 @@
 <?php
 
-class MultiSafepay_Msp_Block_Adminhtml_Servicecost_Totals_Creditmemo extends Mage_Adminhtml_Block_Sales_Order_Creditmemo_Totals {
+class MultiSafepay_Msp_Block_Adminhtml_Servicecost_Totals_Creditmemo extends Mage_Adminhtml_Block_Sales_Order_Creditmemo_Totals
+{
     /* protected function _initTotals() {
       parent::_initTotals();
       $order = $this->getSource()->getOrder();
@@ -30,7 +31,8 @@ class MultiSafepay_Msp_Block_Adminhtml_Servicecost_Totals_Creditmemo extends Mag
       return $this;
       } */
 
-    protected function _initTotals() {
+    protected function _initTotals()
+    {
         parent::_initTotals();
         $order = $this->getSource()->getOrder();
         $amount = $order->getServicecostPdf();
@@ -59,7 +61,8 @@ class MultiSafepay_Msp_Block_Adminhtml_Servicecost_Totals_Creditmemo extends Mag
         return $this;
     }
 
-    protected function _convertFeeCurrency($amount, $currentCurrencyCode, $targetCurrencyCode) {
+    protected function _convertFeeCurrency($amount, $currentCurrencyCode, $targetCurrencyCode)
+    {
         if ($currentCurrencyCode == $targetCurrencyCode) {
             return $amount;
         }

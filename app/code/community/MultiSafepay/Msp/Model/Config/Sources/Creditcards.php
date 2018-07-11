@@ -5,12 +5,14 @@
  * @category MultiSafepay
  * @package  MultiSafepay_Msp
  */
-class MultiSafepay_Msp_Model_Config_Sources_Creditcards {
+class MultiSafepay_Msp_Model_Config_Sources_Creditcards
+{
 
     /**
      * @return array
      */
-    public function toOptionArray() {
+    public function toOptionArray()
+    {
         return array(
             array(
                 "value" => "VISA",

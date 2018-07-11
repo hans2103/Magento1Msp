@@ -5,12 +5,14 @@
  * @category MultiSafepay
  * @package  MultiSafepay_Msp
  */
-class MultiSafepay_Msp_Model_Config_Sources_TaxClasses {
+class MultiSafepay_Msp_Model_Config_Sources_TaxClasses
+{
 
     /**
      * @return array
      */
-    public function toOptionArray() {
+    public function toOptionArray()
+    {
         $collection = Mage::getModel('tax/class')->getCollection()
                 ->distinct(true)
                 ->addFieldToFilter('class_type', array('like' => 'PRODUCT'))
