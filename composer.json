@@ -1,0 +1,7 @@
+{
+  "name": "multisafepay/magento1msp",
+  "type": "magento-module",
+  "description": "MultiSafepay module for Magento1",
+  "version": "1.2.9",
+  "license": "OSL-3.0"
+}
