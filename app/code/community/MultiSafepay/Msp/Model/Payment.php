@@ -763,7 +763,13 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object
         }*/
 		
 		$gateway_data = $quote->getPayment()->getData();
-		$gateway = strtoupper(str_replace("msp_", '', $gateway_data['method']));
+		
+		if ($gateway_data['method'] === 'msp_directebanking' ) {
+			$gateway = 'DIRECTBANK';
+		}else{
+			$gateway = strtoupper(str_replace("msp_", '', $gateway_data['method']));
+		}		
+//		$gateway = strtoupper(str_replace("msp_", '', $gateway_data['method']));
 		
 
         // currency check

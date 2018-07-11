@@ -1,11 +1,56 @@
 <!DOCTYPE html>
-<html>
+<html> 
 
 <head>
 </head>
 
 <body>
 	<div id="container" style="width:900px; margin-left:100">
+
+		<div id="version" style="background-color:#E0E0E0 ;">
+			<b>Release Notes - Magento 2.0.2 (Oct 10, 2014)</b>
+		</div>
+		<p>
+			<b>Improvements</b>
+			<hr size=1 color="#E0E0E0";>
+			<ul>
+				<li>Added an option to set the daysactive for an PAD transaction. When not payed in time, the transaction will expired and the shop will be notified</li>
+				<li>Added extra line to set the order total to paid if it hasn't been done</li>
+				<li>Now use the fee price formatter so it includes the selected currency</li>
+				<li>Force ordertotal set to paid when transaction is completed and invoice creation is disabled.
+				    Only show creation of transaction note once</li>
+				<li>Added version number to config title line</li>
+				<li>Textual improvements</li>
+				<li>Better check on order confirmation email sending</li>
+				<li>Rrecalculate the product price without tax as Magento round at 2 decimals by default and we use 4. 
+				    This resulted in a amount mismatch when ordering larger quantities of the same product</li>
+				<li>Better support for special chars</li>
+				<li>Enabled locking again but return false instead of showing error and exit. This should avoid duplicate invoices when callback is called while before the redirecturl set the orderstatus</li>
+			</ul>
+			<br/>			
+
+			<b>Changes</b>
+			<hr size=1 color="#E0E0E0";>
+			<ul>
+ 				<li>FEE base is rewritten</li>
+ 				<li>Upgrade the php dependence to 5.5.12.</li>
+				<li>Now get the selected gateway from the quote instead of the gateway model. This adds better compatibility with third party onestepcheckout modules</li>
+			</ul>
+			<br>
+			
+			<b>Fixes</b>
+			<hr size=1 color="#E0E0E0";>
+			<ul>
+				<li>Fixed bug for error #1016 on the Return-URL</li>
+				<li>Fixed bug with gateway title not beeing visible in checkout</li>
+				<li>Fixed bug with missing housenumber on connect transactions</li>
+				<li>Fixed bug with order email not beeing sent after transaction complete</li>
+				<li>Fixed bug with double totalPaid amount</li>
+			</ul>
+			
+		</p>
+		<br/>
+		<br/>
 
 		<div id="version" style="background-color:#E0E0E0 ;">
 			<b>Release Notes - Magento 2.0.0 (May 20, 2014)</b>
