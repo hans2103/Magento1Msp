@@ -55,7 +55,11 @@ class MultiSafepay_Msp_Model_Servicecost_Quote_Address_Total_Servicecost extends
         'msp_vvvgiftcard',
         'msp_sportenfit',
         'msp_beautyandwellness',
+        'msp_betaalplan',
+        'msp_trustly',
+        'msp_afterpay',
     );
+
     public $giftcards = array(
         'msp_webgift',
         'msp_ebon',
@@ -103,6 +107,9 @@ class MultiSafepay_Msp_Model_Servicecost_Quote_Address_Total_Servicecost extends
         'msp_kbc',
         'msp_belfius',
         'msp_idealqr',
+        'msp_betaalplan',
+        'msp_trustly',
+        'msp_afterpay',
     );
 
     public function __construct()
@@ -320,7 +327,7 @@ class MultiSafepay_Msp_Model_Servicecost_Quote_Address_Total_Servicecost extends
         }
 
         //Disabled check, fixes PLGMAG-10. Magento seems to not to update USD->EUR rate in db, resulting in wrong conversions. Now we calculate the rate manually and and don't trust Magento stored rate.
-        // if (strlen((string) $rateCurrentToTarget) < 12) { 
+        // if (strlen((string) $rateCurrentToTarget) < 12) {
         $revertCheckingCode = Mage::getModel('directory/currency')->load($targetCurrencyCode);
         $revertCheckingRate = $revertCheckingCode->getAnyRate($currentCurrencyCode);
         $rateCurrentToTarget = 1 / $revertCheckingRate;

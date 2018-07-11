@@ -1,0 +1,21 @@
+<fieldset class="form-list">
+    <ul id="payment_form_<?php echo $this->getMethodCode() ?>" style="display:none">
+        <li>
+            <?php if ($this->getMethodCode() == 'msp_afterpay') { ?>
+
+                <label for="gender" style="width:200px!important;"><?php echo $this->__('Titel') . ':'; ?></label>
+                <input type="radio" name="payment[salutation]" value="Mr"<?php echo ($this->getGender() == 'male') ? 'checked' : ''; ?>>   <?php echo $this->__('Heer'); ?>
+                <input type="radio" name="payment[salutation]" value="Mrs"<?php echo ($this->getGender() == 'female') ? 'checked' : ''; ?>>  <?php echo $this->__('Mevrouw'); ?>
+                <input type="radio" name="payment[salutation]" value="Miss"> <?php echo $this->__('Mejuffrouw'); ?>
+                <br/>
+
+                <label for="birthday" 			    style="width:200px!important;">Geboortedatum: </label>
+                <input name='payment[birthday]'     value="<?php echo $this->getBirthday(); ?>" id="birthday" placeholder='DD-MM-YYYY'/>
+                <br/>
+                <label for="phonenumber" 		style="width:200px!important;">Telefoonnummer:</label>
+                <input name='payment[phonenumber]' 		value="<?php echo $this->getPhonenumber(); ?>"	id="phonenumber"/>
+
+            <?php } ?>
+        </li>
+    </ul>
+</fieldset>

@@ -34,6 +34,15 @@
     padding-top: 12px;
 }
 
+#msp_gateways_msp_afterpay-head{
+    background-image: url("../../images/msp/nl/msp_afterpay.png");
+    background-position-x: 0px;
+    background-repeat: no-repeat;
+    padding-left: 60px;
+    min-height: 30px;
+    padding-top: 12px;
+}
+
 #msp_gateways_msp_payafter-head{
     background-image: url("../../images/msp/nl/msp_payafter.png");
     background-position-x: 0px;
@@ -187,6 +196,24 @@
 
 #msp_gateways_msp_giropay-head{
     background-image: url("../../images/msp/nl/msp_giropay.png");
+    background-position-x: 0px;
+    background-repeat: no-repeat;
+    padding-left: 60px;
+    min-height: 30px;
+    padding-top: 12px;
+}
+
+#msp_gateways_msp_betaalplan-head{
+    background-image: url("../../images/msp/nl/msp_betaalplan.png");
+    background-position-x: 0px;
+    background-repeat: no-repeat;
+    padding-left: 60px;
+    min-height: 30px;
+    padding-top: 12px;
+}
+
+#msp_gateways_msp_trustly-head{
+    background-image: url("../../images/msp/nl/msp_trustly.png");
     background-position-x: 0px;
     background-repeat: no-repeat;
     padding-left: 60px;

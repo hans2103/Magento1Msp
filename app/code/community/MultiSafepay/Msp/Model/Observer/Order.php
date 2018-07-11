@@ -13,6 +13,7 @@ class MultiSafepay_Msp_Model_Observer_Order extends MultiSafepay_Msp_Model_Obser
     const MSP_GENERAL_PAD_CODE = 'msp_payafter';
     const MSP_GENERAL_EINVOICE_CODE = 'msp_einvoice';
     const MSP_GENERAL_KLARNA_CODE = 'msp_klarna';
+    const MSP_GENERAL_AFTERPAY_CODE = 'msp_afterpay';
     const MSP_GATEWAYS_CODE_PREFIX = 'msp_';
 
     public $availablePaymentMethodCodes = array(
@@ -21,6 +22,7 @@ class MultiSafepay_Msp_Model_Observer_Order extends MultiSafepay_Msp_Model_Obser
         'msp_ideal',
         'msp_creditcard',
         'msp_dotpay',
+        //'msp_afterpay', for now we dont allow afterpay manual transaction requests
         //'msp_payafter', for now we dont allow payafter manual transaction requests
         //'msp_einvoice', for now we dont allow payafter manual transaction requests
         'msp_mistercash',
@@ -62,6 +64,8 @@ class MultiSafepay_Msp_Model_Observer_Order extends MultiSafepay_Msp_Model_Obser
         'msp_vvvgiftcard',
         'msp_sportenfit',
         'msp_beautyandwellness',
+        'msp_betaalplan',
+        'msp_trustly',
     );
 
     public function sales_order_place_after(Varien_Event_Observer $observer)
@@ -136,9 +140,6 @@ class MultiSafepay_Msp_Model_Observer_Order extends MultiSafepay_Msp_Model_Obser
 
         if (!$api->isPaymentLinkCreated($order)) {
             if ($payment->getCode() == self::MSP_GENERAL_PAD_CODE || $payment->getCode() == self::MSP_GENERAL_KLARNA_CODE || $payment->getCode() == self::MSP_GENERAL_EINVOICE_CODE) {
-
-
-
 
 
                 $api->test = ($config['test_api_pad'] == 'test');

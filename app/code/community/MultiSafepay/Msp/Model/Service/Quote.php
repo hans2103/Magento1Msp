@@ -10,7 +10,7 @@ class MultiSafepay_Msp_Model_Service_Quote extends Mage_Sales_Model_Service_Quot
 
     public $availablePaymentMethodCodes = array(
         'msp',
-        //'mspcheckout', 
+        //'mspcheckout',
         'msp_ideal',
         'msp_creditcard',
         'msp_dotpay',
@@ -54,6 +54,8 @@ class MultiSafepay_Msp_Model_Service_Quote extends Mage_Sales_Model_Service_Quot
         'msp_vvvgiftcard',
         'msp_sportenfit',
         'msp_beautyandwellness',
+        'msp_betaalplan',
+        'msp_trustly',
     );
 
     /**
@@ -72,7 +74,9 @@ class MultiSafepay_Msp_Model_Service_Quote extends Mage_Sales_Model_Service_Quot
                     Mage::getStoreConfig('msp/settings/keep_cart', $this->_quote->getStoreId()) ||
                     $this->_quote->getPayment()->getMethod() == 'msp_payafter' ||
                     $this->_quote->getPayment()->getMethod() == 'msp_einvoice' ||
-                    $this->_quote->getPayment()->getMethod() == 'msp_klarna') {
+                    $this->_quote->getPayment()->getMethod() == 'msp_klarna'   ||
+                    $this->_quote->getPayment()->getMethod() == 'msp_afterpay'
+                ) {
 
                 $this->_quote->setIsActive(true)->save();
                 $this->_quote->setReservedOrderId(null)->save();

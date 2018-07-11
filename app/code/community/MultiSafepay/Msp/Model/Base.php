@@ -37,7 +37,7 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object
         'PSAFECARD' => 'msp_paysafecard',
         'EPS' => 'msp_eps',
         'FERBUY' => 'msp_ferbuy',
-        'ING' => 'msp_ing',
+        'INGHOME' => 'msp_ing',
         'KBC' => 'msp_kbc',
         'BELFIUS' => 'msp_belfius',
         'IDEALQR' => 'msp_idealqr',
@@ -70,6 +70,9 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object
         'VVVGIFTCARD' => 'msp_vvvgiftcard',
         'SPORTENFIT' => 'msp_sportenfit',
         'BEAUTYANDWELLNESS' => 'msp_beautyandwellness',
+        'SANTANDER' => 'msp_betaalplan',
+        'TRUSTLY' => 'msp_trustly',
+        'AFTERPAY' => 'msp_afterpay',
     );
 
     /**
@@ -339,7 +342,8 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object
             return true;
         }
 
-        if (($usedMethod == 'PAYAFTER' || $usedMethod == 'KLARNA' || $usedMethod == 'EINVOICE') && ($mspStatus == 'cancelled' || $mspStatus == 'void')) {
+        if ( in_array ($usedMethod, array ('PAYAFTER', 'KLARNA', 'EINVOICE', 'AFTERPAY')) &&
+             in_array ($mspStatus, array ('cancelled', 'void')) ) {
             return true;
         }
 
@@ -693,7 +697,8 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object
             return true;
         }
 
-        if (($usedMethod == 'PAYAFTER' || $usedMethod == 'KLARNA' || $usedMethod == 'EINVOICE') && ($mspStatus == 'cancelled' || $mspStatus == 'void')) {
+        if ( in_array ($usedMethod, array ('PAYAFTER', 'KLARNA', 'EINVOICE', 'AFTERPAY')) &&
+             in_array ($mspStatus, array ('cancelled', 'void')) ) {
             return true;
         }
 
@@ -1061,7 +1066,7 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object
                     $msp->updateInvoice();
 
                     if ($msp->error) {
-                        //Disabled as this gives an error when using Qwindo Test Panel. 
+                        //Disabled as this gives an error when using Qwindo Test Panel.
                         //This needs to be rewritten correctly. Disabled now as the error was not used
                         //echo 'update trans error';
                     }
@@ -1074,11 +1079,11 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object
                 $gateway = $order->getPayment()->getMethodInstance()->_gateway;
 
 
-                if ($mail_invoice && $gateway != 'PAYAFTER' && $gateway != 'KLARNA' && $gateway != 'EINVOICE') {
+                if ($mail_invoice && !in_array ($gateway, array('PAYAFTER', 'KLARNA', 'EINVOICE', 'AFTERPAY'))) {
                     $invoice->setEmailSent(true);
                     $invoice->sendEmail();
                     $invoice->save();
-                } elseif (($gateway == 'PAYAFTER' || $gateway == 'KLARNA' || $gateway == 'EINVOICE') && $send_bno_invoice && $mail_invoice) {
+                } elseif (in_array ($gateway, array('PAYAFTER', 'KLARNA', 'EINVOICE', 'AFTERPAY')) && $send_bno_invoice && $mail_invoice) {
                     $invoice->setEmailSent(true);
                     $invoice->sendEmail();
                     $invoice->save();

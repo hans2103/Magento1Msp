@@ -60,6 +60,9 @@ class MultiSafepay_Msp_Model_Gateway_Einvoice extends MultiSafepay_Msp_Model_Gat
         'msp_directdebit',
         'msp_amex',
         'msp_alipay',
+        'msp_betaalplan',
+        'msp_trustly',
+        'msp_afterpay',
     );
 
     public function __construct()

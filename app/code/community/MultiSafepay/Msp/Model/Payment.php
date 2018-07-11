@@ -70,7 +70,10 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object
         'msp_directdebit',
         'msp_amex',
         'msp_alipay',
-    );
+        'msp_betaalplan',
+        'msp_trustly',
+        'msp_afterpay',
+   );
 
     /**
      * Set some vars
@@ -329,9 +332,9 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object
         $this->api->plugin_name = 'Magento';
         $this->api->version = Mage::getConfig()->getNode('modules/MultiSafepay_Msp/version');
         $this->api->use_shipping_notification = false;
-        $this->api->merchant['account_id'] = $this->getConfigData("account_id_pad" . $suffix);
-        $this->api->merchant['site_id'] = $this->getConfigData("site_id_pad" . $suffix);
-        $this->api->merchant['site_code'] = $this->getConfigData("secure_code_pad" . $suffix);
+        $this->api->merchant['account_id']  = ($this->getConfigData("account_id_pad"  . $suffix) !== false) ? $this->getConfigData("account_id_pad"  . $suffix): $this->getConfigData('account_id');
+        $this->api->merchant['site_id']     = ($this->getConfigData("site_id_pad"     . $suffix) !== false) ? $this->getConfigData("site_id_pad"     . $suffix): $this->getConfigData('site_id');
+        $this->api->merchant['site_code']   = ($this->getConfigData("secure_code_pad" . $suffix) !== false) ? $this->getConfigData("secure_code_pad" . $suffix): $this->getConfigData('secure_code');
         $this->api->plugin['shop'] = 'Magento';
         $this->api->plugin['shop_version'] = Mage::getVersion();
         $this->api->plugin['plugin_version'] = $this->api->version;
@@ -409,6 +412,11 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object
             $this->api->gatewayinfo['gender'] = ''; //not available
         }
 
+        if (isset($_GET['salutation'])) {
+            $this->api->gatewayinfo['salutation'] = $_GET['salutation'];
+        } else {
+            $this->api->gatewayinfo['salutation'] = ''; //not available
+        }
 
         if (isset($_GET['phonenumber'])) {
             $this->api->gatewayinfo['phone'] = $_GET['phonenumber'];
@@ -440,13 +448,14 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object
             $this->api->gatewayinfo['birthday'] = ''; //not available
         }
 
-        if (($this->_gateway == "PAYAFTER" || $this->_gateway == "KLARNA") && $this->api->gatewayinfo['bankaccount'] != '' && $this->api->customer['birthday'] != '') {
+        if ( ( in_array ( $this->_gateway, array ("PAYAFTER", "KLARNA"))) && $this->api->gatewayinfo['bankaccount'] != '' && $this->api->customer['birthday'] != '') {
             $this->api->transaction['special'] = true;
         }
 
-        if ($this->_gateway == "EINVOICE") {
+        if (in_array ($this->_gateway, array ("EINVOICE"))) {
             $this->api->transaction['special'] = true;
         }
+
 
         $this->api->transaction['id'] = $orderId;
         $this->api->transaction['amount'] = $amount;
@@ -458,8 +467,9 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object
         $this->api->transaction['gateway'] = $this->_gateway;
         $this->api->transaction['issuer'] = $this->_issuer;
         $this->api->transaction['items'] = $items;
-        $this->api->transaction['daysactive'] = $this->getConfigData("pad_daysactive");
-        $this->api->transaction['secondsactive'] = $this->getConfigData("pad_seconds_active");
+        $this->api->transaction['daysactive']    = ($this->getConfigData('pad_daysactive')     !== false) ? $this->getConfigData('pad_daysactive')      : $this->getConfigData('daysactive');
+        $this->api->transaction['secondsactive'] = ($this->getConfigData('pad_seconds_active') !== false) ? $this->getConfigData('pad_seconds_active')  : $this->getConfigData('seconds_active');
+
         $this->api->setDefaultTaxZones();
 
         $this->getItems($this->getOrder(), $currencyCode);
@@ -633,7 +643,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object
 
             // raise error
             //Mage::throwException(Mage::helper("msp")->__("An error occured: ") . $this->api->error_code . " - " . $this->api->error);
-            if ($this->api->error_code == '1024' && $this->_gateway != "EINVOICE" && $this->_gateway != "KLARNA") {
+            if ($this->api->error_code == '1024' && $this->_gateway == "PAYAFTER") {
                 $errorMessage = Mage::helper("msp")->__("An error occured: ") . $this->api->error_code . /* " - " . $this->api->error . */ '<br />' . Mage::helper("msp")->__('We are sorry to inform you that your request for payment after delivery has been denied by Multifactor.<BR /> If you have questions about this rejection, you can checkout the FAQ on the website of Multifactor') . '<a href="http://www.multifactor.nl/contact" target="_blank">http://www.multifactor.nl/faq</a>' . Mage::helper("msp")->__('You can also contact Multifactor by calling 020-8500533 (at least 2 hours after this rejection) or by sending an email to ') . ' <a href="mailto:support@multifactor.nl">support@multifactor.nl</a>.' . Mage::helper("msp")->__('Please retry placing your order and select a different payment method.');
             } elseif ($this->_gateway == "EINVOICE" && $this->api->error_code == '1024') {
                 $errorMessage = Mage::helper("msp")->__("An error occured: ") . $this->api->error_code . /* " - " . $this->api->error . */ '<br />' . Mage::helper("msp")->__('We are sorry to inform you that your request for E-invoicing has been denied.<BR /> Please select another payment method and try again');
@@ -683,7 +693,10 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object
      */
     protected function _isTestPayAfterDelivery($gateway)
     {
-        $isTest = ($this->getConfigData('test_api_pad') == MultiSafepay_Msp_Model_Config_Sources_Accounts::TEST_MODE);
+
+        $test   = ($this->getConfigData('test_api_pad') !== false) ? $this->getConfigData('test_api_pad'): $this->getConfigData('test_api');
+
+        $isTest = ($test == MultiSafepay_Msp_Model_Config_Sources_Accounts::TEST_MODE);
         if ($isTest) {
             return true;
         }
@@ -702,7 +715,8 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object
      */
     protected function _isTestGiftcard($gateway)
     {
-        $isTest = ($this->getConfigData('test_api_pad') == MultiSafepay_Msp_Model_Config_Sources_Accounts::TEST_MODE);
+        $test   = ($this->getConfigData('test_api_pad') === false) ? $this->getConfigData('test_api'): $this->getConfigData('test_api_pad');
+        $isTest = ($test == MultiSafepay_Msp_Model_Config_Sources_Accounts::TEST_MODE);
         if ($isTest) {
             return true;
         }
@@ -920,7 +934,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object
                     }
                 }
 
-                // Fix for 1027 with catalog prices including tax 
+                // Fix for 1027 with catalog prices including tax
                 if (Mage::getStoreConfig('tax/calculation/price_includes_tax')) {
                     $price = ($item->getRowTotalInclTax() / $item->getQtyOrdered() / (1 + ($item->getTaxPercent() / 100)));
                     $price = round($price, $rounding);
@@ -1157,7 +1171,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object
             }
 
             $url = Mage::getUrl("checkout/onepage/success/", array("_secure" => true));
-        } elseif ($this->_gateway == 'INGHOME' || $this->_gateway == 'KBC') {
+        } elseif (in_array ( $this->_gateway, array ('INGHOME', 'KBC', 'TRUSTLY'))) {
             $url = $api->startDirectXMLTransaction();
         } else {
             //$url = $this->api->startCheckout();
@@ -1260,7 +1274,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object
         }
 
         // get the status
-        if ($payment_method_code == 'msp_payafter' || $payment_method_code == 'msp_klarna' || $payment_method_code == 'msp_einvoice') {
+        if ( in_array ($payment_method_code, array( 'msp_payafter', 'msp_klarna', 'msp_einvoice'))) {
             $api = $this->getPayAfterApi($orderId, $order);
         } elseif ($payment_method_code == 'msp_ebon' ||
                 $payment_method_code == 'msp_webgift' ||
@@ -1343,7 +1357,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object
         }
 
         //Disabled check, fixes PLGMAG-10. Magento seems to not to update USD->EUR rate in db, resulting in wrong conversions. Now we calculate the rate manually and and don't trust Magento stored rate.
-        // if (strlen((string) $rateCurrentToTarget) < 12) { 
+        // if (strlen((string) $rateCurrentToTarget) < 12) {
         $revertCheckingCode = Mage::getModel('directory/currency')->load($targetCurrencyCode);
         $revertCheckingRate = $revertCheckingCode->getAnyRate($currentCurrencyCode);
         $rateCurrentToTarget = 1 / $revertCheckingRate;
