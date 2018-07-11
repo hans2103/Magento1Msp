@@ -600,7 +600,8 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
                 Mage::log($mspreturn, null, 'MultiSafepay-Refunds.log');
                 Mage::getSingleton('adminhtml/session')->addNotice(Mage::helper('msp')->__('Refund request has been sent successfully to MultiSafepay, your transaction has been refunded.'));
             } catch (Exception $e) {
-                Mage::log($mspreturn, null, 'MultiSafepay-Refunds.log');
+                Mage::log($e->getMessage(), null, 'MultiSafepay-Refunds.log');
+                Mage::log($refundData, null, 'MultiSafepay-Refunds.log');
 
                 Mage::getSingleton('adminhtml/session')->addError('Online processing of the refund failed, reason: ' . $e->getMessage());
                 $order->addStatusHistoryComment('Online processing of the refund failed, reason: ' . $e->getMessage(), false);
@@ -636,6 +637,9 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
 
         if ($mapi->error) {
             Mage::getSingleton('adminhtml/session')->addError($mapi->error_code . ' - ' . $mapi->error);
+            $order->addStatusHistoryComment('Online processing of the refund failed<br/>' .
+                'Error code: ' . $mapi->error_code . '<br/>' . 
+                'Error: ' . $mapi->error, false);
             //return false;
         } else {
             Mage::getSingleton('adminhtml/session')->addNotice(Mage::helper('msp')->__('Refund request has been sent successfully to MultiSafepay, your transaction has been refunded.'));

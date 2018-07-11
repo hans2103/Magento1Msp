@@ -2269,7 +2269,7 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
             $this->getResponse()->setHeader('X-Feed-Version', '1.0', true);
             $this->getResponse()->setHeader('Shop-Type', 'Magento', true);
             $this->getResponse()->setHeader('Shop-Version', Mage::getVersion(), true);
-            $this->getResponse()->setHeader('Plugin-Version', '2.4.1', true);
+            $this->getResponse()->setHeader('Plugin-Version', '2.4.2', true);
 
             if ($token !== $auth[1] and round($timestamp - $auth[0]) > 10) {
                 $keys_match = false;
