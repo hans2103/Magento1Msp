@@ -66,6 +66,7 @@ media/msp/it/msp_erotiekbon.png            media/msp/it/msp_erotiekbon.png
 media/msp/it/msp_belfius.png            media/msp/it/msp_belfius.png
 media/msp/it/msp_fashioncheque.png            media/msp/it/msp_fashioncheque.png
 media/msp/it/msp_gezondheidsbon.png            media/msp/it/msp_gezondheidsbon.png
+media/msp/it/msp_idealqr.png            media/msp/it/msp_idealqr.png
 media/msp/it/msp_creditcard.png            media/msp/it/msp_creditcard.png
 media/msp/it/msp_boekenbon.png            media/msp/it/msp_boekenbon.png
 media/msp/it/msp_babygiftcard.png            media/msp/it/msp_babygiftcard.png
@@ -124,6 +125,7 @@ media/msp/nl/msp_erotiekbon.png            media/msp/nl/msp_erotiekbon.png
 media/msp/nl/msp_belfius.png            media/msp/nl/msp_belfius.png
 media/msp/nl/msp_fashioncheque.png            media/msp/nl/msp_fashioncheque.png
 media/msp/nl/msp_gezondheidsbon.png            media/msp/nl/msp_gezondheidsbon.png
+media/msp/nl/msp_idealqr.png            media/msp/nl/msp_idealqr.png
 media/msp/nl/msp_creditcard.png            media/msp/nl/msp_creditcard.png
 media/msp/nl/msp_boekenbon.png            media/msp/nl/msp_boekenbon.png
 media/msp/nl/msp_babygiftcard.png            media/msp/nl/msp_babygiftcard.png
@@ -167,6 +169,7 @@ media/msp/de/msp_erotiekbon.png            media/msp/de/msp_erotiekbon.png
 media/msp/de/msp_belfius.png            media/msp/de/msp_belfius.png
 media/msp/de/msp_fashioncheque.png            media/msp/de/msp_fashioncheque.png
 media/msp/de/msp_gezondheidsbon.png            media/msp/de/msp_gezondheidsbon.png
+media/msp/de/msp_idealqr.png            media/msp/de/msp_idealqr.png
 media/msp/de/msp_creditcard.png            media/msp/de/msp_creditcard.png
 media/msp/de/msp_boekenbon.png            media/msp/de/msp_boekenbon.png
 media/msp/de/msp_babygiftcard.png            media/msp/de/msp_babygiftcard.png
@@ -210,6 +213,7 @@ media/msp/fr/msp_erotiekbon.png            media/msp/fr/msp_erotiekbon.png
 media/msp/fr/msp_belfius.png            media/msp/fr/msp_belfius.png
 media/msp/fr/msp_fashioncheque.png            media/msp/fr/msp_fashioncheque.png
 media/msp/fr/msp_gezondheidsbon.png            media/msp/fr/msp_gezondheidsbon.png
+media/msp/fr/msp_idealqr.png            media/msp/fr/msp_idealqr.png
 media/msp/fr/msp_creditcard.png            media/msp/fr/msp_creditcard.png
 media/msp/fr/msp_boekenbon.png            media/msp/fr/msp_boekenbon.png
 media/msp/fr/msp_babygiftcard.png            media/msp/fr/msp_babygiftcard.png
@@ -253,6 +257,7 @@ media/msp/es/msp_erotiekbon.png            media/msp/es/msp_erotiekbon.png
 media/msp/es/msp_belfius.png            media/msp/es/msp_belfius.png
 media/msp/es/msp_fashioncheque.png            media/msp/es/msp_fashioncheque.png
 media/msp/es/msp_gezondheidsbon.png            media/msp/es/msp_gezondheidsbon.png
+media/msp/es/msp_idealqr.png            media/msp/es/msp_idealqr.png
 media/msp/es/msp_creditcard.png            media/msp/es/msp_creditcard.png
 media/msp/es/msp_boekenbon.png            media/msp/es/msp_boekenbon.png
 media/msp/es/msp_babygiftcard.png            media/msp/es/msp_babygiftcard.png
@@ -296,6 +301,7 @@ media/msp/en/msp_erotiekbon.png            media/msp/en/msp_erotiekbon.png
 media/msp/en/msp_belfius.png            media/msp/en/msp_belfius.png
 media/msp/en/msp_fashioncheque.png            media/msp/en/msp_fashioncheque.png
 media/msp/en/msp_gezondheidsbon.png            media/msp/en/msp_gezondheidsbon.png
+media/msp/en/msp_idealqr.png            media/msp/en/msp_idealqr.png
 media/msp/en/msp_creditcard.png            media/msp/en/msp_creditcard.png
 media/msp/en/msp_boekenbon.png            media/msp/en/msp_boekenbon.png
 media/msp/en/msp_babygiftcard.png            media/msp/en/msp_babygiftcard.png
@@ -342,6 +348,7 @@ skin/adminhtml/default/default/images/msp/nl/msp_erotiekbon.png            skin/
 skin/adminhtml/default/default/images/msp/nl/msp_belfius.png            skin/adminhtml/default/default/images/msp/nl/msp_belfius.png
 skin/adminhtml/default/default/images/msp/nl/msp_fashioncheque.png            skin/adminhtml/default/default/images/msp/nl/msp_fashioncheque.png
 skin/adminhtml/default/default/images/msp/nl/msp_gezondheidsbon.png            skin/adminhtml/default/default/images/msp/nl/msp_gezondheidsbon.png
+skin/adminhtml/default/default/images/msp/nl/msp_idealqr.png            skin/adminhtml/default/default/images/msp/nl/msp_idealqr.png
 skin/adminhtml/default/default/images/msp/nl/msp_creditcard.png            skin/adminhtml/default/default/images/msp/nl/msp_creditcard.png
 skin/adminhtml/default/default/images/msp/nl/msp_boekenbon.png            skin/adminhtml/default/default/images/msp/nl/msp_boekenbon.png
 skin/adminhtml/default/default/images/msp/nl/msp_babygiftcard.png            skin/adminhtml/default/default/images/msp/nl/msp_babygiftcard.png
