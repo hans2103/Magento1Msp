@@ -1,21 +1,19 @@
 <?php
+
 /**
  *
  * @category MultiSafepay
  * @package  MultiSafepay_Msp
- * @license  http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
+class MultiSafepay_Msp_Model_Observer_Shipment extends MultiSafepay_Msp_Model_Observer_Abstract {
 
-class MultiSafepay_Msp_Model_Observer_Shipment extends MultiSafepay_Msp_Model_Observer_Abstract
-{
     public $availablePaymentMethodCodes = array(
         'msp_payafter',
     );
 
-    public function sales_order_shipment_save_after(Varien_Event_Observer $observer)
-    {
+    public function sales_order_shipment_save_after(Varien_Event_Observer $observer) {
         /** @var $event Varien_Event */
-        $event    = $observer->getEvent();
+        $event = $observer->getEvent();
 
         /** @var $shipment Mage_Sales_Model_Order_Shipment */
         $shipment = $event->getShipment();
@@ -41,7 +39,7 @@ class MultiSafepay_Msp_Model_Observer_Shipment extends MultiSafepay_Msp_Model_Ob
             return $this;
         }
 
-        $invoiceId  = $order->getInvoiceCollection()->getFirstItem()->getId();
+        $invoiceId = $order->getInvoiceCollection()->getFirstItem()->getId();
 
         /** @var $checkout MultiSafepay_Msp_Model_Checkout */
         $checkout = Mage::getModel('msp/checkout');
@@ -50,7 +48,7 @@ class MultiSafepay_Msp_Model_Observer_Shipment extends MultiSafepay_Msp_Model_Ob
         $base = $checkout->getBase($order->getId());
 
         $configPayAfter = Mage::getStoreConfig('msp/msp_payafter', $order->getStoreId());
-        $configGateway  = Mage::getStoreConfig('msp/settings', $order->getStoreId());
+        $configGateway = Mage::getStoreConfig('msp/settings', $order->getStoreId());
 
         /** @var $api MultiSafepay_Msp_Model_Api_Shipment */
         $api = Mage::getSingleton('msp/api_shipment');
@@ -60,22 +58,22 @@ class MultiSafepay_Msp_Model_Observer_Shipment extends MultiSafepay_Msp_Model_Ob
             $suffix = '_test';
         }
 
-        $api->test                      = ($configPayAfter['test_api_pad'] == 'test');
-        $api->debug                     = $configGateway['debug'];
+        $api->test = ($configPayAfter['test_api_pad'] == 'test');
+        $api->debug = $configGateway['debug'];
 
-        $api->merchant['account_id']    = $configPayAfter['account_id_pad' . $suffix];
-        $api->merchant['site_id']       = $configPayAfter['site_id_pad' . $suffix];
-        $api->merchant['site_code']     = $configPayAfter['secure_code_pad' . $suffix];
+        $api->merchant['account_id'] = $configPayAfter['account_id_pad' . $suffix];
+        $api->merchant['site_id'] = $configPayAfter['site_id_pad' . $suffix];
+        $api->merchant['site_code'] = $configPayAfter['secure_code_pad' . $suffix];
 
-        $api->transaction['id']         = $order->getIncrementId();
+        $api->transaction['id'] = $order->getIncrementId();
         $api->transaction['invoice_id'] = $invoiceId;
-        $api->transaction['shipdate']   = date('Y-m-d H:i:s');
-        $api->transaction['carrier']    = $order->getShippingDescription();
+        $api->transaction['shipdate'] = date('Y-m-d H:i:s');
+        $api->transaction['carrier'] = $order->getShippingDescription();
 
         if ($trackings = Mage::app()->getRequest()->getParam('tracking')) {
             $trackingNumbers = '';
             foreach ($trackings as $tracking) {
-                $trackingNumbers .= $tracking['title'] .'|' . $tracking['number'] . ';';
+                $trackingNumbers .= $tracking['title'] . '|' . $tracking['number'] . ';';
             }
             $api->transaction['shipper_trace_code'] = trim($trackingNumbers, ';');
         } else {
@@ -90,7 +88,7 @@ class MultiSafepay_Msp_Model_Observer_Shipment extends MultiSafepay_Msp_Model_Ob
         // Check error code
         if ($api->error) {
             $base->log("Error " . $api->error_code . ": " . $api->error);
-         }
+        }
 
         if ($result) {
             Mage::getSingleton('adminhtml/session')->addNotice(Mage::helper('msp')->__('The order has been successfully set to shipped within your MultiSafepay transaction, the Pay After Delivery process continues.'));
@@ -100,4 +98,5 @@ class MultiSafepay_Msp_Model_Observer_Shipment extends MultiSafepay_Msp_Model_Ob
 
         return $this;
     }
+
 }

@@ -1,24 +1,22 @@
 <?php
+
 /**
  *
  * @category MultiSafepay
  * @package  MultiSafepay_Msp
- * @license  http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
+require_once(Mage::getBaseDir('lib') . DS . 'multisafepay' . DS . 'MultiSafepay.combined.php');
 
-require_once(Mage::getBaseDir('lib').DS.'multisafepay'.DS.'MultiSafepay.combined.php');
+class MultiSafepay_Msp_CheckoutController extends Mage_Core_Controller_Front_Action {
 
-class MultiSafepay_Msp_CheckoutController extends Mage_Core_Controller_Front_Action
-{
     protected $base;
 
     /**
      * Checkout redirect -> start checkout transaction
      */
-    public function redirectAction()
-    {
+    public function redirectAction() {
         /** @var $session Mage_Checkout_Model_Session */
-        $session  =  Mage::getSingleton('checkout/session');
+        $session = Mage::getSingleton('checkout/session');
 
         /** @var $checkout MultiSafepay_Msp_Model_Checkout */
         $checkout = Mage::getModel("msp/checkout");
@@ -26,7 +24,7 @@ class MultiSafepay_Msp_CheckoutController extends Mage_Core_Controller_Front_Act
         // empty cart -> redirect
         if (!$session->getQuote()->hasItems()) {
             $this->getResponse()->setRedirect(Mage::getUrl('checkout/cart'));
-			return;
+            return;
         }
 
         // create new quote
@@ -36,11 +34,11 @@ class MultiSafepay_Msp_CheckoutController extends Mage_Core_Controller_Front_Act
         $storeQuote->merge($session->getQuote());
         $storeQuote->setItemsCount($session->getQuote()->getItemsCount())->setItemsQty($session->getQuote()->getItemsQty())->setChangedFlag(false);
         $storeQuote->save();
-    
+
         $baseCurrency = $session->getQuote()->getBaseCurrencyCode();
-        $currency     = Mage::app()->getStore($session->getQuote()->getStoreId())->getBaseCurrency();
+        $currency = Mage::app()->getStore($session->getQuote()->getStoreId())->getBaseCurrency();
         $session->getQuote()->collectTotals()->save();
-    
+
         // replace quote into session
         $oldQuote = $session->getQuote();
         $oldQuote->setIsActive(false)->save();
@@ -49,7 +47,7 @@ class MultiSafepay_Msp_CheckoutController extends Mage_Core_Controller_Front_Act
 
         // checkout
         $checkoutLink = $checkout->startCheckout();
-    
+
         header("Location: " . $checkoutLink);
         exit();
     }
@@ -57,13 +55,10 @@ class MultiSafepay_Msp_CheckoutController extends Mage_Core_Controller_Front_Act
     /**
      * Agreements page
      */
-    public function agreementsAction()
-    {
+    public function agreementsAction() {
         $this->loadLayout();
         $block = $this->getLayout()->createBlock(
-            'Mage_Checkout_Block_Agreements',
-            '',
-            array('template' => 'msp/agreements.phtml')
+                'Mage_Checkout_Block_Agreements', '', array('template' => 'msp/agreements.phtml')
         );
         echo $block->toHtml();
     }
@@ -71,11 +66,10 @@ class MultiSafepay_Msp_CheckoutController extends Mage_Core_Controller_Front_Act
     /**
      * Return after transaction
      */
-    public function returnAction()
-    {
-		$this->notificationAction(true);
+    public function returnAction() {
+        $this->notificationAction(true);
         $transactionId = $this->getRequest()->getQuery('transactionid');
-      
+
         // clear cart
         /** @var $session Mage_Checkout_Model_Session */
         $session = Mage::getSingleton("checkout/session");
@@ -92,13 +86,13 @@ class MultiSafepay_Msp_CheckoutController extends Mage_Core_Controller_Front_Act
         $session->setLastRealOrderId($order->getIncrementId());
 
         $storeId = Mage::app()->getStore()->getId();
-        $config  = Mage::getStoreConfig('mspcheckout/settings', $storeId);
+        $config = Mage::getStoreConfig('mspcheckout/settings', $storeId);
 
         // We now have an order so we can also request the customerID. With the customer ID we can login the user.
         if ($config["auto_login_fco_user"]) {
             $order_data = $order->getData();
             $customer = Mage::getModel('customer/customer')->load($order_data['customer_id']);
-            $session  = Mage::getSingleton('customer/session')->setCustomerAsLoggedIn($customer);
+            $session = Mage::getSingleton('customer/session')->setCustomerAsLoggedIn($customer);
         }
 
         // Just as an extra feature, option to redirect to the account instead of the thank you page.
@@ -108,23 +102,21 @@ class MultiSafepay_Msp_CheckoutController extends Mage_Core_Controller_Front_Act
             $this->_redirect("checkout/onepage/success?utm_nooverride=1", array("_secure" => true));
         }
     }
-  
+
     /**
      * Cancel action
      */
-    public function cancelAction()
-    {
+    public function cancelAction() {
         $this->_redirect("checkout", array("_secure" => true));
     }
-  
+
     /**
      * Checks if this is a fastcheckout notification
      */
-    public function isFCONotification($transId)
-    {
+    public function isFCONotification($transId) {
         $storeId = Mage::app()->getStore()->getStoreId();
-        $config  = Mage::getStoreConfig('mspcheckout/settings', $storeId);
-   
+        $config = Mage::getStoreConfig('mspcheckout/settings', $storeId);
+
         $msp = new MultiSafepay();
         $msp->test = ($config["test_api"] == 'test');
         $msp->merchant['account_id'] = $config["account_id"];
@@ -143,11 +135,10 @@ class MultiSafepay_Msp_CheckoutController extends Mage_Core_Controller_Front_Act
     /**
      * Status notification
      */
-	function notificationAction($return = false) 
-    {
+    function notificationAction($return = false) {
         $transactionId = $this->getRequest()->getQuery('transactionid');
-        $isInitial     = ($this->getRequest()->getQuery('type') == 'initial') ? true : false;
-        $isShipping    = ($this->getRequest()->getQuery('type') == 'shipping') ? true : false;
+        $isInitial = ($this->getRequest()->getQuery('type') == 'initial') ? true : false;
+        $isShipping = ($this->getRequest()->getQuery('type') == 'shipping') ? true : false;
 
         /** @var $checkout MultiSafepay_Msp_Model_Checkout */
         $checkout = Mage::getModel('msp/checkout');
@@ -157,58 +148,52 @@ class MultiSafepay_Msp_CheckoutController extends Mage_Core_Controller_Front_Act
             $this->handleShippingRatesNotification($checkout);
             return;
         }
-        
+
         // Check if this is a fastcheckout notification
-        if((!$isInitial) && (!$this->isFCONotification($transactionId))) {
+        if ((!$isInitial) && (!$this->isFCONotification($transactionId))) {
             //Mage::log("Redirecting to standard method notification URL...", null, "multisafepay.log");
             $redirect = Mage::getUrl("msp/standard/notification/");
             header('HTTP/1.1 307 Temporary Redirect');
             header('Location: ' . $redirect);
-			exit;
+            exit;
         }
-        
+
         // Is this notification about new shipping address?
         if ($this->isShippingMethodsNotification()) {
             $this->handleShippingMethodsNotification($checkout);
             return;
         }
- 
+
         $done = $checkout->notification($transactionId, $isInitial);
 
-        if(!$return){	
-			if ($isInitial)
-			{
-				$returnUrl = Mage::getUrl("msp/checkout/return", array("_secure" => true)) . '?transactionid=' . $transactionId;
+        if (!$return) {
+            if ($isInitial) {
+                $returnUrl = Mage::getUrl("msp/checkout/return", array("_secure" => true)) . '?transactionid=' . $transactionId;
 
-				$storeId = Mage::getModel('sales/quote')->load($transactionId)->getStoreId();
-				$storeName = Mage::app()->getGroup($storeId)->getName();
+                $storeId = Mage::getModel('sales/quote')->load($transactionId)->getStoreId();
+                $storeName = Mage::app()->getGroup($storeId)->getName();
 
- 			// display return message
- 				$this->getResponse()->setBody('Return to <a href="' . $returnUrl . '">' . $storeName . '</a>');
-
- 			}else{
-	 			if ($done)
-				{
-	 				$this->getResponse()->setBody('ok');
-	 			}
-				else
-				{
-	 				$this->getResponse()->setBody('nok');
-				}
-			}
-		}else{
-			return true;
-		}
+                // display return message
+                $this->getResponse()->setBody('Return to <a href="' . $returnUrl . '">' . $storeName . '</a>');
+            } else {
+                if ($done) {
+                    $this->getResponse()->setBody('ok');
+                } else {
+                    $this->getResponse()->setBody('ng');
+                }
+            }
+        } else {
+            return true;
+        }
     }
 
     /**
      * @return bool
      */
-    public function isShippingMethodsNotification()
-    {
+    public function isShippingMethodsNotification() {
         // Check for mandatory parameters
-        $country       = $this->getRequest()->getQuery('country');
-        $countryCode   = $this->getRequest()->getQuery('countrycode');
+        $country = $this->getRequest()->getQuery('country');
+        $countryCode = $this->getRequest()->getQuery('countrycode');
         $transactionId = $this->getRequest()->getQuery('transactionid');
 
         if (empty($country) || empty($countryCode) || empty($transactionId)) {
@@ -221,13 +206,12 @@ class MultiSafepay_Msp_CheckoutController extends Mage_Core_Controller_Front_Act
     /**
      * @param $model
      */
-    public function handleShippingMethodsNotification($model)
-    {
-        $country       = $this->getRequest()->getQuery('country');
-        $countryCode   = $this->getRequest()->getQuery('countrycode');
+    public function handleShippingMethodsNotification($model) {
+        $country = $this->getRequest()->getQuery('country');
+        $countryCode = $this->getRequest()->getQuery('countrycode');
         $transactionId = $this->getRequest()->getQuery('transactionid');
-        $weight        = $this->getRequest()->getQuery('weight');
-        $size          = $this->getRequest()->getQuery('size');
+        $weight = $this->getRequest()->getQuery('weight');
+        $size = $this->getRequest()->getQuery('size');
 
         header("Content-Type:text/xml");
         print($model->getShippingMethodsFilteredXML($country, $countryCode, $weight, $size, $transactionId));
@@ -236,20 +220,20 @@ class MultiSafepay_Msp_CheckoutController extends Mage_Core_Controller_Front_Act
     /**
      * @param $model MultiSafepay_Msp_Model_Checkout
      */
-    public function handleShippingRatesNotification($model)
-    {
+    public function handleShippingRatesNotification($model) {
         $transactionId = $this->getRequest()->getQuery('transactionid');
-        $countryCode   = $this->getRequest()->getQuery('countrycode');
-        $zipCode       = $this->getRequest()->getQuery('zipcode');
-        $settings      = array(
+        $countryCode = $this->getRequest()->getQuery('countrycode');
+        $zipCode = $this->getRequest()->getQuery('zipcode');
+        $settings = array(
             'currency' => $this->getRequest()->getQuery('currency'),
-            'country'  => $this->getRequest()->getQuery('country'),
-            'weight'   => $this->getRequest()->getQuery('weight'),
-            'amount'   => $this->getRequest()->getQuery('amount'),
-            'size'     => $this->getRequest()->getQuery('size'),
+            'country' => $this->getRequest()->getQuery('country'),
+            'weight' => $this->getRequest()->getQuery('weight'),
+            'amount' => $this->getRequest()->getQuery('amount'),
+            'size' => $this->getRequest()->getQuery('size'),
         );
 
         header("Content-Type:text/xml");
         print $model->getShippingRatesFilteredXML($transactionId, $countryCode, $zipCode, $settings);
     }
+
 }

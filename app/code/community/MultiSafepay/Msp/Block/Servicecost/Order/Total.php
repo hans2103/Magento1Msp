@@ -1,13 +1,13 @@
 <?php
-class MultiSafepay_Msp_Block_Servicecost_Order_Total extends Mage_Core_Block_Template
-{
+
+class MultiSafepay_Msp_Block_Servicecost_Order_Total extends Mage_Core_Block_Template {
+
     /**
      * Get label cell tag properties
      *
      * @return string
      */
-    public function getLabelProperties()
-    {
+    public function getLabelProperties() {
         return $this->getParentBlock()->getLabelProperties();
     }
 
@@ -16,8 +16,7 @@ class MultiSafepay_Msp_Block_Servicecost_Order_Total extends Mage_Core_Block_Tem
      *
      * @return Mage_Sales_Model_Order
      */
-    public function getOrder()
-    {
+    public function getOrder() {
         return $this->getParentBlock()->getOrder();
     }
 
@@ -26,8 +25,7 @@ class MultiSafepay_Msp_Block_Servicecost_Order_Total extends Mage_Core_Block_Tem
      *
      * @return Mage_Sales_Model_Order
      */
-    public function getSource()
-    {
+    public function getSource() {
         return $this->getParentBlock()->getSource();
     }
 
@@ -36,8 +34,7 @@ class MultiSafepay_Msp_Block_Servicecost_Order_Total extends Mage_Core_Block_Tem
      *
      * @return string
      */
-    public function getValueProperties()
-    {
+    public function getValueProperties() {
         return $this->getParentBlock()->getValueProperties();
     }
 
@@ -46,20 +43,20 @@ class MultiSafepay_Msp_Block_Servicecost_Order_Total extends Mage_Core_Block_Tem
      *
      * @return Enterprise_Reward_Block_Sales_Order_Total
      */
-    public function initTotals()
-    {
+    public function initTotals() {
         if ((float) $this->getOrder()->getBaseFeeAmount()) {
             $source = $this->getSource();
-            $value  = $this->getOrder()->getServicecostPdf();
- 	     $code  =  $this->getOrder()->getPayment()->getMethod();
+            $value = $this->getOrder()->getServicecostPdf();
+            $code = $this->getOrder()->getPayment()->getMethod();
             $this->getParentBlock()->addTotal(new Varien_Object(array(
-                'code'   => 'servicecost',
+                'code' => 'servicecost',
                 'strong' => false,
-                'label'  => Mage::helper('msp')->getFeeLabel($code),
-                'value'  => $source instanceof Mage_Sales_Model_Order_Creditmemo ? - $value : $value
+                'label' => Mage::helper('msp')->getFeeLabel($code),
+                'value' => $source instanceof Mage_Sales_Model_Order_Creditmemo ? - $value : $value
             )));
         }
 
         return $this;
     }
+
 }
