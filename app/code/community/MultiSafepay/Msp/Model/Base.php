@@ -180,6 +180,57 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object
             $transdetails[$key] = $value;
         }
 
+        
+        /*
+         * We need to update the shippingmethods for FCO transactions because these can still change after the order is created
+         */
+        $details = $mspDetails;
+        $quoteid= $order->getQuoteId();
+        $quote= Mage::getModel('sales/quote')->load($quoteid);
+     
+        
+        if(!empty($details['shipping']['type']))
+        {
+            $qAddress = $order->getShippingAddress();
+            $qAddress->setTaxAmount($details['total-tax']['total']);
+            $qAddress->setBaseTaxAmount($details['total-tax']['total']);
+
+            if ($details['shipping']['type'] == 'flat-rate-shipping') {
+                $method = 'mspcheckout_flatrate';
+            } elseif($details['shipping']['type'] == 'pickup') {
+                $method = 'mspcheckout_pickup';
+            }
+
+            if (!empty($method)) {
+                //Mage::getSingleton('tax/config')->setShippingPriceIncludeTax(false);
+
+                $excludingTax = $details['shipping']['cost'];
+
+                $order->setShippingMethod($method)
+                    ->setShippingDescription($details['shipping']['name'])
+                    ->setShippingAmount($excludingTax, true)
+                    ->setBaseShippingAmount($excludingTax, true);
+
+                $includingTax = Mage::helper('tax')->getShippingPrice($excludingTax, true, $qAddress, $quote->getCustomerTaxClassId());
+                $shippingTax = $includingTax - $excludingTax;
+                $order->setShippingTaxAmount($shippingTax)
+                  ->setBaseShippingTaxAmount($shippingTax)
+                  ->setShippingInclTax($includingTax)
+                  ->setBaseShippingInclTax($includingTax);
+            } else {
+                $order->setShippingMethod(null);
+            }
+
+            $order->setGrandTotal($details['order-total']['total']);
+            $order->setBaseGrandTotal($details['order-total']['total']);
+            $order->setTotalPaid($details['order-total']['total']);
+            $order->save();
+        }
+        
+    
+        
+        
+        
         $complete      = false;
         $cancel        = false;
         $newState      = null;
@@ -331,6 +382,7 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object
 		}else{
 			$is_already_invoiced 				= 	false;
 		}*/
+		
 		if (!$this->isStatusInHistory($order, $mspStatus))
 		{
 			if($order->hasInvoices()) 
@@ -345,7 +397,7 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object
 					$payment->setTransactionId($mspDetails['ewallet']['id']);
 					$transaction                                            =       $payment->addTransaction('capture', null, false, $statusMessage);
 					$transaction->setParentTxnId($mspDetails['ewallet']['id']);
-					$transaction->setIsClosed(0);
+					$transaction->setIsClosed(1);
 					$transaction->setAdditionalInformation(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS, $transdetails);
 					$transaction->save();
 					
@@ -353,16 +405,20 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object
 					$is_already_invoiced 				= 	true;
 				}elseif($complete && $order->getState() == Mage_Sales_Model_Order::STATE_NEW)
 				{
+				
 						$payment 							= 	$order->getPayment();
 						$payment->setTransactionId($mspDetails['ewallet']['id']);
 						$transaction 						= 	$payment->addTransaction('capture', null, false, $statusMessage);
 						$transaction->setParentTxnId($mspDetails['ewallet']['id']);
-						$transaction->setIsClosed(0);
+						$transaction->setIsClosed(1);
 						$transaction->setAdditionalInformation(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS, $transdetails);
 						$transaction->save();
+						$payment->setAmount($order->getGrandTotal());
+						
 						$order->setTotalPaid($order->getGrandTotal());
 				}
 			}
+			
 
 			
 			if ($order->getState() == Mage_Sales_Model_Order::STATE_NEW || $order->getState() != 'complete' )
@@ -373,14 +429,13 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object
 				$canUpdate 							= 	false;
 			}
 			
-
 			// update the status if changed
 			if ($canUpdate && (($newState != $order->getState()) || ($newStatus != $order->getStatus())))
 			{
-				if (!$this->isStatusInHistory($order, $mspStatus))
-				{
+				//if (!$this->isStatusInHistory($order, $mspStatus))
+				//{
 					$order->setState($newState, $newStatus, $statusMessage);
-				}
+				//}
 					
 				// create an invoice when the payment is completed
 				//if ($complete)
@@ -470,6 +525,8 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object
         return false;
     }
     
+    
+   
 
     /**
      * Get the current Magento version (as integer, 1.4.x.x => 14)

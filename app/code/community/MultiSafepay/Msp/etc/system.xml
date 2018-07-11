@@ -13,7 +13,7 @@
         <payment>
             <groups>
                 <msp translate="label" module="msp">
-                    <label>MultiSafepay - 2.0.1</label>
+                    <label>MultiSafepay - 2.0.2</label>
                     <sort_order>671</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
@@ -331,7 +331,7 @@
         <!-- end: Main Settings (Payment Methods tab) -->
         <!-- begin: MSP Gateways -->
         <msp translate="label" module="msp">
-            <label>MultiSafepay - Gateways - 2.0.1</label>
+            <label>MultiSafepay - Gateways - 2.0.2</label>
             <tab>sales</tab>
             <frontend_type>text</frontend_type>
             <sort_order>1000</sort_order>
@@ -3674,7 +3674,7 @@
         <!-- end: MSP Gateways -->
         <!-- begin: MSP Fast Checkout -->
         <mspcheckout translate="label" module="msp">
-            <label>MultiSafepay - Fast Checkout - 2.0.1</label>
+            <label>MultiSafepay - Fast Checkout - 2.0.2</label>
             <tab>sales</tab>
             <frontend_type>text</frontend_type>
             <sort_order>1001</sort_order>

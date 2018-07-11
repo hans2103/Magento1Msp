@@ -4,7 +4,12 @@ app/code/community/MultiSafepay/Msp            app/code/community/MultiSafepay/M
 # app/etc
 app/etc/modules/MultiSafepay_Msp.xml            app/etc/modules/MultiSafepay_Msp.xml
 # app/locale
+app/locale/it_IT/MultiSafepay_Msp.csv            app/locale/it_IT/MultiSafepay_Msp.csv
 app/locale/nl_NL/MultiSafepay_Msp.csv            app/locale/nl_NL/MultiSafepay_Msp.csv
+app/locale/es_ES/MultiSafepay_Msp.csv            app/locale/es_ES/MultiSafepay_Msp.csv
+app/locale/en_EN/MultiSafepay_Msp.csv            app/locale/en_EN/MultiSafepay_Msp.csv
+app/locale/fr_FR/MultiSafepay_Msp.csv            app/locale/fr_FR/MultiSafepay_Msp.csv
+app/locale/de_DE/MultiSafepay_Msp.csv            app/locale/de_DE/MultiSafepay_Msp.csv
 # app/design
 app/design/frontend/base/default/layout/msp.xml            app/design/frontend/base/default/layout/msp.xml
 app/design/frontend/base/default/template/msp/link.phtml            app/design/frontend/base/default/template/msp/link.phtml
@@ -14,12 +19,12 @@ app/design/frontend/base/default/template/msp/linkText.phtml            app/desi
 app/design/frontend/base/default/template/msp/gateways.phtml            app/design/frontend/base/default/template/msp/gateways.phtml
 app/design/frontend/base/default/template/msp/bno.phtml            app/design/frontend/base/default/template/msp/bno.phtml
 app/design/frontend/base/default/template/msp/agreements.phtml            app/design/frontend/base/default/template/msp/agreements.phtml
-app/design/frontend/base/default/template/msp/paymentFee/checkout/fee.phtml            app/design/frontend/base/default/template/msp/paymentFee/checkout/fee.phtml
+app/design/adminhtml/default/default/template/msp/idealissuers.phtml            app/design/adminhtml/default/default/template/msp/idealissuers.phtml
+app/design/adminhtml/default/default/template/msp/gateways.phtml            app/design/adminhtml/default/default/template/msp/gateways.phtml
 # lib
 lib/multisafepay/MultiSafepay.combined.php            lib/multisafepay/MultiSafepay.combined.php
 # media
 media/msp/it/msp_visa.png            media/msp/it/msp_visa.png
-media/msp/it/msp_fijncadeau.png            media/msp/it/msp_fijncadeau.png
 media/msp/it/Thumbs.db            media/msp/it/Thumbs.db
 media/msp/it/msp_directebanking.png            media/msp/it/msp_directebanking.png
 media/msp/it/msp_ebon.png            media/msp/it/msp_ebon.png
@@ -43,7 +48,6 @@ media/msp/it/msp_boekenbon.png            media/msp/it/msp_boekenbon.png
 media/msp/it/msp_babygiftcard.png            media/msp/it/msp_babygiftcard.png
 media/msp/it/msp_banktransfer.png            media/msp/it/msp_banktransfer.png
 media/msp/nl/msp_visa.png            media/msp/nl/msp_visa.png
-media/msp/nl/msp_fijncadeau.png            media/msp/nl/msp_fijncadeau.png
 media/msp/nl/Thumbs.db            media/msp/nl/Thumbs.db
 media/msp/nl/msp_directebanking.png            media/msp/nl/msp_directebanking.png
 media/msp/nl/msp_ebon.png            media/msp/nl/msp_ebon.png
@@ -67,7 +71,6 @@ media/msp/nl/msp_boekenbon.png            media/msp/nl/msp_boekenbon.png
 media/msp/nl/msp_babygiftcard.png            media/msp/nl/msp_babygiftcard.png
 media/msp/nl/msp_banktransfer.png            media/msp/nl/msp_banktransfer.png
 media/msp/de/msp_visa.png            media/msp/de/msp_visa.png
-media/msp/de/msp_fijncadeau.png            media/msp/de/msp_fijncadeau.png
 media/msp/de/Thumbs.db            media/msp/de/Thumbs.db
 media/msp/de/msp_directebanking.png            media/msp/de/msp_directebanking.png
 media/msp/de/msp_ebon.png            media/msp/de/msp_ebon.png
@@ -91,7 +94,6 @@ media/msp/de/msp_boekenbon.png            media/msp/de/msp_boekenbon.png
 media/msp/de/msp_babygiftcard.png            media/msp/de/msp_babygiftcard.png
 media/msp/de/msp_banktransfer.png            media/msp/de/msp_banktransfer.png
 media/msp/fr/msp_visa.png            media/msp/fr/msp_visa.png
-media/msp/fr/msp_fijncadeau.png            media/msp/fr/msp_fijncadeau.png
 media/msp/fr/Thumbs.db            media/msp/fr/Thumbs.db
 media/msp/fr/msp_directebanking.png            media/msp/fr/msp_directebanking.png
 media/msp/fr/msp_ebon.png            media/msp/fr/msp_ebon.png
@@ -115,7 +117,6 @@ media/msp/fr/msp_boekenbon.png            media/msp/fr/msp_boekenbon.png
 media/msp/fr/msp_babygiftcard.png            media/msp/fr/msp_babygiftcard.png
 media/msp/fr/msp_banktransfer.png            media/msp/fr/msp_banktransfer.png
 media/msp/es/msp_visa.png            media/msp/es/msp_visa.png
-media/msp/es/msp_fijncadeau.png            media/msp/es/msp_fijncadeau.png
 media/msp/es/Thumbs.db            media/msp/es/Thumbs.db
 media/msp/es/msp_directebanking.png            media/msp/es/msp_directebanking.png
 media/msp/es/msp_ebon.png            media/msp/es/msp_ebon.png
@@ -139,7 +140,6 @@ media/msp/es/msp_boekenbon.png            media/msp/es/msp_boekenbon.png
 media/msp/es/msp_babygiftcard.png            media/msp/es/msp_babygiftcard.png
 media/msp/es/msp_banktransfer.png            media/msp/es/msp_banktransfer.png
 media/msp/en/msp_visa.png            media/msp/en/msp_visa.png
-media/msp/en/msp_fijncadeau.png            media/msp/en/msp_fijncadeau.png
 media/msp/en/Thumbs.db            media/msp/en/Thumbs.db
 media/msp/en/msp_directebanking.png            media/msp/en/msp_directebanking.png
 media/msp/en/msp_ebon.png            media/msp/en/msp_ebon.png
