@@ -571,9 +571,11 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
 
             // raise error
             //Mage::throwException(Mage::helper("msp")->__("An error occured: ") . $this->api->error_code . " - " . $this->api->error);
-            if ($this->api->error_code == '1024') {
+            if ($this->api->error_code == '1024' && $this->_gateway != "EINVOICE" && $this->_gateway != "KLARNA") {
                 $errorMessage = Mage::helper("msp")->__("An error occured: ") . $this->api->error_code . /* " - " . $this->api->error . */ '<br />' . Mage::helper("msp")->__('We are sorry to inform you that your request for payment after delivery has been denied by Multifactor.<BR /> If you have questions about this rejection, you can checkout the FAQ on the website of Multifactor') . '<a href="http://www.multifactor.nl/contact" target="_blank">http://www.multifactor.nl/faq</a>' . Mage::helper("msp")->__('You can also contact Multifactor by calling 020-8500533 (at least 2 hours after this rejection) or by sending an email to ') . ' <a href="mailto:support@multifactor.nl">support@multifactor.nl</a>.' . Mage::helper("msp")->__('Please retry placing your order and select a different payment method.');
-            } else {
+            }elseif($this->_gateway == "EINVOICE" && $this->api->error_code == '1024' ){
+                $errorMessage = Mage::helper("msp")->__("An error occured: ") . $this->api->error_code . /* " - " . $this->api->error . */ '<br />' . Mage::helper("msp")->__('We are sorry to inform you that your request for E-invoicing has been denied.<BR /> Please select another payment method and try again');
+            }else {
                 $errorMessage = Mage::helper("msp")->__("An error occured: ") . $this->api->error_code . " - " . $this->api->error . '<br />' . Mage::helper("msp")->__("Please retry placing your order and select a different payment method.");
             }
             Mage::log($errorMessage);

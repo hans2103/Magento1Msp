@@ -68,7 +68,9 @@ class MultiSafepay_Msp_Model_Observer_Order extends MultiSafepay_Msp_Model_Obser
         /** @var $order Mage_Sales_Model_Order */
         $order = $observer->getEvent()->getOrder();
 
-
+		if($order->getEditIncrement()){
+		    return true;
+	    }
 
 
         /** @var $payment Mage_Payment_Model_Method_Abstract */
