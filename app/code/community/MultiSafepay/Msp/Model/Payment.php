@@ -1201,6 +1201,10 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
         $api->transaction['id'] = $orderId;
         $status = $api->getStatus();
 
+        // log the transaction status requests and responses
+        $this->getBase($orderId)->log($this->api->request_xml);
+        $this->getBase($orderId)->log($this->api->reply_xml);
+        
         /** @var $helper MultiSafepay_Msp_Helper_Data */
         $helper = Mage::helper('msp');
         /** @var $quote Mage_Sales_Model_Quote */

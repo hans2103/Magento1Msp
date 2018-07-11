@@ -33,7 +33,7 @@
                 $iconFileUrl = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA) . $fileWithPath;
               ?>
             <input type="radio" name="payment[<?php echo $_code ?>_bank]" value="<?php echo $bank['code']['VALUE']; ?>">
-			<span style="display:block;float:left;width:45px;"><img src="<?php echo $iconFileUrl;?>"></span>&nbsp;<?php echo $bank['description']['VALUE']; ?>
+			<span style="display:block;float:left;width:45px;"><img src="<?php echo $iconFileUrl;?>" style="width:20px;"></span>&nbsp;<?php echo $bank['description']['VALUE']; ?>
             <?php }else{
                 ?>
                 <input type="radio" name="payment[<?php echo $_code ?>_bank]" value="<?php echo $bank['code']['VALUE']; ?>">
