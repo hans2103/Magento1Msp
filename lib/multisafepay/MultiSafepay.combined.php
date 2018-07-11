@@ -116,7 +116,7 @@ class MultiSafepay {
     var $parsed_xml;
     var $parsed_root;
 
-    function MultiSafepay() {
+    function __construct() {
         $this->cart = new MspCart();
         $this->fields = new MspCustomFields();
     }
@@ -1043,17 +1043,19 @@ class MultiSafepay {
     function setIp() {
 
         $ip = $_SERVER['REMOTE_ADDR'];
-        preg_match("/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/", $ip, $matches);
-
-        $this->customer['ipaddress'] = $matches[0];
+        $isValid = filter_var($ip, FILTER_VALIDATE_IP);
+        
+        if($isValid) {
+            $this->customer['ipaddress'] = $isValid;
+        }
 
         if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
 
             $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-            preg_match("/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/", $ip, $matches);
+            $isValid = filter_var($ip, FILTER_VALIDATE_IP);
 
-            if ($matches[0] != '') {
-                $this->customer['forwardedip'] = $matches[0];
+            if ($isValid) {
+                $this->customer['forwardedip'] = $isValid;
             } else {
                 $this->customer['forwardedip'] = '127.0.0.1';
             }
@@ -1368,7 +1370,7 @@ class msp_gc_xmlparser {
      * Takes in XML data as input( do not include the <xml> tag
      */
 
-    function msp_gc_xmlparser($input, $xmlParams = array(XML_OPTION_CASE_FOLDING => 0)) {
+    function __construct($input, $xmlParams = array(XML_OPTION_CASE_FOLDING => 0)) {
 
         // XML PARSE BUG: http://bugs.php.net/bug.php?id=45996
         $input = str_replace('&amp;', '[msp-amp]', $input);
@@ -1500,7 +1502,7 @@ class msp_gc_XmlBuilder {
     var $indent;
     var $stack = array();
 
-    function msp_gc_XmlBuilder($indent = '  ') {
+    function __construct($indent = '  ') {
         $this->indent = $indent;
         $this->xml = '<?xml version="1.0" encoding="utf-8"?>' . "\n";
     }
@@ -1676,7 +1678,7 @@ class MspCart {
      *                         , as of now values can be 'USD' or 'GBP'.
      *                         defaults to 'USD'
      */
-    function MspCart($id = '', $key = '', $server_type = "sandbox", $currency = "EUR") {
+    function __construct($id = '', $key = '', $server_type = "sandbox", $currency = "EUR") {
         $this->merchant_id = $id;
         $this->merchant_key = $key;
         $this->currency = $currency;
@@ -3068,7 +3070,7 @@ class MspMerchantPrivate {
     var $data;
     var $type = "Abstract";
 
-    function MspMerchantPrivate() {
+    function __construct() {
         
     }
 
@@ -3121,7 +3123,7 @@ class MspMerchantPrivateData extends MspMerchantPrivate {
      *                      </stuff>
      *                    </my-order-id>
      */
-    function MspMerchantPrivateData($data = array()) {
+    function __construct($data = array()) {
         $this->data = $data;
         $this->type = 'merchant-private-data';
     }
@@ -3150,7 +3152,7 @@ class MspMerchantPrivateItemData extends MspMerchantPrivate {
      *                      </stuff>
      *                    </my-item-id>
      */
-    function MspMerchantPrivateItemData($data = array()) {
+    function __construct($data = array()) {
         $this->data = $data;
         $this->type = 'merchant-private-item-data';
     }
@@ -3243,7 +3245,7 @@ class MspItem {
      * @param double $numeric_weight the weight of the item
      * 
      */
-    function MspItem($name, $desc, $qty, $price, $item_weight = '', $numeric_weight = '') {
+    function __construct($name, $desc, $qty, $price, $item_weight = '', $numeric_weight = '') {
         $this->item_name = $this->xmlEscape($name);
         $this->item_description = $this->xmlEscape($desc);
         $this->unit_price = $price;
@@ -3294,7 +3296,7 @@ class MspItem {
      * @return void
      */
     function SetTaxTableSelector($tax_selector) {
-        $this->tax_table_selector = $tax_selector;
+        $this->tax_table_selector = (string) $tax_selector;
     }
 
     /**
@@ -3383,7 +3385,7 @@ class MspFlatRateShipping {
      * @param string $name a name for the shipping
      * @param double $price the price for this shipping
      */
-    function MspFlatRateShipping($name, $price) {
+    function __construct($name, $price) {
         $this->name = $name;
         $this->price = $price;
     }
@@ -3435,7 +3437,7 @@ class MspShippingFilters {
     var $excluded_state_areas_arr;
     var $excluded_zip_patterns_arr;
 
-    function MspShippingFilters() {
+    function __construct() {
         $this->allowed_country_codes_arr = array();
         $this->allowed_postal_patterns_arr = array();
         $this->allowed_state_areas_arr = array();
@@ -3646,7 +3648,7 @@ class MspPickUp {
      * @param string $name the name of this shipping option
      * @param double $price the handling cost (if there is one)
      */
-    function MspPickUp($name, $price, $provider = '') {
+    function __construct($name, $price, $provider = '') {
         $this->price = $price;
         $this->name = $name;
         $this->provider = $provider;
@@ -3692,7 +3694,7 @@ class MspTaxRule {
     var $zip_patterns_arr;
     var $country_area;
 
-    function MspTaxRule() {
+    function __construct() {
         
     }
 
@@ -3743,7 +3745,7 @@ class MspDefaultTaxRule extends MspTaxRule {
 
     var $shipping_taxed = false;
 
-    function MspDefaultTaxRule($tax_rate, $shipping_taxed = "false") {
+    function __construct($tax_rate, $shipping_taxed = "false") {
         $this->tax_rate = $tax_rate;
         $this->shipping_taxed = $shipping_taxed;
 
@@ -3762,7 +3764,7 @@ class MspDefaultTaxRule extends MspTaxRule {
  */
 class MspAlternateTaxRule extends MspTaxRule {
 
-    function MspAlternateTaxRule($tax_rate) {
+    function __construct($tax_rate) {
         $this->tax_rate = $tax_rate;
 
         $this->country_codes_arr = array();
@@ -3784,7 +3786,7 @@ class MspAlternateTaxTable {
     var $tax_rules_arr;
     var $standalone;
 
-    function MspAlternateTaxTable($name = "", $standalone = "false") {
+    function __construct($name = "", $standalone = "false") {
         if ($name != "") {
             $this->name = $name;
             $this->tax_rules_arr = array();
@@ -3946,7 +3948,7 @@ class MspCustomField {
     var $descriptionRight = array();
     var $descriptionBottom = array();
 
-    function MspCustomField($name = null, $type = null, $label = null) {
+    function __construct($name = null, $type = null, $label = null) {
         $this->name = $name;
         $this->type = $type;
         $this->label = $label;
@@ -3978,7 +3980,7 @@ class MspCustomFieldOption {
     var $value;
     var $label;
 
-    function MspCustomFieldOption($value, $label) {
+    function __construct($value, $label) {
         $this->value = $value;
         $this->label = $label;
     }
@@ -3991,7 +3993,7 @@ class MspCustomFieldValidation {
     var $data;
     var $error;
 
-    function MspCustomFieldValidation($type, $data, $error) {
+    function __construct($type, $data, $error) {
         $this->type = $type;
         $this->data = $data;
         $this->error = $error;
@@ -4004,7 +4006,7 @@ class MspCustomFieldFilter {
     var $allowed_country_codes_arr;
     var $excluded_country_codes_arr;
 
-    function MspCustomFieldFilter() {
+    function __construct() {
         $this->allowed_country_codes_arr = array();
         $this->excluded_country_codes_arr = array();
     }
