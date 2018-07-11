@@ -79,8 +79,23 @@ class Mage_Msp_CheckoutController extends Mage_Core_Controller_Front_Action
 		$order = Mage::getSingleton('sales/order')->loadByAttribute('ext_order_id', $transactionid);
 		$session->setLastOrderId($order->getId());
 		$session->setLastRealOrderId($order->getIncrementId());
-      
-		$this->_redirect("checkout/onepage/success?utm_nooverride=1", array("_secure" => true));
+		
+		$storeId = Mage::app()->getStore()->getId();
+		$config = Mage::getStoreConfig('mspcheckout' . "/settings", $storeId);
+		
+		//We now have an order so we can also request the customerID. With the customer ID we can login the user.
+		if($config["auto_login_fco_user"]){
+			$order_data =$order->getData();
+			$customer = Mage::getModel('customer/customer')->load($order_data['customer_id']);
+			$session =Mage::getSingleton('customer/session')->setCustomerAsLoggedIn($customer);
+		}
+	 
+		//Just as an extra feature, option to redirect to the account instead of the thank you page.
+		if($config["redirect_to_account"]){
+			$this->_redirect("customer/account?utm_nooverride=1", array("_secure" => true));
+		}else{
+			$this->_redirect("checkout/onepage/success?utm_nooverride=1", array("_secure" => true));
+		}
 	}
   
 	/**
@@ -131,7 +146,6 @@ class Mage_Msp_CheckoutController extends Mage_Core_Controller_Front_Action
 	*/
 	function notificationAction() 
 	{
-	
         $transactionid = $this->getRequest()->getQuery('transactionid');
         $initial       = ($this->getRequest()->getQuery('type') == 'initial') ? true : false;
         

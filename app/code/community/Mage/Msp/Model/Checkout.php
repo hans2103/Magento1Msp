@@ -805,16 +805,16 @@ class Mage_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
 
 		// check if an order is already created
 		$orders = Mage::getModel('sales/order')->getCollection()->addAttributeToFilter('ext_order_id', $quoteId);
-
+		
 		if (count($orders)) 
 		{
 			$this->getBase()->log("Existing order found (%d), canceling create order", count($orders));
 			return;
 		}
 
-		$customerId = '0'; 
 		$storeId = Mage::app()->getStore()->getId();
-
+		$config = Mage::getStoreConfig('mspcheckout' . "/settings", $storeId);
+		
 		// load quote
 		$this->getBase()->log("Loading quote");
 		$quote = Mage::getModel('sales/quote')->setStoreId($storeId)->load($quoteId)->setIsActive(true);
@@ -828,12 +828,109 @@ class Mage_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
 			$billing->setCompany($api->details['custom-fields']['company']);
 		}
     
-		$quote->setBillingAddress($billing);
-		$shipping = $this->_importAddress($api->details['customer-delivery']);
-		$quote->setShippingAddress($shipping);
 		$quote->getPayment()->importData(array('method'=>'mspcheckout'));
 		$this->_importTotals($quote->getShippingAddress());
 
+		//addresses that we use when creating the new customer account
+		$shipping_address 	= 	array 	(
+											'firstname' 	=> 	$api->details['customer-delivery']['firstname'],
+											'lastname' 		=> 	$api->details['customer-delivery']['lastname'],
+											'street' 		=> 	array 	(
+																			'0' 	=>  $api->details['customer-delivery']['address1'],
+																			'1' 	=> 	$api->details['customer-delivery']['housenumber'],
+																		),
+											'city' 			=> 	$api->details['customer-delivery']['city'],
+											'region_id' 	=> 	'',
+											'region' 		=> 	'',
+											'postcode' 		=> 	$api->details['customer-delivery']['zipcode'],
+											'country_id'	=> 	$api->details['customer-delivery']['country'], /* Croatia */
+											'telephone' 	=> 	$api->details['customer-delivery']['phone1'],
+										);
+										
+		$billing_address 	= 	array 	(
+											'firstname' 	=> 	$api->details['customer']['firstname'],
+											'lastname' 		=> 	$api->details['customer']['lastname'],
+											'street' 		=> 	array 	(
+																			'0' 	=>  $api->details['customer']['address1'],
+																			'1' 	=> 	$api->details['customer']['housenumber'],
+																		),
+											'city' 			=> 	$api->details['customer']['city'],
+											'region_id' 	=> 	'',
+											'region' 		=> 	'',
+											'postcode' 		=> 	$api->details['customer']['zipcode'],
+											'country_id'	=> 	$api->details['customer']['country'], 
+											'telephone' 	=> 	$api->details['customer']['phone1'],
+										);
+		/*
+		*	Start adding customer code
+		*/
+		// Website and Store details
+		$websiteId = Mage::app()->getWebsite()->getId();
+		$store = Mage::app()->getStore();
+		
+		$customer = Mage::getModel("customer/customer");
+		$customer->website_id = $websiteId;
+		$customer->setStore($store);
+
+		// Customer Information
+		$firstname 			= 	$api->details['customer']['firstname'];
+		$lastname 			= 	$api->details['customer']['lastname'];
+		$email 				= 	$api->details['customer']['email'];
+		$passwordLength 	= 	10;
+		$password			= 	$customer->generatePassword($passwordLength);
+	
+		try 
+		{
+			$customer->firstname 		= $firstname;
+			$customer->lastname 		= $lastname;
+			$customer->email 			= $email;
+			$customer->password_hash    = md5($password);
+			$customer->setPassword($password);
+			
+			if($customer->save())
+			{
+				$customAddress = Mage::getModel('customer/address');
+				$customAddress->setData($shipping_address)->setCustomerId($customer->getId())->setIsDefaultBilling('0')->setIsDefaultShipping('1')->setSaveInAddressBook('1');
+				try {
+					$customAddress->save();
+				}
+				catch (Exception $ex) {
+				}
+				
+				$customAddress = Mage::getModel('customer/address');
+				$customAddress->setData($billing_address)->setCustomerId($customer->getId())->setIsDefaultBilling('1')->setIsDefaultShipping('0')->setSaveInAddressBook('1');
+				try {
+					$customAddress->save();
+				}
+				catch (Exception $ex) {
+				}
+			
+				$customerId = $customer->getId();
+				
+				if($config["send_new_account_email"]){
+					$customer->sendNewAccountEmail(); 
+				}
+			}else{
+				$customerId = '0'; 
+			}
+		}catch(Exception $e){
+			$customer ->loadByEmail( $email );
+			$customerId = $customer->getId();
+		}
+		
+		$customerObj 	= 	Mage::getModel('customer/customer')->load($customerId);
+        $quote->assignCustomer($customerObj);
+		//we add the customer to quote that will be converted to an order later, but because the customer could exist already then the addresses that are used are wrong. We need to update the addresses within the quote with
+		//the addresses used at FCO, sow set the billing and shipping addresses again
+		$quote->setBillingAddress($billing);
+		$shipping = $this->_importAddress($api->details['customer-delivery']);
+		$quote->setShippingAddress($shipping);
+		//Finished resetting the addresses
+		
+		/*
+		*	End adding customer code
+		*/
+		
 		// create order
 		$this->getBase()->log("Create order");
 		$convertQuote = Mage::getSingleton('sales/convert_quote');
@@ -1156,7 +1253,7 @@ class Mage_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
 	{
         $methods = $this->getShippingMethodsFiltered($country, $countryCode, $weight, $size, $transactionId);
         
-        $outxml .= '<shipping-info>';
+        $outxml = '<shipping-info>';
         foreach ($methods as $method) {
             $outxml .= '<shipping>';
             $outxml .= '<shipping-name>';

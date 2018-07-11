@@ -44,7 +44,9 @@ class MultiSafepay {
 	'accountholdercity'	=> '',
 	'accountholdercountry'	=> '',
 	'user_agent'			=>	'',
-	'referrer'				=>	''
+	'referrer'				=>	'',
+	'bankaccount'			=>	'',
+	'birthday'				=> 	''
   );
   
   // customer-delivery data
@@ -78,6 +80,25 @@ class MultiSafepay {
     'invoice_id'       => '',
     'shipdate'         => '',
   );
+  
+  var $gatewayinfo = array(
+	'user_agent'			=>	'',
+	'referrer'				=>	'',
+	'bankaccount'			=>	'',
+	'birthday'				=> 	'',
+	'phone'					=>	'',
+	'email'					=>	'',
+	'issuer'				=>	''
+  );
+  
+  var $plugin = array(
+		'shop'				=>	'',
+		'shop_version'		=>	'',
+		'plugin_version'	=> 	'',
+		'partner'			=>	'',
+		'shop_root_url'		=> 	''
+	
+	);
 
   var $ganalytics = array(
     'account'    => '',
@@ -457,10 +478,12 @@ class MultiSafepay {
     if (!$rootNode)
       return false;
 
-    // fix for when there's only one gateway
+   // fix for when there's only one gateway
     $xml_gateways = $rootNode['gateways']['gateway'];
-    if (!isset($xml_gateways[0]))
-      $xml_gateways = array($xml_gateways);
+    if (!isset($xml_gateways[0])){
+		$xml_gateways = array($xml_gateways);
+		$rootNode['gateways']['gateway'] = $xml_gateways;
+	}
 
     // get gatesways
     $gateways = array();
@@ -512,6 +535,13 @@ class MultiSafepay {
         <redirect_url>' .     $this->xmlEscape($this->merchant['redirect_url']) . '</redirect_url>
         <close_window>' .     $this->xmlEscape($this->merchant['close_window']) . '</close_window>
       </merchant>
+	   <plugin>
+		<shop>' .          	  $this->xmlEscape($this->plugin['shop']) 					. '</shop>
+		<shop_version>' .     $this->xmlEscape($this->plugin['shop_version']) 			. '</shop_version>
+		<plugin_version>' .   $this->xmlEscape($this->plugin['plugin_version']) 		. '</plugin_version>
+		<partner>' .          $this->xmlEscape($this->plugin['partner']) 				. '</partner>
+		<shop_root_url>' .    $this->xmlEscape($this->plugin['shop_root_url']) 			. '</shop_root_url>
+	  </plugin>
       <customer>
         <locale>' .           $this->xmlEscape($this->customer['locale']) . '</locale>
         <ipaddress>' .        $this->xmlEscape($this->customer['ipaddress']) . '</ipaddress>
@@ -599,6 +629,13 @@ function createDirectXMLTransactionRequest(){
 			<redirect_url>' .     $this->xmlEscape($this->merchant['redirect_url']) . '</redirect_url>
 			<close_window>' .     $this->xmlEscape($this->merchant['close_window']) . '</close_window>
 		  </merchant>
+		   <plugin>
+		<shop>' .          	  $this->xmlEscape($this->plugin['shop']) 					. '</shop>
+		<shop_version>' .     $this->xmlEscape($this->plugin['shop_version']) 			. '</shop_version>
+		<plugin_version>' .   $this->xmlEscape($this->plugin['plugin_version']) 		. '</plugin_version>
+		<partner>' .          $this->xmlEscape($this->plugin['partner']) 				. '</partner>
+		<shop_root_url>' .    $this->xmlEscape($this->plugin['shop_root_url']) 			. '</shop_root_url>
+	  </plugin>
 		  <customer>
 			<locale>' .           $this->xmlEscape($this->customer['locale']) . '</locale>
 			<ipaddress>' .        $this->xmlEscape($this->customer['ipaddress']) . '</ipaddress>
@@ -667,6 +704,13 @@ function createDirectXMLTransactionRequest(){
 			<redirect_url>' .     $this->xmlEscape($this->merchant['redirect_url']) . '</redirect_url>
 			<close_window>' .     $this->xmlEscape($this->merchant['close_window']) . '</close_window>
 		  </merchant>
+		   <plugin>
+		<shop>' .          	  $this->xmlEscape($this->plugin['shop']) 					. '</shop>
+		<shop_version>' .     $this->xmlEscape($this->plugin['shop_version']) 			. '</shop_version>
+		<plugin_version>' .   $this->xmlEscape($this->plugin['plugin_version']) 		. '</plugin_version>
+		<partner>' .          $this->xmlEscape($this->plugin['partner']) 				. '</partner>
+		<shop_root_url>' .    $this->xmlEscape($this->plugin['shop_root_url']) 			. '</shop_root_url>
+	  </plugin>
 		  <customer>
 			<locale>' .           $this->xmlEscape($this->customer['locale']) . '</locale>
 			<ipaddress>' .        $this->xmlEscape($this->customer['ipaddress']) . '</ipaddress>
@@ -758,6 +802,13 @@ function createDirectXMLTransactionRequest(){
 				<redirect_url>' .     $this->xmlEscape($this->merchant['redirect_url']) . '</redirect_url>
 				<close_window>' .     $this->xmlEscape($this->merchant['close_window']) . '</close_window>
 			</merchant>
+			 <plugin>
+		<shop>' .          	  $this->xmlEscape($this->plugin['shop']) 					. '</shop>
+		<shop_version>' .     $this->xmlEscape($this->plugin['shop_version']) 			. '</shop_version>
+		<plugin_version>' .   $this->xmlEscape($this->plugin['plugin_version']) 		. '</plugin_version>
+		<partner>' .          $this->xmlEscape($this->plugin['partner']) 				. '</partner>
+		<shop_root_url>' .    $this->xmlEscape($this->plugin['shop_root_url']) 			. '</shop_root_url>
+	  </plugin>
 			<customer>
 				<locale>' .           $this->xmlEscape($this->customer['locale']) . '</locale>
 				<ipaddress>' .        $this->xmlEscape($this->customer['ipaddress']) . '</ipaddress>
@@ -793,6 +844,15 @@ function createDirectXMLTransactionRequest(){
 			' . $this->fields_xml . '
 			' . $ganalytics . '		
 			' . $use_shipping_xml . ' 
+			<gatewayinfo>
+				<referrer>'.		$this->xmlEscape($this->gatewayinfo['referrer']).'</referrer>
+				<user_agent>'.		$this->xmlEscape($this->gatewayinfo['user_agent']).'</user_agent>
+				<birthday>'. 		$this->xmlEscape($this->gatewayinfo['birthday']).'</birthday>
+				<bankaccount>'.		$this->xmlEscape($this->gatewayinfo['bankaccount']).'</bankaccount>
+				<phone>'.			$this->xmlEscape($this->gatewayinfo['phone']).'</phone>
+				<email>'.			$this->xmlEscape($this->gatewayinfo['email']).'</email>
+				<issuerid>'.		$this->xmlEscape($this->gatewayinfo['issuerid']).'</issuerid>
+			</gatewayinfo>
 			<transaction>
 				<id>' .               $this->xmlEscape($this->transaction['id']) . '</id>
 				<currency>' .         $this->xmlEscape($this->transaction['currency']) . '</currency>
@@ -962,12 +1022,12 @@ function createDirectXMLTransactionRequest(){
       $shippingTaxed = ($shippingTaxed) ? 'true' : 'false';
   
       if ($globalRate){
-          $rule = new MspDefaultTaxRule('0.19', $shippingTaxed);
+          $rule = new MspDefaultTaxRule('0.21', $shippingTaxed);
           $this->cart->AddDefaultTaxRules($rule);
       }
       
-      $table = new MspAlternateTaxTable('BTW19', 'true');
-      $rule  = new MspAlternateTaxRule('0.19');
+      $table = new MspAlternateTaxTable('BTW21', 'true');
+      $rule  = new MspAlternateTaxRule('0.21');
       $table->AddAlternateTaxRules($rule);
       $this->cart->AddAlternateTaxTables($table);
       
@@ -2262,7 +2322,7 @@ class msp_gc_XmlBuilder {
               array('standalone' => $curr_table->standalone,
                     'name' => $curr_table->name));
             $xml_data->Push('alternate-tax-rules');
-
+			$rule_added = false;
             foreach($curr_table->tax_rules_arr as $curr_rule) {
               if($curr_rule->country_area != "") {
                 $xml_data->Push('alternate-tax-rule');
@@ -3111,9 +3171,43 @@ class msp_gc_XmlBuilder {
      * @param double $numeric_weight the weight of the item
      * 
      */
+      function xmlEscape($str){
+    $string = htmlspecialchars($str,ENT_COMPAT, "UTF-8");
+	
+	
+	
+	return htmlentities($string , ENT_COMPAT, "UTF-8", true);
+
+  }
+
+  
+
+  
+  /*
+   * Returns the string with all XML escaping removed
+   */
+  function xmlUnescape($str){
+    return html_entity_decode($str,ENT_COMPAT, "UTF-8");
+  }
+	
+	
+    /**
+     * {@link http://code.google.com/apis/checkout/developer/index.html#tag_item <item>}
+     * 
+     * @param string $name the name of the item -- required
+     * @param string $desc the description of the item -- required
+     * @param integer $qty the number of units of this item the customer has 
+     *                    in its shopping cart -- required
+     * @param double $price the unit price of the item -- required
+     * @param string $item_weight the weight unit used to specify the item's
+     *                            weight,
+     *                            one of 'LB' (pounds) or 'KG' (kilograms)
+     * @param double $numeric_weight the weight of the item
+     * 
+     */
     function MspItem($name, $desc, $qty, $price, $item_weight='', $numeric_weight='') {
-      $this->item_name = $name; 
-      $this->item_description= $desc;
+      $this->item_name = $this->xmlEscape($name); 
+      $this->item_description=  $this->xmlEscape($desc);
       $this->unit_price = $price;
       $this->quantity = $qty;
 

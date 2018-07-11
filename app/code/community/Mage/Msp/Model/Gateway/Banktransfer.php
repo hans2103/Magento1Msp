@@ -4,12 +4,12 @@ class Mage_Msp_Model_Gateway_Banktransfer extends Mage_Msp_Model_Gateway_Abstrac
 {
 	protected $_code    = "msp_banktransfer";
 	protected $_model   = "banktransfer";
-	public $_gateway = "BANKTRANS";
+	public $_gateway 	= "BANKTRANS";
+	public $string 		=	'';
+	//protected $_formBlockType = 'msp/gateways';  
 	
-	protected $_formBlockType = 'msp/gateways';  
 	
-	
-	public function assignData($data)
+	/*public function assignData($data)
 	{
 		
 		if ( !($data instanceof Varien_Object) ) {
@@ -44,7 +44,7 @@ class Mage_Msp_Model_Gateway_Banktransfer extends Mage_Msp_Model_Gateway_Abstrac
 
 		return $this;
 	}
-	
+	*/
 	
 	
 }
