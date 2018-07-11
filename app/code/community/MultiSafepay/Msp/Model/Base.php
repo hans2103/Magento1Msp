@@ -24,43 +24,42 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
     public $transdetails;
     public $mspDetails;
     protected $_paid;
-    
     public $methodMap = array(
-        'IDEAL' =>'msp_ideal',
-        'DOTPAY' =>'msp_dotpay',
-        'PAYAFTER'=>'msp_payafter',
-        'EINVOICE'=>'msp_einvoice',
-        'KLARNA'=>'msp_klarna',
-        'MISTERCASH'=>'msp_mistercash',
-        'VISA'=> 'msp_visa',
-        'MASTERCARD'=>'msp_mastercard',
-        'BANKTRANS'=>'msp_banktransfer',
-        'MAESTRO'=>'msp_maestro',
-        'PAYPAL'=>'msp_paypal',
-        'AMEX'=>'msp_amex',
-        'WEBGIFT'=>'msp_webgift',
-        'EBON'=>'msp_ebon',
-        'BABYGIFTCARD'=>'msp_babygiftcard',
-        'BOEKENBON'=>'msp_boekenbon',
-        'EROTIEKBON'=>'msp_erotiekbon',
-        'GIVEACARD'=>'msp_giveacard',
-        'PARFUMNL'=>'msp_parfumnl',
-        'PARFUMCADEAUKAART'=>'msp_parfumcadeaukaart',
-        'DEGROTESPEELGOEDWINKEL'=>'msp_degrotespeelgoedwinkel',
-        'GIROPAY'=>'msp_giropay',
-        'MULTISAFEPAY'=>'msp_multisafepay',
-        'DIRECTBANK'=>'msp_directebanking',
-        'DIRDEB'=>'msp_directdebit',
-        'YOURGIFT'=>'msp_yourgift',
-        'WIJNCADEAU'=>'msp_wijncadeau',
-        'LIEF'=>'msp_lief',
-        'GEZONDHEIDSBON'=>'msp_gezondheidsbon',
-        'FASHIONCHEQUE'=>'msp_fashioncheque',
-        'FASHIONGIFTCARD'=>'msp_fashiongiftcard',
-        'PODIUM'=>'msp_podium',
-        'VVVGIFTCARD'=>'msp_vvvgiftcard',
-        'SPORTENFIT'=> 'msp_sportenfit',
-        'BEAUTYANDWELLNESS'=>'msp_beautyandwellness',
+        'IDEAL' => 'msp_ideal',
+        'DOTPAY' => 'msp_dotpay',
+        'PAYAFTER' => 'msp_payafter',
+        'EINVOICE' => 'msp_einvoice',
+        'KLARNA' => 'msp_klarna',
+        'MISTERCASH' => 'msp_mistercash',
+        'VISA' => 'msp_visa',
+        'MASTERCARD' => 'msp_mastercard',
+        'BANKTRANS' => 'msp_banktransfer',
+        'MAESTRO' => 'msp_maestro',
+        'PAYPAL' => 'msp_paypal',
+        'AMEX' => 'msp_amex',
+        'WEBSHOPGIFTCARD' => 'msp_webgift',
+        'EBON' => 'msp_ebon',
+        'BABYGIFTCARD' => 'msp_babygiftcard',
+        'BOEKENBON' => 'msp_boekenbon',
+        'EROTIEKBON' => 'msp_erotiekbon',
+        'GIVEACARD' => 'msp_giveacard',
+        'PARFUMNL' => 'msp_parfumnl',
+        'PARFUMCADEAUKAART' => 'msp_parfumcadeaukaart',
+        'DEGROTESPEELGOEDWINKEL' => 'msp_degrotespeelgoedwinkel',
+        'GIROPAY' => 'msp_giropay',
+        'MULTISAFEPAY' => 'msp_multisafepay',
+        'DIRECTBANK' => 'msp_directebanking',
+        'DIRDEB' => 'msp_directdebit',
+        'YOURGIFT' => 'msp_yourgift',
+        'WIJNCADEAU' => 'msp_wijncadeau',
+        'LIEF' => 'msp_lief',
+        'GEZONDHEIDSBON' => 'msp_gezondheidsbon',
+        'FASHIONCHEQUE' => 'msp_fashioncheque',
+        'FASHIONGIFTCARD' => 'msp_fashiongiftcard',
+        'PODIUM' => 'msp_podium',
+        'VVVGIFTCARD' => 'msp_vvvgiftcard',
+        'SPORTENFIT' => 'msp_sportenfit',
+        'BEAUTYANDWELLNESS' => 'msp_beautyandwellness',
     );
 
     /**
@@ -225,10 +224,10 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
         if ($creditmemo_enabled && ($mspStatus == 'refunded' || $mspStatus == 'partial_refunded')) {
             return true;
         }
-        
+
         $usedMethod = $this->methodMap[$mspDetails['paymentdetails']['type']];
-        
-     
+
+
 
         /**
          *    Create the transaction details array
@@ -295,13 +294,13 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
                 $order->setShippingMethod(null);
             }
 
-            $order->setGrandTotal($details['order-total']['total']+$details['shipping']['cost']);
-            $order->setBaseGrandTotal($details['order-total']['total']+$details['shipping']['cost']);
-            $order->setTotalPaid($details['order-total']['total']+$details['shipping']['cost']);
+            $order->setGrandTotal($details['order-total']['total'] + $details['shipping']['cost']);
+            $order->setBaseGrandTotal($details['order-total']['total'] + $details['shipping']['cost']);
+            $order->setTotalPaid($details['order-total']['total'] + $details['shipping']['cost']);
             $order->save();
         }
-        
-        
+
+
 
 
         $complete = false;
@@ -309,25 +308,24 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
         $newState = null;
         $newStatus = true; // makes Magento use the default status belonging to state
         $statusMessage = '';
-		//$this->_paid = $details['transaction']['amount']/100;
-
+        //$this->_paid = $details['transaction']['amount']/100;
         //If the order already has in invoice than it was paid for using another method? So if our transaction expires we shouldn't update it to cancelled because it was already invoiced.
         if ($order->hasInvoices() && $mspStatus == 'expired') {
             return true;
         }
-        
-        if(($usedMethod == 'PAYAFTER' || $usedMethod == 'KLARNA' || $usedMethod == 'EINVOICE') && ($mspStatus == 'cancelled' || $mspStatus == 'void')){
+
+        if (($usedMethod == 'PAYAFTER' || $usedMethod == 'KLARNA' || $usedMethod == 'EINVOICE') && ($mspStatus == 'cancelled' || $mspStatus == 'void')) {
             return true;
         }
-        
+
         $payment_method_quote = $quote->getPayment();
         $payment = $order->getPayment();
-        
-        if($usedMethod != $payment->getMethod()){
-	        $payment->setMethod($usedMethod);
-			$payment->save();
-			$payment_method_quote->setMethod($usedMethod);
-			$payment_method_quote->save();
+
+        if ($usedMethod != $payment->getMethod()) {
+            $payment->setMethod($usedMethod);
+            $payment->save();
+            $payment_method_quote->setMethod($usedMethod);
+            $payment_method_quote->save();
         }
 
         switch ($mspStatus) {
@@ -358,12 +356,12 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
                     $transaction->setAdditionalInformation(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS, $this->transdetails);
                     $transaction->save();
                 }
-                
-                /*if(round($order->getGrandTotal(),2) != $this->_paid && $mspDetails['ewallet']['fastcheckout'] !='YES' && !Mage::getStoreConfigFlag('msp/settings/allow_convert_currency')){
-	            	$newState = Mage_Sales_Model_Order::STATE_PAYMENT_REVIEW;
-					$newStatus = Mage_Sales_Model_Order::STATE_PAYMENT_REVIEW;
-					$statusMessage = Mage::helper("msp")->__("Payment received for an amount that is not equal to the order total amount. Please verify the paid amount!");
-                }*/
+
+                /* if(round($order->getGrandTotal(),2) != $this->_paid && $mspDetails['ewallet']['fastcheckout'] !='YES' && !Mage::getStoreConfigFlag('msp/settings/allow_convert_currency')){
+                  $newState = Mage_Sales_Model_Order::STATE_PAYMENT_REVIEW;
+                  $newStatus = Mage_Sales_Model_Order::STATE_PAYMENT_REVIEW;
+                  $statusMessage = Mage::helper("msp")->__("Payment received for an amount that is not equal to the order total amount. Please verify the paid amount!");
+                  } */
 
                 break;
             case "uncleared":
@@ -510,9 +508,9 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
                 $is_already_invoiced = true;
             } else {
                 $is_already_invoiced = false;
-                
 
-                if ($complete && $autocreateInvoice){// && $this->_paid == round($order->getBaseGrandTotal(), 2) && !Mage::getStoreConfigFlag('msp/settings/allow_convert_currency')) {
+
+                if ($complete && $autocreateInvoice) {// && $this->_paid == round($order->getBaseGrandTotal(), 2) && !Mage::getStoreConfigFlag('msp/settings/allow_convert_currency')) {
                     $payment = $order->getPayment();
                     $payment->setTransactionId($mspDetails['ewallet']['id']);
                     $transaction = $payment->addTransaction('capture', null, false, $statusMessage);
@@ -530,13 +528,13 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
                     $transaction->setIsClosed(1);
                     $transaction->setAdditionalInformation(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS, $transdetails);
                     $transaction->save();
-                    /*if(!Mage::getStoreConfigFlag('msp/settings/allow_convert_currency')){
-                        $payment->setAmount($this->_paid);
-                        $order->setTotalPaid($this->_paid);
-                    }else{
-                        $payment->setAmount($order->getGrandTotal());
-                        $order->setTotalPaid($order->getGrandTotal());
-                    }*/
+                    /* if(!Mage::getStoreConfigFlag('msp/settings/allow_convert_currency')){
+                      $payment->setAmount($this->_paid);
+                      $order->setTotalPaid($this->_paid);
+                      }else{
+                      $payment->setAmount($order->getGrandTotal());
+                      $order->setTotalPaid($order->getGrandTotal());
+                      } */
                 }
             }
 
@@ -678,8 +676,8 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
                 $order->addStatusHistoryComment('Automatically invoiced by MultiSafepay invoicer.', false);
                 $transactionSave = Mage::getModel('core/resource_transaction')->addObject($invoice)->addObject($invoice->getOrder());
                 $transactionSave->save();
-				
-				$payment = $order->getPayment();
+
+                $payment = $order->getPayment();
 
                 $transaction = $payment->getTransaction($this->mspDetails['ewallet']['id']);
                 if (is_object($transaction)) {

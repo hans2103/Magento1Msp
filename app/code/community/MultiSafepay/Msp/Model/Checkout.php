@@ -174,16 +174,16 @@ class MultiSafepay_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
         $this->_getShippingRates();
         $this->setTaxes();
         $this->getCustomFieldsFromFile();
-        
-        if($this->getSectionConfigData('checkout_custom_fields/fco_postnl')){
-	        $title = 'Post NL';
-	        $price = $this->getSectionConfigData('checkout_custom_fields/fco_postnl_amount');
-	        //$price = (float) Mage::helper('tax')->getShippingPrice($price, false, false);
-			$provider = 'PostNL';
-	        $shipping = new MspPickup($title, $price, $provider);
-	        $this->api->cart->AddShipping($shipping);
+
+        if ($this->getSectionConfigData('checkout_custom_fields/fco_postnl')) {
+            $title = 'Post NL';
+            $price = $this->getSectionConfigData('checkout_custom_fields/fco_postnl_amount');
+            //$price = (float) Mage::helper('tax')->getShippingPrice($price, false, false);
+            $provider = 'PostNL';
+            $shipping = new MspPickup($title, $price, $provider);
+            $this->api->cart->AddShipping($shipping);
         }
-        
+
 
 
         if ($this->getSectionConfigData('checkout_google_analytics/active')) {
@@ -293,7 +293,7 @@ class MultiSafepay_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
             $field->SetStandardField('birthday', 2 == $option);
             $this->api->fields->AddField($field);
         }
-        
+
         $option = $this->getSectionConfigData('checkout_custom_fields/xtra_phone');
         if ($option) {
             $field = new MspCustomField();

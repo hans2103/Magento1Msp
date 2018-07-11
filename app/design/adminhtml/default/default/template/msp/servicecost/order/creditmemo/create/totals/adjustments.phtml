@@ -9,16 +9,16 @@
 <?php $_source = $this->getSource() ?>
 <?php
 if ($_source->getInvoice()) {
-    $fee = $_source->getInvoice()->getBaseServicecost() - $_source->getOrder()->getBaseServicecostRefunded() /*+ ($_source->getInvoice()->getBaseServicecostTax() - $_source->getOrder()->getBaseServiceTaxRefunded())*/;
+    $fee = $_source->getInvoice()->getBaseServicecost() - $_source->getOrder()->getBaseServicecostRefunded() /* + ($_source->getInvoice()->getBaseServicecostTax() - $_source->getOrder()->getBaseServiceTaxRefunded()) */;
 } else {
-    $fee = $_source->getOrder()->getBaseServicecost() - $_source->getOrder()->getBaseServicecostRefunded()/* + ($_source->getOrder()->getBaseServicecostTax() - $_source->getOrder()->getBaseServiceTaxRefunded())*/;
+    $fee = $_source->getOrder()->getBaseServicecost() - $_source->getOrder()->getBaseServicecostRefunded()/* + ($_source->getOrder()->getBaseServicecostTax() - $_source->getOrder()->getBaseServiceTaxRefunded()) */;
 }
 ?>
 
 <?php if ($_source): ?>
     <tr>
-      <td class="label"><?php echo Mage::helper('msp')->getFeeLabel($_source->getOrder()->getPayment()->getMethod()) . '  available for refund'; ?></td>
-      <td><input type="text" name="creditmemo[servicecost]" value="<?php echo number_format(round($fee, 2), 2); ?>" class="input-text not-negative-amount" style="width:60px;text-align:right" id="servicecost"/></td>
+      <td class="label"><?php echo Mage::helper('msp')->getFeeLabel($_source->getOrder()->getPayment()->getMethod()) . ' Incl TAX (if you don\'t want to refund the fee then add the amount as an Adjustmend Fee)'; ?></td>
+      <td><input type="text" disabled name="creditmemo[servicecost]" value="<?php echo number_format(round($fee, 2), 2); ?>" class="input-text not-negative-amount" style="width:60px;text-align:right" id="servicecost"/></td>
     </tr>
     <tr>
       <td class="label"><?php echo $this->getShippingLabel() ?></td>

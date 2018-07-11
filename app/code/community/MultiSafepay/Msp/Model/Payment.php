@@ -261,11 +261,11 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
 
         $currentCurrencyCode = Mage::app()->getStore()->getCurrentCurrencyCode();
         $baseCurrencyCode = Mage::app()->getBaseCurrencyCode();
-        
-		if($order->getGlobalCurrencyCode() == 'EUR' && Mage::getStoreConfigFlag('msp/settings/allow_convert_currency')){
-			$amount = $order_base_grand_total;
+
+        if ($order->getGlobalCurrencyCode() == 'EUR' && Mage::getStoreConfigFlag('msp/settings/allow_convert_currency')) {
+            $amount = $order_base_grand_total;
             $currencyCode = 'EUR';
-		}elseif ($canUseCurrentCurrency) {
+        } elseif ($canUseCurrentCurrency) {
             $amount = $checked_amount_current;
             $currencyCode = $currentCurrencyCode;
         } elseif ($isAllowConvert) {
@@ -362,8 +362,8 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
         } else {
             $this->api->gatewayinfo['phone'] = ''; //not available
         }
-        
-        
+
+
         if (isset($_GET['accountnumber'])) {
             $this->api->gatewayinfo['bankaccount'] = $_GET['accountnumber'];
             $this->api->customer['bankaccount'] = $_GET['accountnumber'];
@@ -385,10 +385,10 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
             $this->api->gatewayinfo['birthday'] = ''; //not available
         }
 
-        if (($this->_gateway == "PAYAFTER" || $this->_gateway =="KLARNA") && $this->api->gatewayinfo['bankaccount'] != '' && $this->api->customer['birthday'] != '') {
+        if (($this->_gateway == "PAYAFTER" || $this->_gateway == "KLARNA") && $this->api->gatewayinfo['bankaccount'] != '' && $this->api->customer['birthday'] != '') {
             $this->api->transaction['special'] = true;
         }
-        
+
         if ($this->_gateway == "EINVOICE") {
             $this->api->transaction['special'] = true;
         }
@@ -499,43 +499,43 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
 
         //Add shipping line item
         $title = $this->getOrder()->getShippingDescription();
-        
+
         //Code blow added to recalculate excluding tax for the shipping cost. Older Magento installations round differently, causing a 1 cent mismatch. This is why we recalculate it.
-        $diff= $this->getOrder()->getShippingInclTax()- $this->getOrder()->getShippingAmount();
-		$test = ($diff/$this->getOrder()->getShippingAmount())*100;
-		$shipping_percentage = 1 + round($test, 0)/100;
-		$shippin_exc_tac_calculated = $this->getOrder()->getShippingInclTax()/$shipping_percentage;
-		$percentage = round($test, 0)/100;
-		$price = number_format($this->_convertCurrency($shippin_exc_tac_calculated, $currentCurrencyCode, $currencyCode), 10, '.', '');
-        /*End code */
-        
+        $diff = $this->getOrder()->getShippingInclTax() - $this->getOrder()->getShippingAmount();
+        $test = ($diff / $this->getOrder()->getShippingAmount()) * 100;
+        $shipping_percentage = 1 + round($test, 0) / 100;
+        $shippin_exc_tac_calculated = $this->getOrder()->getShippingInclTax() / $shipping_percentage;
+        $percentage = round($test, 0) / 100;
+        $price = number_format($this->_convertCurrency($shippin_exc_tac_calculated, $currentCurrencyCode, $currencyCode), 10, '.', '');
+        /* End code */
+
         //$price = number_format($this->_convertCurrency($this->getOrder()->getShippingAmount(), $currentCurrencyCode, $currencyCode), 10, '.', '');
 
-        /*$shipping_tax_id = 'none';
+        /* $shipping_tax_id = 'none';
 
-        if (is_array($this->_getShippingTaxRules())) {
-            foreach ($this->_getShippingTaxRules() as $key => $value) {
-                $shipping_tax_id = $key;
-            }
-        } elseif ($this->_getShippingTaxRules()) {
-            $shipping_tax_id = $this->_getShippingTaxRules() / 100;
-            $table = new MspAlternateTaxTable();
-            $table->name = $shipping_tax_id;
-            $rule = new MspAlternateTaxRule($shipping_tax_id);
-            $table->AddAlternateTaxRules($rule);
-            $this->api->cart->AddAlternateTaxTables($table);
-        }*/
+          if (is_array($this->_getShippingTaxRules())) {
+          foreach ($this->_getShippingTaxRules() as $key => $value) {
+          $shipping_tax_id = $key;
+          }
+          } elseif ($this->_getShippingTaxRules()) {
+          $shipping_tax_id = $this->_getShippingTaxRules() / 100;
+          $table = new MspAlternateTaxTable();
+          $table->name = $shipping_tax_id;
+          $rule = new MspAlternateTaxRule($shipping_tax_id);
+          $table->AddAlternateTaxRules($rule);
+          $this->api->cart->AddAlternateTaxTables($table);
+          } */
 
-		    $table = new MspAlternateTaxTable();
-            $table->name = $percentage;
-            $rule = new MspAlternateTaxRule($percentage);
-            $table->AddAlternateTaxRules($rule);
-            $this->api->cart->AddAlternateTaxTables($table);
+        $table = new MspAlternateTaxTable();
+        $table->name = $percentage;
+        $rule = new MspAlternateTaxRule($percentage);
+        $table->AddAlternateTaxRules($rule);
+        $this->api->cart->AddAlternateTaxTables($table);
 
 
         $c_item = new MspItem($title, 'Shipping', 1, $price, 'KG', 0);
         $c_item->SetMerchantItemId('msp-shipping');
-        $c_item->SetTaxTableSelector($percentage); 
+        $c_item->SetTaxTableSelector($percentage);
         $this->api->cart->AddItem($c_item);
         //End shipping line item
         //Add available taxes to the fco transaction request
@@ -919,10 +919,10 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
 
         $canUseCurrentCurrency = in_array(Mage::app()->getStore()->getCurrentCurrencyCode(), $currencies);
 
-        if($order->getGlobalCurrencyCode() == 'EUR' && Mage::getStoreConfigFlag('msp/settings/allow_convert_currency')){
-			$amount = $order_base_grand_total;
+        if ($order->getGlobalCurrencyCode() == 'EUR' && Mage::getStoreConfigFlag('msp/settings/allow_convert_currency')) {
+            $amount = $order_base_grand_total;
             $currencyCode = 'EUR';
-		}elseif ($canUseCurrentCurrency) {
+        } elseif ($canUseCurrentCurrency) {
             $amount = $checked_amount_current;
             $currencyCode = Mage::app()->getStore()->getCurrentCurrencyCode();
         } elseif ($isAllowConvert) {
@@ -1043,7 +1043,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
             $api->transaction['gateway'] = $this->_gateway;
         }
 
-   
+
 
 
         $ideal_issuer = "";

@@ -9,7 +9,7 @@
 <config>
     <tabs>
         <ms translate="label">
-            <label><![CDATA[<div style="display:inline-block;color:#00adee;text-transform: capitalize;font-size: 120%;font-weight:900;font-family:Tahoma, Geneva, sans-serif;">Multi</div><div style="display:inline-block;color:black;text-transform: capitalize;font-size: 120%;font-weight:900;font-family:Tahoma, Geneva, sans-serif;">Safepay</div><div style="display: inline-block;vertical-align: middle;border: 3px dotted #666;width:8px;height:8px;border-radius:8px;margin-bottom:3px;margin-left:3px;"></div>&nbsp;&nbsp;]]> (2.2.6)</label>
+            <label><![CDATA[<div style="display:inline-block;color:#00adee;text-transform: capitalize;font-size: 120%;font-weight:900;font-family:Tahoma, Geneva, sans-serif;">Multi</div><div style="display:inline-block;color:black;text-transform: capitalize;font-size: 120%;font-weight:900;font-family:Tahoma, Geneva, sans-serif;">Safepay</div><div style="display: inline-block;vertical-align: middle;border: 3px dotted #666;width:8px;height:8px;border-radius:8px;margin-bottom:3px;margin-left:3px;"></div>&nbsp;&nbsp;]]> (2.2.7)</label>
             <sort_order>301</sort_order>
             <!--<class>admin-system-config-msp</class>-->
         </ms>
@@ -7088,7 +7088,7 @@
               <show_in_website>1</show_in_website>
               <show_in_store>1</show_in_store>
             </agreements_active>
-          <!--  <fco_postnl>
+            <!--  <fco_postnl>
                 <label>Post NL shipping</label>
                 <comment>If enabled the customer can select Post NL drop points</comment>
                 <frontend_type>select</frontend_type>
@@ -7134,13 +7134,13 @@
               <show_in_store>1</show_in_store>
             </xtra_birthday>
             <xtra_phone>
-                <label>Phonenumber</label>
-                <frontend_type>select</frontend_type>
-                <source_model>msp/config_sources_fields</source_model>
-                <sort_order>50</sort_order>
-                <show_in_default>1</show_in_default>
-                <show_in_website>1</show_in_website>
-                <show_in_store>1</show_in_store>
+              <label>Phonenumber</label>
+              <frontend_type>select</frontend_type>
+              <source_model>msp/config_sources_fields</source_model>
+              <sort_order>50</sort_order>
+              <show_in_default>1</show_in_default>
+              <show_in_website>1</show_in_website>
+              <show_in_store>1</show_in_store>
             </xtra_phone>
             <xtra_chamberofcommerce>
               <label>Chamber of Commerce (CoC/KvK)</label>

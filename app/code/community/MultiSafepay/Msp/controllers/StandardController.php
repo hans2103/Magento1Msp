@@ -110,18 +110,33 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
         $session->setLastRealOrderId($order->getIncrementId());
 
         //$url = Mage::getUrl('checkout/onepage/success?utm_nooverride=1&__store', array("__secure" => true, "__store"=> $order->getStoreId()));
-        $url = Mage::getUrl('checkout/onepage/success?utm_nooverride', array(
-		    '_current' => true,
-		    '_use_rewrite' => true,
-		    '_secure' => true,
-		    '_store' => $order->getStoreId(),
-		    '_store_to_url' => true
-		));
-      header('Content-type: text/html; charset=utf-8');
-        header("Location: " . $url, true);
-        header("Connection: close", true);
-        header("Content-Length: 0", true);
-        exit;
+        /* $url = Mage::getUrl('checkout/onepage/success', array(
+          '_current' => true,
+          '_use_rewrite' => true,
+          '_secure' => true,
+          '_store' => $order->getStoreId(),
+          '_store_to_url' => true,
+          'query' => array("utm_nooverride" => 1)
+          )); */
+
+
+        $this->_redirect("checkout/onepage/success", array(
+            '_current' => true,
+            '_use_rewrite' => true,
+            '_secure' => true,
+            '_store' => $order->getStoreId(),
+            '_store_to_url' => true,
+            '_query' => array("utm_nooverride" => 1)
+        ));
+
+
+        //print_r($url);exit;
+
+        /* header('Content-type: text/html; charset=utf-8');
+          header("Location: " . $url, true);
+          header("Connection: close", true);
+          header("Content-Length: 0", true);
+          exit; */
         //$this->_redirect($url);
         //$this->_redirect("checkout/onepage/success?utm_nooverride=1", array("__secure" => true, "__store"=> $order->getStoreId()));
     }
@@ -169,9 +184,13 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
 
         //Validate this function. Do we need this one as an extra setting? Why not just detect it on checkout -> ???
         if (Mage::getStoreConfig("msp/settings/use_onestepcheckout") || Mage::getStoreConfig("payment/msp/use_onestepcheckout")) {
-            $this->_redirect("onestepcheckout?utm_nooverride=1", array("_secure" => true));
+            //$this->_redirect("onestepcheckout?utm_nooverride=1", array("_secure" => true));
+            $this->_redirect("onestepcheckout", array("_secure" => true,
+                "query" => array("utm_nooverride" => 1)));
         } else {
-            $this->_redirect("checkout?utm_nooverride=1", array("_secure" => true));
+            //$this->_redirect("checkout?utm_nooverride=1", array("_secure" => true));
+            $this->_redirect("checkout", array("_secure" => true,
+                "query" => array("utm_nooverride" => 1)));
         }
     }
 
@@ -230,7 +249,7 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
         $storeId = Mage::app()->getStore()->getStoreId();
         $config = Mage::getStoreConfig('mspcheckout' . "/settings", $storeId);
 
-        if ( isset($config["active"]) && $config["active"]) {//if (isset($config["account_id"])) {
+        if (isset($config["active"]) && $config["active"]) {//if (isset($config["account_id"])) {
             $msp = new MultiSafepay();
             $msp->test = ($config["test_api"] == 'test');
             $msp->merchant['account_id'] = $config["account_id"];
@@ -268,7 +287,6 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
         }
         $paymentModel = Mage::getSingleton("msp/" . $this->getGatewayModel());
 
-
         $done = $paymentModel->notification($orderId, $initial);
 
         if (!$return) {
@@ -293,33 +311,27 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
     }
 
     /*
-     * This function will generate the product feed, used for FastCheckout shopping
-     *
+     * 	Function that generates a JSON product feed based on productID or CategoryID
      */
+    public function getProductsFeed() {
+        $category_id = $this->getRequest()->getQuery('category_id');
+        $product_id = $this->getRequest()->getQuery('product_id');
 
-    public function feedAction() {
-        $storeId = Mage::app()->getStore()->getStoreId();
-        $config = Mage::getStoreConfig('mspcheckout' . "/settings", $storeId);
-        $api_key = $this->getRequest()->getQuery('api_key');
-        $config_api_key = $config["api_key"];
-
-        if (strtoupper($api_key) == strtoupper($config_api_key)) {
-            $keys_match = true;
-        } else {
-            $keys_match = false;
+        if (empty($category_id) && empty($product_id)) {
+            echo 'Nothing to fetch. Missing product_id or category_id';
+            exit;
         }
-        $json = array();
 
-        if ($config["allow_fcofeed"] && $keys_match) {
-            $products = Mage::getModel('catalog/product')->getCollection();
-            $products->addAttributeToFilter('status', 1); //1 is set to select product in stock
-            $products->addAttributeToFilter('visibility', 4); //4 is set to select active products
-            $products->addAttributeToSelect('*');
-            $prodIds = $products->getAllIds();
+        //If category is set then get the products from that category
+        //If category is not set, but product_id is, then get that product
+        if (!empty($category_id)) {
+            $products = Mage::getModel('catalog/category')->load($category_id);
+            $productslist = $products->getProductCollection()->addAttributeToSelect('*')->addAttributeToFilter('status', 1)->addAttributeToFilter('visibility', 4);
+            $json = array();
+            $prodIds = $productslist->getAllIds();
 
             foreach ($prodIds as $productId) {
                 $product = Mage::getModel('catalog/product')->load($productId);
-
                 $maincat = $subcats = '';
                 $cats = $product->getCategoryIds();
                 //$eee = implode(",",$cats);
@@ -330,7 +342,7 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
                     } else {
                         $subcats .= ">" . $_cat->getName();
                     }
-                } //creating and setting parent category and other categories
+                }
 
                 $product_data = array();
                 $product_data['ProductID'] = $productId;
@@ -346,7 +358,6 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
                 $product_data['RetailPrice'] = round($product->getPrice(), 4);
                 $product_data['UniversalProductCode'] = $product->getData('upc'); //need variable
                 $product_data['Currency'] = Mage::app()->getStore()->getCurrentCurrencyCode();
-
 
                 foreach ($product->getOptions() as $value) {
                     if (is_object($value)) {
@@ -374,15 +385,194 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
                 }
                 $json[] = $product_data;
             }
+        } elseif (!empty($product_id)) {
+            $json = array();
+            $product = Mage::getModel('catalog/product')->load($product_id);
+            $maincat = $subcats = '';
+            $cats = $product->getCategoryIds();
+            //$eee = implode(",",$cats);
+            foreach ($cats as $category_id) {
+                $_cat = Mage::getModel('catalog/category')->load($category_id);
+                if ($subcats == '') {
+                    $maincat = $subcats = $_cat->getName();
+                } else {
+                    $subcats .= ">" . $_cat->getName();
+                }
+            }
+
+            $product_data = array();
+            $product_data['ProductID'] = $product_id;
+            $product_data['ProductName'] = $product->getName();
+            $product_data['SKUnumber'] = $product->getSku();
+            $product_data['PrimaryCategory'] = $maincat;
+            $product_data['SecondaryCategory'] = $subcats;
+            $product_data['ProductURL'] = $product->getProductUrl();
+            $product_data['ProductImageURL'] = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA) . 'catalog/product' . $product->getImage();
+            $product_data['ShortProductDescription'] = substr(iconv("UTF-8", "UTF-8//IGNORE", $product->getDescription()), 0, 150) . "...";
+            $product_data['LongProductDescription'] = substr(iconv("UTF-8", "UTF-8//IGNORE", $product->getDescription()), 0, 2000);
+            $product_data['SalePrice'] = round($product->getFinalPrice(), 4);
+            $product_data['RetailPrice'] = round($product->getPrice(), 4);
+            $product_data['UniversalProductCode'] = $product->getData('upc'); //need variable
+            $product_data['Currency'] = Mage::app()->getStore()->getCurrentCurrencyCode();
+
+            foreach ($product->getOptions() as $value) {
+                if (is_object($value)) {
+                    $values = $value->getValues();
+                    foreach ($values as $values) {
+                        $product_data['Options']['CustomOptions'][$value->getTitle()][] = $values->getData();
+                    }
+                }
+            }
+
+            $attributes = $product->getAttributes();
+            foreach ($attributes as $attribute) {
+                if ($attribute->getIsVisibleOnFront()) {
+                    $product_data['Attributes'][$attribute->getAttributeCode()] = array('label' => $attribute->getFrontend()->getLabel($product), 'value' => $attribute->getFrontend()->getValue($product));
+                }
+            }
+
+            if ($product->isConfigurable()) {
+                $productAttributeOptions = $product->getTypeInstance(true)->getConfigurableAttributesAsArray($product);
+                foreach ($productAttributeOptions as $productAttribute) {
+                    foreach ($productAttribute['values'] as $attribute) {
+                        $product_data['Options']['GlobalOptions'][$productAttribute['label']][$attribute['value_index']] = array('Label' => $attribute['store_label'], 'Pricing' => $attribute['pricing_value']);
+                    }
+                }
+            }
+            $json[] = $product_data;
+        }
+        return json_encode($json);
+    }
+
+    /*
+     * 	Function that generates a JSON Categories feed.
+     */
+
+    public function getCategoriesFeed() {
+        $recursionLevel = 10;
+        $parent = Mage::app()->getStore()->getRootCategoryId();
+        $tree = Mage::getResourceModel('catalog/category_tree');
+        $nodes = $tree->loadNode($parent)->loadChildren($recursionLevel)->getChildren();
+        $tree->addCollectionData(null, false, $parent);
+        $categoryTreeData = new stdClass();
+        $categoryTreeData->categories = array();
+        foreach ($nodes as $node) {
+            $categoryTreeData->categories[] = $this->getNodeChildrenData($node);
+        }
+        return json_encode($categoryTreeData);
+    }
+
+    function getNodeChildrenData(Varien_Data_Tree_Node $node) {
+        $data = array(
+            'title' => $node->getData('name'),
+            'id' => $node->getData('entity_id')
+        );
+
+        foreach ($node->getChildren() as $childNode) {
+            if (!array_key_exists('children', $data)) {
+                $data['children'] = array();
+            }
+            $data['children'][] = $this->getNodeChildrenData($childNode);
+        }
+        return $data;
+    }
+
+    /*
+     * 	Function that generates a JSON Stock feed based on productID(s).
+     */
+
+    public function getStockFeed() {
+        $product_id = $this->getRequest()->getQuery('product_id');
+        $stock = array();
+        if (empty($product_id)) {
+            echo 'Nothing to fetch. Missing product_id.';
+            exit;
+        }
+
+        $stockItem = Mage::getModel('cataloginventory/stock_item')->loadByProduct($product_id);
+        $stockqty = new stdclass();
+        $stockqty->ProductID = $product_id;
+        $stockqty->Stock = $stockItem->getQty();
+        $stock[] = $stockqty;
+        return json_encode($stock);
+    }
+
+    /*
+     * 	Function that generates a JSON Tax feed.
+     */
+    public function getTaxFeed() {
+        $taxRules = Mage::getModel('tax/sales_order_tax')->getCollection();
+        $taxes = array();
+
+        foreach ($taxRules as $taxRule) {
+            print_r($taxRule);
+            exit;
+
+            $tax_rule = new stdclass();
+            $tax_rule->id = $taxRule->getTaxId();
+            $tax_rule->name = $taxRule->getTitle();
+            $tax_rule->rate = $taxRule->getPercent();
+            $taxes[] = $tax_rule;
+        }
+        return json_encode($taxes);
+    }
+
+    /*
+     * 	Function that generates a JSON Shipping feed.
+     */
+    public function getShippingFeed() {
+        return 'Shipping feed in json needs to be returned';
+    }
+
+    /*
+     * This function will generate the product feed, used for FastCheckout shopping
+     *
+     */
+    public function feedAction() {
+        $storeId = Mage::app()->getStore()->getStoreId();
+        $config = Mage::getStoreConfig('mspcheckout' . "/settings", $storeId);
+        $api_key = $this->getRequest()->getQuery('api_key');
+        $config_api_key = $config["api_key"];
+
+        if (strtoupper($api_key) == strtoupper($config_api_key)) {
+            $keys_match = true;
+        } else {
+            $keys_match = false;
+        }
+
+        //Check if feed is enabled and api keys match
+        if ($config["allow_fcofeed"] && $keys_match) {
+            $identifier = $this->getRequest()->getQuery('identifier');
+            if (empty($identifier)) {
+                echo 'Identifier not set';
+                exit;
+            }
+            $json = '';
+
+            switch ($identifier) {
+                case "products":
+                    $json = $this->getProductsFeed();
+                    break;
+                case "categories":
+                    $json = $this->getCategoriesFeed();
+                    break;
+                case "stock":
+                    $json = $this->getStockFeed();
+                    break;
+                case "tax":
+                    $json = $this->getTaxFeed();
+                    break;
+                case "shipping":
+                    $json = $this->getShippingFeed();
+                    break;
+            }
 
             $this->getResponse()->setHeader('Content-type', 'application/json', true);
-            echo '<pre>';
-
-            echo $this->json_readable_encode($json);
-            echo '</pre>';
+            echo $json;
             exit;
         } else {
             echo Mage::helper("msp")->__("You are not allowed to request the product feed!");
+            exit;
         }
     }
 
