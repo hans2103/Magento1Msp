@@ -55,6 +55,7 @@ class MultiSafepay_Msp_Model_Api_Paylink {
         'msp_babygiftcard' => 'BABYGIFTCARD',
         'msp_boekenbon' => 'BOEKENBON',
         'msp_erotiekbon' => 'EROTIEKBON',
+        'msp_giveacard' => 'GIVEACARD',
         'msp_parfumnl' => 'PARFUMNL',
         'msp_parfumcadeaukaart' => 'PARFUMCADEAUKAART',
         'msp_degrotespeelgoedwinkel' => 'DEGROTESPEELGOEDWINKEL',
@@ -88,7 +89,7 @@ class MultiSafepay_Msp_Model_Api_Paylink {
 
         $payment = $order->getPayment()->getMethodInstance();
         $pm_code = $payment->getCode();
-         $storename = strtok($order->getStoreName(), "\n");//Mage::app()->getStore()->getName();
+        $storename = strtok($order->getStoreName(), "\n"); //Mage::app()->getStore()->getName();
         $billing = $order->getBillingAddress();
         $shipping = $order->getShippingAddress();
 
@@ -109,9 +110,9 @@ class MultiSafepay_Msp_Model_Api_Paylink {
         $mapi->merchant['site_code'] = $this->merchant['security_code'];
 
         $mapi->test = $this->test;
-        $mapi->merchant['notification_url'] = Mage::getUrl("msp/standard/notification") . '&type=initial';
-        $mapi->merchant['cancel_url'] = Mage::getUrl("msp/standard/cancel", array("_secure" => true));
-        $mapi->merchant['redirect_url'] = Mage::getUrl("msp/standard/return", array("_secure" => true));
+          $mapi->merchant['notification_url'] = Mage::getUrl("msp/standard/notification", array("_secure" => true, "_store"=> $order->getStoreId())) . '&type=initial';
+        $mapi->merchant['cancel_url'] = Mage::getUrl("msp/standard/cancel", array("_secure" => true, "_store"=> $order->getStoreId()));
+        $mapi->merchant['redirect_url'] = Mage::getUrl("msp/standard/return", array("_secure" => true, "_store"=> $order->getStoreId()));
 
         $mapi->parseCustomerAddress($billing->getStreet(1));
 

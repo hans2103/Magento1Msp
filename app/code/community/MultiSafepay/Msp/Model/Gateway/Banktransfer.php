@@ -11,4 +11,5 @@ class MultiSafepay_Msp_Model_Gateway_Banktransfer extends MultiSafepay_Msp_Model
     public $_model = "banktransfer";
     public $_gateway = "BANKTRANS";
     public $string = '';
+
 }

@@ -28,7 +28,7 @@ $additionalColumns = array(
         'servicecost_pdf',
     ),
     $this->getTable('sales/invoice') => array(
-         'servicecost',
+        'servicecost',
         'base_servicecost',
         'servicecost_invoiced',
         'base_servicecost_invoiced',
@@ -58,7 +58,7 @@ $additionalColumns = array(
         'servicecost_pdf',
     ),
     $this->getTable('sales/creditmemo') => array(
-         'servicecost',
+        'servicecost',
         'base_servicecost',
         'servicecost_invoiced',
         'base_servicecost_invoiced',
@@ -72,7 +72,7 @@ $additionalColumns = array(
         'base_servicecost_tax_refunded',
         'servicecost_pdf',
     ),
-); 
+);
 
 foreach ($additionalColumns as $table => $columns) {
     foreach ($columns as $column) {

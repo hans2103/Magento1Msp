@@ -29,6 +29,7 @@ class MultiSafepay_Msp_Model_Observer_Order extends MultiSafepay_Msp_Model_Obser
         'msp_babygiftcard',
         'msp_boekenbon',
         'msp_erotiekbon',
+        'msp_giveacard',
         'msp_parfumnl',
         'msp_parfumcadeaukaart',
         'msp_degrotespeelgoedwinkel',

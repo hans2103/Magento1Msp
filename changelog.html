@@ -8,6 +8,38 @@
 	<div id="container" style="width:900px; margin-left:100">
 	
 		<div id="version" style="background-color:#E0E0E0 ;">
+			<b>Release Notes - Magento 2.2.2 (Dec 28th, 2015)</b>
+		</div>
+		<p>
+		
+			<b>Improvements</b>
+			<hr size=1 color="#E0E0E0";>
+			<ul>
+				<li>If paid amount difference from total order amount. A Note is added with extra info. No invoice is created.</li>
+                <li>Added (incl Tax) to totals line to make it more cleare as other lines can be set in tax totals settings. Also added this for the frontend.</li>
+                <li>Added configurable FastCheckout field for phonenumber.</li>
+
+            </ul>
+			<br/>			
+
+			<b>Fixes</b>
+			<hr size=1 color="#E0E0E0";>
+			<ul>
+				<li>Fixes undefined configMain notice.</li>
+                <li>Added missing klarna.phtml</li>
+                <li>In case an order is paid by second chance and an other paymentmethod is used as the initial, the order will be updated with the correct payment method.</li>
+                <li>Fixes bug with directdebit using a wrong gateway code</li>
+                <li>Fixes for wrong creditmemo amounts that are processed.</li>
+                <li>Fixes Store id is now used to get the correct store urls to redirect to</li>
+                <li>Fixes cancelled status for PAD and Klarna notifications are now ignored as the order was already set to Paid. If set to canceled then a creditmemo can't be created anymore.</li>
+                <li>Fixes bug causing the order status set to "payment review" instead of "processing". This was caused because the order grandtotal had to be rounded to two so it matches the paid amount in the transaction.</li>
+            </ul>
+		</p>
+		<br/>
+		<br/>
+
+
+		<div id="version" style="background-color:#E0E0E0 ;">
 			<b>Release Notes - Magento 2.2.1 (Nov 12th, 2015)</b>
 		</div>
 		<p>

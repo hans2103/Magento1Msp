@@ -21,15 +21,14 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
     public $api;
     public $payafterapi;
     public $pay_factor = 1;
-	public $_configCode= 'msp';
-	
-	
-	public $giftcards = array(
+    public $_configCode = 'msp';
+    public $giftcards = array(
         'msp_webgift',
         'msp_ebon',
         'msp_babygiftcard',
         'msp_boekenbon',
         'msp_erotiekbon',
+        'msp_giveacard',
         'msp_parfumnl',
         'msp_parfumcadeaukaart',
         'msp_degrotespeelgoedwinkel',
@@ -44,8 +43,6 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
         'msp_sportenfit',
         'msp_beautyandwellness',
     );
-
-    
     public $gateways = array(
         'msp_ideal',
         'msp_payafter',
@@ -61,9 +58,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
         'msp_directebanking',
         'msp_directdebit',
         'msp_amex',
-     
     );
-
 
     /**
      * Set some vars
@@ -347,13 +342,13 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
         $this->api->gatewayinfo['email'] = $this->getOrder()->getCustomerEmail();
         $this->api->gatewayinfo['phone'] = $billing->getTelephone();
 
-		if (isset($_GET['gender'])) {
-			$this->api->customer['gender'] 		= $_GET['gender'];
-			$this->api->gatewayinfo['gender'] 	= $_GET['gender'];
-		} else {
-			$this->api->customer['gender'] 		= ''; //not available
-			$this->api->gatewayinfo['gender'] 	= ''; //not available
-		}
+        if (isset($_GET['gender'])) {
+            $this->api->customer['gender'] = $_GET['gender'];
+            $this->api->gatewayinfo['gender'] = $_GET['gender'];
+        } else {
+            $this->api->customer['gender'] = ''; //not available
+            $this->api->gatewayinfo['gender'] = ''; //not available
+        }
 
 
         if (isset($_GET['accountnumber'])) {
@@ -466,7 +461,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
             $total_fee += $fixed_fee;
             $fee = $total_fee;
             $tax = ($fee / $bigRate) * $rate;
-            $fee = $fee - $tax; 
+            $fee = $fee - $tax;
 
 
             //add pay after delivery fee if enabled
@@ -493,13 +488,13 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
 		$test = ($diff/$this->getOrder()->getShippingAmount())*100;
 		$shipping_percentage = 1 + round($test, 0)/100;
 		$shippin_exc_tac_calculated = $this->getOrder()->getShippingInclTax()/$shipping_percentage;
-
+		$percentage = round($test, 0)/100;
 		$price = number_format($this->_convertCurrency($shippin_exc_tac_calculated, $currentCurrencyCode, $currencyCode), 10, '.', '');
         /*End code */
         
         //$price = number_format($this->_convertCurrency($this->getOrder()->getShippingAmount(), $currentCurrencyCode, $currencyCode), 10, '.', '');
 
-        $shipping_tax_id = 'none';
+        /*$shipping_tax_id = 'none';
 
         if (is_array($this->_getShippingTaxRules())) {
             foreach ($this->_getShippingTaxRules() as $key => $value) {
@@ -512,14 +507,22 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
             $rule = new MspAlternateTaxRule($shipping_tax_id);
             $table->AddAlternateTaxRules($rule);
             $this->api->cart->AddAlternateTaxTables($table);
-        }
+        }*/
+
+		    $table = new MspAlternateTaxTable();
+            $table->name = $percentage;
+            $rule = new MspAlternateTaxRule($percentage);
+            $table->AddAlternateTaxRules($rule);
+            $this->api->cart->AddAlternateTaxTables($table);
+
 
         $c_item = new MspItem($title, 'Shipping', 1, $price, 'KG', 0);
         $c_item->SetMerchantItemId('msp-shipping');
-        $c_item->SetTaxTableSelector($shipping_tax_id); //TODO Validate this one. 
+        $c_item->SetTaxTableSelector($percentage); 
         $this->api->cart->AddItem($c_item);
         //End shipping line item
         //Add available taxes to the fco transaction request
+
         $this->getTaxes();
 
 
@@ -611,7 +614,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
 
         return false;
     }
-    
+
     /**
      * @return bool
      */
@@ -788,12 +791,12 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
             //$quantity = round($item->getQtyOrdered(), 2);
 
             $ndata = $item->getData();
-            
-            
-            if($this->api->transaction['gateway'] == 'KLARNA'){
+
+
+            if ($this->api->transaction['gateway'] == 'KLARNA') {
                 $rounding = 10;
-            }else{
-              $rounding = 10;
+            } else {
+                $rounding = 10;
             }
 
             if ($ndata['price'] != 0) {
@@ -827,7 +830,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
                         $price = number_format($this->_convertCurrency($price, $currentCurrencyCode, $targetCurrencyCode), $rounding, '.', '');
                     }
                 }
-                
+
                 // Fix for 1027 with catalog prices including tax 
                 if (Mage::getStoreConfig('tax/calculation/price_includes_tax')) {
                     $price = ($item->getRowTotalInclTax() / $item->getQtyOrdered() / (1 + ($item->getTaxPercent() / 100)));
@@ -880,14 +883,19 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
           } */
 
         $gateway_data = $quote->getPayment()->getData();
+        if ($gateway_data['method'] === 'msp_directebanking' ) {
+			$gateway = 'DIRECTBANK';
+		}else{
         $gateway = strtoupper(str_replace("msp_", '', $gateway_data['method']));
+		}	
+        //$gateway = strtoupper(str_replace("msp_", '', $gateway_data['method']));
 
 
-		if(in_array($gateway_data['method'], $this->gateways)){
-		    $this->_configCode = 'msp_gateways';
-		}elseif(in_array($gateway_data['method'], $this->giftcards)){   
-			$this->_configCode = 'msp_giftcards';  
-		}
+        if (in_array($gateway_data['method'], $this->gateways)) {
+            $this->_configCode = 'msp_gateways';
+        } elseif (in_array($gateway_data['method'], $this->giftcards)) {
+            $this->_configCode = 'msp_giftcards';
+        }
 
 
         // currency check
@@ -896,7 +904,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
         if ($gateway_data['method'] == 'msp') {
             $currencies = explode(',', Mage::getStoreConfig('payment/msp/allowed_currency'));
         } else {
-            $currencies = explode(',', Mage::getStoreConfig($this->_configCode.'/' . strtolower($gateway_data['method']) . '/allowed_currency'));
+            $currencies = explode(',', Mage::getStoreConfig($this->_configCode . '/' . strtolower($gateway_data['method']) . '/allowed_currency'));
         }
 
         $canUseCurrentCurrency = in_array(Mage::app()->getStore()->getCurrentCurrencyCode(), $currencies);
@@ -937,6 +945,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
                 $gateway_data['method'] == 'msp_boekenbon' ||
                 $gateway_data['method'] == 'msp_degrotespeelgoedwinkel' ||
                 $gateway_data['method'] == 'msp_erotiekbon' ||
+                $gateway_data['method'] == 'msp_giveacard' ||
                 $gateway_data['method'] == 'msp_fashioncheque' ||
                 $gateway_data['method'] == 'msp_fashiongiftcard' ||
                 $gateway_data['method'] == 'msp_gezondheidsbon' ||
@@ -1161,6 +1170,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
                 $payment_method_code == 'msp_boekenbon' ||
                 $payment_method_code == 'msp_degrotespeelgoedwinkel' ||
                 $payment_method_code == 'msp_erotiekbon' ||
+                $payment_method_code == 'msp_giveacard' ||
                 $payment_method_code == 'msp_fashioncheque' ||
                 $payment_method_code == 'msp_fashiongiftcard' ||
                 $payment_method_code == 'msp_gezondheidsbon' ||

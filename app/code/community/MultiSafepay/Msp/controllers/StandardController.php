@@ -92,7 +92,7 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
      * Return after transaction
      */
     public function returnAction() {
-       $transactionId = $this->getRequest()->getQuery('transactionid');
+        $transactionId = $this->getRequest()->getQuery('transactionid');
 
         /** @var $session Mage_Checkout_Model_Session */
         $session = Mage::getSingleton("checkout/session");
@@ -108,11 +108,10 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
         $order = Mage::getModel('sales/order')->loadByIncrementId($transactionId);
         $session->setLastOrderId($order->getId());
         $session->setLastRealOrderId($order->getIncrementId());
-        
-        // End fix
-        $this->_redirect("checkout/onepage/success/", array("_secure" => true));
-    }
 
+        // End fix
+        $this->_redirect("checkout/onepage/success?utm_nooverride=1", array("_secure" => true));
+    }
 
     /**
      * @return Mage_Checkout_Model_Type_Onepage
@@ -141,7 +140,7 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
         //add keep cart function in cancelaction to have better support for onestepcheckout modules that overrule the observer
         if (Mage::getStoreConfig('payment/msp/keep_cart', $quote->getStoreId()) ||
                 Mage::getStoreConfig('msp/settings/keep_cart', $quote->getStoreId()) ||
-                $quote->getPayment()->getMethod() == 'msp_payafter'||
+                $quote->getPayment()->getMethod() == 'msp_payafter' ||
                 $quote->getPayment()->getMethod() == 'msp_klarna') {
 
             if ($quoteId = $checkout->getLastQuoteId()) {

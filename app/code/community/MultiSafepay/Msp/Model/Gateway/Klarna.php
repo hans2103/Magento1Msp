@@ -12,14 +12,13 @@ class MultiSafepay_Msp_Model_Gateway_Klarna extends MultiSafepay_Msp_Model_Gatew
     public $_gateway = "KLARNA";
     protected $_formBlockType = 'msp/klarna';
     protected $_canUseCheckout = true;
-
-
     public $giftcards = array(
         'msp_webgift',
         'msp_ebon',
         'msp_babygiftcard',
         'msp_boekenbon',
         'msp_erotiekbon',
+        'msp_giveacard',
         'msp_parfumnl',
         'msp_parfumcadeaukaart',
         'msp_degrotespeelgoedwinkel',
@@ -34,8 +33,6 @@ class MultiSafepay_Msp_Model_Gateway_Klarna extends MultiSafepay_Msp_Model_Gatew
         'msp_sportenfit',
         'msp_beautyandwellness',
     );
-
-    
     public $gateways = array(
         'msp_ideal',
         'msp_payafter',
@@ -51,8 +48,8 @@ class MultiSafepay_Msp_Model_Gateway_Klarna extends MultiSafepay_Msp_Model_Gatew
         'msp_directebanking',
         'msp_directdebit',
         'msp_amex',
-     
     );
+
     public function __construct() {
         $availableByIP = true;
         if (Mage::getStoreConfig('msp_gateways/msp_klarna/ip_check')) {
@@ -67,17 +64,17 @@ class MultiSafepay_Msp_Model_Gateway_Klarna extends MultiSafepay_Msp_Model_Gatew
             }
         }
 
-        if(in_array($this->_code, $this->gateways)){
-		        $this->_configCode = 'msp_gateways';
-		        $this->_module = 'msp_gateways';
-            	$currencies = explode(',', Mage::getStoreConfig('msp_gateways/' . $this->_code . '/allowed_currency'));
-				$isAllowConvert = Mage::getStoreConfigFlag('msp/settings/allow_convert_currency');
-			}elseif(in_array($this->_code, $this->giftcards)){   
-				$this->_configCode = 'msp_giftcards';  
-				$this->_module = 'msp_giftcards';       	
-				$currencies = explode(',', Mage::getStoreConfig('msp_giftcards/' . $this->_code . '/allowed_currency'));
-				$isAllowConvert = Mage::getStoreConfigFlag('msp/settings/allow_convert_currency');
-			}
+        if (in_array($this->_code, $this->gateways)) {
+            $this->_configCode = 'msp_gateways';
+            $this->_module = 'msp_gateways';
+            $currencies = explode(',', Mage::getStoreConfig('msp_gateways/' . $this->_code . '/allowed_currency'));
+            $isAllowConvert = Mage::getStoreConfigFlag('msp/settings/allow_convert_currency');
+        } elseif (in_array($this->_code, $this->giftcards)) {
+            $this->_configCode = 'msp_giftcards';
+            $this->_module = 'msp_giftcards';
+            $currencies = explode(',', Mage::getStoreConfig('msp_giftcards/' . $this->_code . '/allowed_currency'));
+            $isAllowConvert = Mage::getStoreConfigFlag('msp/settings/allow_convert_currency');
+        }
 
         if ($isAllowConvert) {
             $availableByCurrency = true;
@@ -110,7 +107,7 @@ class MultiSafepay_Msp_Model_Gateway_Klarna extends MultiSafepay_Msp_Model_Gatew
             $gender = '';
         }
 
-		
+
         $url = $this->getModelUrl("msp/standard/redirect/issuer/" . $this->_issuer);
         if (!strpos($url, "?"))
             $url .= '?birthday=' . $birthday . '&accountnumber=' . $accountnumber . '&gender=' . $gender;

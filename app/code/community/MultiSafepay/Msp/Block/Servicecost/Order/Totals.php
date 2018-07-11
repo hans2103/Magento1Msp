@@ -15,7 +15,7 @@ class MultiSafepay_Msp_Block_Servicecost_Order_Totals extends Mage_Sales_Block_O
                 'code' => 'servicecost',
                 'value' => $amount,
                 'base_value' => $amount,
-                'label' => Mage::helper('msp')->getFeeLabel($code)
+                'label' => Mage::helper('msp')->getFeeLabel($code).' (incl Tax)'
                     ), array('tax'))
             );
         }

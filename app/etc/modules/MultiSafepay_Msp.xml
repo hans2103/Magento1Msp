@@ -7,13 +7,13 @@
  */
 -->
 <config>
-    <modules>
-        <MultiSafepay_Msp>
-            <active>true</active>
-            <codePool>community</codePool>
-            <depends>
-                <Mage_Payment/>
-            </depends>
-        </MultiSafepay_Msp>
-    </modules>
+  <modules>
+    <MultiSafepay_Msp>
+      <active>true</active>
+      <codePool>community</codePool>
+      <depends>
+        <Mage_Payment/>
+      </depends>
+    </MultiSafepay_Msp>
+  </modules>
 </config>

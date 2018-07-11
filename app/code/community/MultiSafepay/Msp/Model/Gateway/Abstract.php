@@ -25,7 +25,7 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
     protected $_canRefund = true;
     protected $_canRefundInvoicePartial = true;
     public $payment;
-    public $_configCode= 'msp';
+    public $_configCode = 'msp';
 
     const MSP_GENERAL_CODE = 'msp';
     const MSP_FASTCHECKOUT_CODE = 'mspcheckout';
@@ -54,6 +54,7 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
         'msp_beautyandwellness',
         'msp_boekenbon',
         'msp_erotiekbon',
+        'msp_giveacard',
         'msp_parfumnl',
         'msp_parfumcadeaukaart',
         'msp_degrotespeelgoedwinkel',
@@ -70,13 +71,13 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
         'msp_fashioncheque',
         'msp_fashiongiftcard',
     );
-    
     public $giftcards = array(
         'msp_webgift',
         'msp_ebon',
         'msp_babygiftcard',
         'msp_boekenbon',
         'msp_erotiekbon',
+        'msp_giveacard',
         'msp_parfumnl',
         'msp_parfumcadeaukaart',
         'msp_degrotespeelgoedwinkel',
@@ -91,8 +92,6 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
         'msp_sportenfit',
         'msp_beautyandwellness',
     );
-
-    
     public $gateways = array(
         'msp_ideal',
         'msp_payafter',
@@ -108,11 +107,10 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
         'msp_directebanking',
         'msp_directdebit',
         'msp_amex',
-     
     );
 
     public function __construct() {
-	   
+
         if ($this->_code == 'msp') {
             $currencies = explode(',', $this->getConfigData('allowed_currency'));
             $isAllowConvert = $this->getConfigData('allow_convert_currency');
@@ -127,21 +125,21 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
                 }
             }
         } else {
-	       $isAllowConvert = false;
-	       $currencies = array();
-	        if(in_array($this->_code, $this->gateways)){
-		        $this->_configCode = 'msp_gateways';
-		        $this->_module = 'msp_gateways';
-            	$currencies = explode(',', Mage::getStoreConfig('msp_gateways/' . $this->_code . '/allowed_currency'));
-				$isAllowConvert = Mage::getStoreConfigFlag('msp/settings/allow_convert_currency');
-			}elseif(in_array($this->_code, $this->giftcards)){   
-				$this->_configCode = 'msp_giftcards';  
-				$this->_module = 'msp_giftcards';       	
-				$currencies = explode(',', Mage::getStoreConfig('msp_giftcards/' . $this->_code . '/allowed_currency'));
-				$isAllowConvert = Mage::getStoreConfigFlag('msp/settings/allow_convert_currency');
-			}
-			
-   	
+            $isAllowConvert = false;
+            $currencies = array();
+            if (in_array($this->_code, $this->gateways)) {
+                $this->_configCode = 'msp_gateways';
+                $this->_module = 'msp_gateways';
+                $currencies = explode(',', Mage::getStoreConfig('msp_gateways/' . $this->_code . '/allowed_currency'));
+                $isAllowConvert = Mage::getStoreConfigFlag('msp/settings/allow_convert_currency');
+            } elseif (in_array($this->_code, $this->giftcards)) {
+                $this->_configCode = 'msp_giftcards';
+                $this->_module = 'msp_giftcards';
+                $currencies = explode(',', Mage::getStoreConfig('msp_giftcards/' . $this->_code . '/allowed_currency'));
+                $isAllowConvert = Mage::getStoreConfigFlag('msp/settings/allow_convert_currency');
+            }
+
+
             if ($isAllowConvert) {
                 $this->_canUseCheckout = true;
             } else {
@@ -152,21 +150,19 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
                 }
             }
         }
-        
-        
- 	 
- 	    $group_id = 0; // If not logged in, customer group id is 0
+
+
+
+        $group_id = 0; // If not logged in, customer group id is 0
         if (Mage::getSingleton('customer/session')->isLoggedIn()) { // If logged in, set customer group id
-			$group_id = Mage::getSingleton('customer/session')->getCustomer()->getGroupId();
-		}
-		$option = trim(Mage::getStoreConfig($this->_configCode.'/' . $this->_code . '/specificgroups'));
-		$specificgroups = explode(",", $option);
-		// If customer group is not in available groups and config option is not empty, disable this gateway
-		if (!in_array($group_id, $specificgroups) && $option !== "") {
-			$this->_canUseCheckout = false;
-		}
-		
-		  
+            $group_id = Mage::getSingleton('customer/session')->getCustomer()->getGroupId();
+        }
+        $option = trim(Mage::getStoreConfig($this->_configCode . '/' . $this->_code . '/specificgroups'));
+        $specificgroups = explode(",", $option);
+        // If customer group is not in available groups and config option is not empty, disable this gateway
+        if (!in_array($group_id, $specificgroups) && $option !== "") {
+            $this->_canUseCheckout = false;
+        }
     }
 
     // For 1.3.2.4
@@ -178,7 +174,7 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
     public function setSortOrder($order) {
         // Magento tries to set the order from payment/, instead of our msp/
 
-        $this->sort_order = Mage::getStoreConfig($this->_configCode.'/' . $this->_code . '/sort_order'); 
+        $this->sort_order = Mage::getStoreConfig($this->_configCode . '/' . $this->_code . '/sort_order');
     }
 
     /**
@@ -370,15 +366,15 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
     public function refund(Varien_Object $payment, $amount) {
         $order = $payment->getOrder();
         $payment = $order->getPayment()->getMethodInstance();
-		$data = Mage::app()->getRequest()->getPost('creditmemo');	
-		$refunded_servicecost = $data['servicecost'];	
-		
-	
-		if($refunded_servicecost != $order->getServicecost()){
-			$amount = $amount - $order->getServicecost() + $refunded_servicecost;
-		}
-			
-			
+        $data = Mage::app()->getRequest()->getPost('creditmemo');
+        $refunded_servicecost = $data['servicecost'];
+
+
+        if ($refunded_servicecost != $order->getServicecost()) {
+            $amount = $amount - $order->getServicecost() + $refunded_servicecost;
+        }
+
+
         switch ($payment->getCode()) {
             // MSP - Fast Checkout
             case self::MSP_FASTCHECKOUT_CODE:
