@@ -79,6 +79,7 @@ class MultiSafepay {
     'daysactive'       => '',
     'invoice_id'       => '',
     'shipdate'         => '',
+	'special'			=> '',
   );
   
   var $gatewayinfo = array(
@@ -191,7 +192,7 @@ class MultiSafepay {
     // return payment url
 	
 	//print_r($rootNode);exit;
-    $this->payment_url = $this->xmlUnescape($rootNode['gatewayinfo']['redirecturl']['VALUE']);
+    $this->payment_url = '';//$this->xmlUnescape($rootNode['gatewayinfo']['redirecturl']['VALUE']);
     return $this->payment_url;
   }
   
@@ -291,8 +292,14 @@ class MultiSafepay {
       return false;
     
     // return payment url
-    $this->payment_url = $this->xmlUnescape($rootNode['transaction']['payment_url']['VALUE']);
-    return $this->payment_url;
+    //$this->payment_url = $this->xmlUnescape($rootNode['transaction']['payment_url']['VALUE']);
+    if(isset($rootNode['transaction']['payment_url']['VALUE']))
+	{
+	    $this->payment_url = $this->xmlUnescape($rootNode['transaction']['payment_url']['VALUE']);
+	    return $this->payment_url;
+	}else{
+		return false;
+	}
   }
   
 
@@ -523,7 +530,7 @@ class MultiSafepay {
     if (!empty($this->issuer)){
       $issuer =' issuer="'.$this->xmlEscape($this->issuer).'"';
     }
-    
+ 
     $request = '<?xml version="1.0" encoding="UTF-8"?>
     <redirecttransaction ua="' . $this->plugin_name . ' ' . $this->version . '">
       <merchant>
@@ -588,7 +595,7 @@ class MultiSafepay {
       </transaction>
       <signature>' .          $this->xmlEscape($this->signature) . '</signature>
     </redirecttransaction>';
-    
+
     return $request;
   }
 function createDirectXMLTransactionRequest(){
@@ -779,8 +786,9 @@ function createDirectXMLTransactionRequest(){
 		}
 		
 		
-		if($this->transaction['gateway'] != ""){
-	
+		if($this->transaction['special'] != ""){
+			$trans_type ='directtransaction';
+		}elseif($this->transaction['gateway'] != ""){
 				$trans_type ='redirecttransaction';
 			}
 			else{
@@ -826,6 +834,8 @@ function createDirectXMLTransactionRequest(){
 				<email>' .            $this->xmlEscape($this->customer['email']) . '</email>
 				<referrer>' .         $this->xmlEscape($this->customer['referrer']) 			. '</referrer>
 				<user_agent>' .       $this->xmlEscape($this->customer['user_agent']) 			. '</user_agent>
+				<birthday>'. 		$this->xmlEscape($this->customer['birthday']).'</birthday>
+				<bankaccount>'.	$this->xmlEscape($this->customer['bankaccount']).'</bankaccount>
 			</customer>
 			<customer-delivery>
 				<firstname>' .        $this->xmlEscape($this->delivery['firstname']) . '</firstname>
@@ -851,7 +861,7 @@ function createDirectXMLTransactionRequest(){
 				<bankaccount>'.		$this->xmlEscape($this->gatewayinfo['bankaccount']).'</bankaccount>
 				<phone>'.			$this->xmlEscape($this->gatewayinfo['phone']).'</phone>
 				<email>'.			$this->xmlEscape($this->gatewayinfo['email']).'</email>
-				<issuerid>'.		$this->xmlEscape($this->gatewayinfo['issuerid']).'</issuerid>
+				<issuerid>'.		$this->xmlEscape($this->gatewayinfo['issuer']).'</issuerid>
 			</gatewayinfo>
 			<transaction>
 				<id>' .               $this->xmlEscape($this->transaction['id']) . '</id>
@@ -950,11 +960,23 @@ function createDirectXMLTransactionRequest(){
   /*
    * Sets the customers ip variables
    */
-  function setIp(){
-    $this->customer['ipaddress'] = $_SERVER['REMOTE_ADDR'];
+ function setIp(){
+
+	$ip = $_SERVER['REMOTE_ADDR'];
+	preg_match("/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/", $ip, $matches); 
+
+    $this->customer['ipaddress'] = $matches[0];
 
     if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])){
-      $this->customer['forwardedip'] = $_SERVER['HTTP_X_FORWARDED_FOR'];
+
+	$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+	preg_match("/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/", $ip, $matches); 
+		
+	  if($matches[0] != ''){	
+		$this->customer['forwardedip'] = $matches[0];
+	  }else{
+		$this->customer['forwardedip'] = '127.0.0.1';
+	  }
     }
   }
   
@@ -1089,7 +1111,13 @@ function createDirectXMLTransactionRequest(){
   /*
    * Returns the string escaped for use in XML documents
    */
-  function xmlEscape($str){
+function xmlEscape($str){
+	$ts = array("/[Р-Х]/","/Ц/","/Ч/","/[Ш-Ы]/","/[Ь-Я]/","/а/","/б/","/[в-жи]/","/з/","/[й-м]/","/[н-п]/","/[р-х]/","/ц/","/ч/","/[ш-ы]/","/[ь-я]/","/№/","/ё/","/[ђ-іј]/","/ї/","/[љ-ќ]/","/[§-џ]/");
+	$tn = array("A","AE","C","E","I","D","N","O","X","U","Y","a","ae","c","e","i","d","n","o","x","u","y");
+	
+	$str = preg_replace($ts,$tn, $str);
+	$str = mb_convert_encoding($str, 'UTF-8');
+	//$str = htmlspecialchars($string, ENT_QUOTES);
     return htmlspecialchars($str,ENT_COMPAT, "UTF-8");
   }
 
@@ -3172,14 +3200,14 @@ class msp_gc_XmlBuilder {
      * 
      */
       function xmlEscape($str){
-    $string = htmlspecialchars($str,ENT_COMPAT, "UTF-8");
+	$ts = array("/[Р-Х]/","/Ц/","/Ч/","/[Ш-Ы]/","/[Ь-Я]/","/а/","/б/","/[в-жи]/","/з/","/[й-м]/","/[н-п]/","/[р-х]/","/ц/","/ч/","/[ш-ы]/","/[ь-я]/","/№/","/ё/","/[ђ-іј]/","/ї/","/[љ-ќ]/","/[§-џ]/");
+	$tn = array("A","AE","C","E","I","D","N","O","X","U","Y","a","ae","c","e","i","d","n","o","x","u","y");
 	
-	
-	
-	return htmlentities($string , ENT_COMPAT, "UTF-8", true);
-
+	$str = preg_replace($ts,$tn, $str);
+	$str = mb_convert_encoding($str, 'UTF-8');
+	//$str = htmlspecialchars($string, ENT_QUOTES);
+    return htmlspecialchars($str,ENT_COMPAT, "UTF-8");
   }
-
   
 
   
