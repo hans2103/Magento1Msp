@@ -261,17 +261,13 @@ class Mage_Msp_Model_Base extends Varien_Object
 		/*
 		*	ENDING UNDO CANCEL CODE
 		*/
-		
 		if($order->getState() == Mage_Sales_Model_Order::STATE_PROCESSING){
 			$is_already_invoiced = true;
 		}else{
 			$is_already_invoiced = false;
 		}
 		
-		
-		
-		
-		if ($order->getState() == Mage_Sales_Model_Order::STATE_NEW || $order->getState() == Mage_Sales_Model_Order::STATE_PROCESSING)
+		if ($order->getState() == Mage_Sales_Model_Order::STATE_NEW )// test without || $order->getState() == Mage_Sales_Model_Order::STATE_PROCESSING to avoid duplicate cancel bug
 		{
 			$canUpdate = true;
 		}
@@ -280,7 +276,6 @@ class Mage_Msp_Model_Base extends Varien_Object
 		if ($canUpdate && (($newState != $order->getState()) || ($newStatus != $order->getStatus())))
 		{
 			$order->setState($newState, $newStatus, $statusMessage);
-
 
 			// create an invoice when the payment is completed
 			if ($complete && $autocreateInvoice && !$is_already_invoiced)
@@ -295,81 +290,20 @@ class Mage_Msp_Model_Base extends Varien_Object
 			}
 		}
 
-		
 		if(ucfirst($order->getState()) == ucfirst(Mage_Sales_Model_Order::STATE_CANCELED))
 		{
 			if (!$this->isCancellationFinal($order, 'Cancellation finalized'))
 			{
-				$order->setState('Canceled', 'Canceled', 'Cancellation finalized');
+				$order->setState('canceled', 'canceled', 'Cancellation finalized');
 				$order->cancel();
 			}
 		}
-		
-		/*
-		*	If an order has been cancelled but a transaction is completed by using second chance etc then the order can't be activated again because Cancel state is definitive.
-		*	In this situation we will notify the support email so that they can handle this order and they know that a canceled order now has been paid.
-		*/
-		
-		//LETOP, code nog niet operationeel!! Voor toekomstig gebruik
-		
-		/*
-		$support_email 		= $this->getConfigData("support_email");
-		$send_support_email = $this->getConfigData("send_support_email");
-
-		$body 				= 'Validate order with orderID: '.$mspDetails['transaction']['id'].'. <br /> This order was first cancelled and is now processed again by Multisafepay and can be paid by using second chance. Please validate the order and payment.';
-		
-		$processed_message = 'This order was canceled but still received a status update request by MultiSafepay, please validate the payment of this order!';
-		
-		$support_email_send = false;
-		$canceled = false;
-		
-		$subject = 'State change of canceled order: '.$mspDetails['transaction']['id'];
-		
-		if (!$this->isStatusInHistory($order, $mspStatus) && ($order->getState() == Mage_Sales_Model_Order::STATE_CANCELED))
-		{
-			$history_messages = $order->getAllStatusHistory();
-			foreach($history_messages as $status)
-			{
-				if($status->getStatus() == 'canceled' && $status->getComment() == '')
-				{
-					$canceled = true;
-				}
-				
-				if(!$support_email_send)
-				{
-					if(strpos($status->getComment(), $processed_message) !== false)
-					{
-						$support_email_send = true;
-					}else{
-						$support_email_send  = false;
-					}
-				}
-			}
-			
-			if(!$canUpdate && $send_support_email && $support_email != '' && !$support_email_send && !$canceled)
-			{
-				$headers	 = 'From: ' . Mage::app()->getStore()->getName() . ' <' . $support_email . '>\r\n';
-				$headers	.= 'Reply-To: ' . Mage::app()->getStore()->getName()  . ' <' . $support_email  . '>\r\n';
-				$headers	.= 'Return-Path: Mail-Error <' . $from_email  . '>\r\n';
-				$headers	.= 'X-Mailer: PHP/' . phpversion() .'\r\n';
-				$headers	.= 'X-Priority: Normal\r\n';
-				$headers 	.= "MIME-Version: 1.0\r\n";
-				$headers 	.= "Content-Type: text/html; charset=ISO-8859-1\r\n";
-				mail($support_email, $subject, $body, $headers);
-				$order->addStatusToHistory('Canceled', $processed_message);
-				
-			}
-		}
-		*/
 		
 		
 		/**
 		*	Fix to activate new order email function to be activated
 		*/
-		
 		$send_order_email = $this->getConfigData("new_order_mail");
-		
-		//echo $send_order_email;exit;
 		
 		if($send_order_email == 'after_payment')
 		{
@@ -416,8 +350,6 @@ class Mage_Msp_Model_Base extends Varien_Object
 	function isStatusInHistory($order, $mspStatus)
 	{
 		$history = $order->getAllStatusHistory();
-		
-		
 		foreach($history as $status)
 		{
 			if(strpos($status->getComment(), 'Status: <strong>'.$mspStatus.'</strong>') !== false)

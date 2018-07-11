@@ -147,6 +147,11 @@
 				<model>msp/gateway_ideal</model>
 				<title>MSP iDeal</title>
 			</msp_ideal>
+			<msp_payafter>
+        <active>1</active>
+				<model>msp/gateway_payafter</model>
+				<title>MSP Pay after Delivery</title>
+			</msp_payafter>
 			<msp_mistercash>
         <active>1</active>
 				<model>msp/gateway_mistercash</model>
@@ -256,6 +261,12 @@
 				<title>iDeal</title>
 				<lang>nl</lang>
 			</msp_ideal>
+			<msp_payafter translate="title" module="msp">
+				<active>0</active>
+				<model>msp/gateway_payafter</model>
+				<title>Pay after Delivery</title>
+				<lang>nl</lang>
+			</msp_payafter>
 			<msp_mistercash translate="title" module="msp">
 				<active>0</active>
 				<model>msp/gateway_mistercash</model>

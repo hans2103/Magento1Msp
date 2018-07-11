@@ -42,7 +42,9 @@ class MultiSafepay {
 	'accountid'			=>'',
 	'accountholdername' =>'',
 	'accountholdercity'	=> '',
-	'accountholdercountry'	=> ''
+	'accountholdercountry'	=> '',
+	'user_agent'			=>	'',
+	'referrer'				=>	''
   );
   
   // customer-delivery data
@@ -525,7 +527,8 @@ class MultiSafepay {
         <country>' .          $this->xmlEscape($this->customer['country']) . '</country>
         <phone>' .            $this->xmlEscape($this->customer['phone']) . '</phone>
         <email>' .            $this->xmlEscape($this->customer['email']) . '</email>
-		<referer>' . 		  $this->xmlEscape($this->customer['referer']). '</referer>
+		<referrer>' .         $this->xmlEscape($this->customer['referrer']) 			. '</referrer>
+		<user_agent>' .       $this->xmlEscape($this->customer['user_agent']) 			. '</user_agent>
       </customer>
 			<customer-delivery>
 				<firstname>' .        $this->xmlEscape($this->delivery['firstname']) . '</firstname>
@@ -611,6 +614,8 @@ function createDirectXMLTransactionRequest(){
 			<country>' .          $this->xmlEscape($this->customer['country']) . '</country>
 			<phone>' .            $this->xmlEscape($this->customer['phone']) . '</phone>
 			<email>' .            $this->xmlEscape($this->customer['email']) . '</email>
+			<referrer>' .         $this->xmlEscape($this->customer['referrer']) 			. '</referrer>
+			<user_agent>' .       $this->xmlEscape($this->customer['user_agent']) 			. '</user_agent>
 		  </customer>
 				<customer-delivery>
 					<firstname>' .        $this->xmlEscape($this->delivery['firstname']) . '</firstname>
@@ -677,6 +682,8 @@ function createDirectXMLTransactionRequest(){
 			<country>' .          $this->xmlEscape($this->customer['country']) . '</country>
 			<phone>' .            $this->xmlEscape($this->customer['phone']) . '</phone>
 			<email>' .            $this->xmlEscape($this->customer['email']) . '</email>
+			<referrer>' .         $this->xmlEscape($this->customer['referrer']) 			. '</referrer>
+			<user_agent>' .       $this->xmlEscape($this->customer['user_agent']) 			. '</user_agent>
 		  </customer>
 				<customer-delivery>
 					<firstname>' .        $this->xmlEscape($this->delivery['firstname']) . '</firstname>
@@ -703,12 +710,6 @@ function createDirectXMLTransactionRequest(){
 		return $request;
 	}
 	
-	
-	
-	
-	
-	
-	
 
   /*
    * Create the checkout request xml
@@ -732,9 +733,22 @@ function createDirectXMLTransactionRequest(){
 		}else{
 			$use_shipping_xml = "";
 		}
+		
+		
+		if($this->transaction['gateway'] != ""){
+	
+				$trans_type ='redirecttransaction';
+			}
+			else{
+
+				$trans_type ='checkouttransaction';	
+			}
+
+		
+		
 				
 		$request = '<?xml version="1.0" encoding="UTF-8"?>
-		<checkouttransaction ua="' . $this->plugin_name . ' ' . $this->version . '">
+		<'.$trans_type .' ua="' . $this->plugin_name . ' ' . $this->version . '">
 			<merchant>
         <account>' .          $this->xmlEscape($this->merchant['account_id']) . '</account>
         <site_id>' .          $this->xmlEscape($this->merchant['site_id']) . '</site_id>
@@ -759,7 +773,8 @@ function createDirectXMLTransactionRequest(){
 				<country>' .          $this->xmlEscape($this->customer['country']) . '</country>
 				<phone>' .            $this->xmlEscape($this->customer['phone']) . '</phone>
 				<email>' .            $this->xmlEscape($this->customer['email']) . '</email>
-				<referer>' . 		  $this->xmlEscape($this->customer['referer']). '</referer>
+				<referrer>' .         $this->xmlEscape($this->customer['referrer']) 			. '</referrer>
+				<user_agent>' .       $this->xmlEscape($this->customer['user_agent']) 			. '</user_agent>
 			</customer>
 			<customer-delivery>
 				<firstname>' .        $this->xmlEscape($this->delivery['firstname']) . '</firstname>
@@ -791,7 +806,7 @@ function createDirectXMLTransactionRequest(){
         <gateway>'.           $this->xmlEscape($this->transaction['gateway']) . '</gateway>
 			</transaction>
 			<signature>' .          $this->xmlEscape($this->signature) . '</signature>
-		</checkouttransaction>';
+		</'.$trans_type .'>';
 		
 		return $request;
 	}

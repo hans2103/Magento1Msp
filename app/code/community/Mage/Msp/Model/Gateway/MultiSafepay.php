@@ -4,5 +4,5 @@ class Mage_Msp_Model_Gateway_MultiSafepay extends Mage_Msp_Model_Gateway_Abstrac
 {
 	protected $_code    = "msp_multisafepay";
 	protected $_model   = "multiSafepay";
-	protected $_gateway = "WALLET";
+	public $_gateway = "WALLET";
 }

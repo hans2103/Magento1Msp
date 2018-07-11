@@ -49,8 +49,18 @@ class Mage_Msp_StandardController extends Mage_Core_Controller_Front_Action
 		//$this->getOnepage()->getQuote()->save();
 
 		$paymentModel = Mage::getSingleton("msp/" . $this->getGatewayModel());
+		if(isset($paymentModel->_gateway)){
+			$selected_gateway = $paymentModel->_gateway;
+		}
+		
 		$paymentModel->setParams($this->getRequest()->getParams());
-		$paymentLink = $paymentModel->startTransaction();
+		
+		if($selected_gateway != 'PAYAFTER'){
+			$paymentLink = $paymentModel->startTransaction();
+		}else{
+			$paymentLink = $paymentModel->startPayAfterTransaction();
+		}		
+		
 		// redirect
 		header("Location: " . $paymentLink);
 		exit();
@@ -115,29 +125,35 @@ class Mage_Msp_StandardController extends Mage_Core_Controller_Front_Action
    
 		$storeId = Mage::app()->getStore()->getStoreId();
 		$config = Mage::getStoreConfig('mspcheckout' . "/settings", $storeId);
-   
-		$msp = new MultiSafepay();
-		$msp->test = ($config["test_api"] == 'test');
-		$msp->merchant['account_id'] = $config["account_id"];
-		$msp->merchant['site_id'] = $config["site_id"];
-		$msp->merchant['site_code'] = $config["secure_code"];
-		$msp->transaction['id'] = $transId;
-
-		if($msp->getStatus() == false)
+		
+		if(isset($config["account_id"]))
 		{
-			Mage::log("Error while getting status.", null, "multisafepay.log");
-		}
-		else
-		{  
-			Mage::log("Got status: ".$msp->details['ewallet']['fastcheckout'], null, "multisafepay.log");
-			if($msp->details['ewallet']['fastcheckout'] == "YES")
+			$msp = new MultiSafepay();
+			$msp->test = ($config["test_api"] == 'test');
+			$msp->merchant['account_id'] = $config["account_id"];
+			$msp->merchant['site_id'] = $config["site_id"];
+			$msp->merchant['site_code'] = $config["secure_code"];
+			$msp->transaction['id'] = $transId;
+
+			if($msp->getStatus() == false)
 			{
-				return true;
+				Mage::log("Error while getting status.", null, "multisafepay.log");
 			}
 			else
-			{
-				return false;
+			{  
+				Mage::log("Got status: ".$msp->details['ewallet']['fastcheckout'], null, "multisafepay.log");
+				if($msp->details['ewallet']['fastcheckout'] == "YES")
+				{
+					return true;
+				}
+				else
+				{
+					return false;
+				}
 			}
+		}else{
+			Mage::log("No FCO transaction so default to normal notification", null, "multisafepay.log");
+			return false;
 		}
 	}  
 	

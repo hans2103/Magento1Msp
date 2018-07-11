@@ -4,7 +4,7 @@ class Mage_Msp_Model_Gateway_Banktransfer extends Mage_Msp_Model_Gateway_Abstrac
 {
 	protected $_code    = "msp_banktransfer";
 	protected $_model   = "banktransfer";
-	protected $_gateway = "BANKTRANS";
+	public $_gateway = "BANKTRANS";
 	
 	protected $_formBlockType = 'msp/gateways';  
 	

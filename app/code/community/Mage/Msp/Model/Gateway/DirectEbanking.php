@@ -4,5 +4,5 @@ class Mage_Msp_Model_Gateway_DirectEbanking extends Mage_Msp_Model_Gateway_Abstr
 {
 	protected $_code    = "msp_directebanking";
 	protected $_model   = "directEbanking";
-	protected $_gateway = "DIRECTBANK";
+	public $_gateway = "DIRECTBANK";
 }
