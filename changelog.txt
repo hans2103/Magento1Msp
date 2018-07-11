@@ -1,3 +1,6 @@
+1.3.0
+ - DirectXML for iDeal issuers on website.
+
 1.2.9.x
  - New order e-mail option is active, you can now set when you want to send the order emails.
  - Quantity didn't got updated correct when some statusses got processed.
