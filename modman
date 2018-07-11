@@ -16,6 +16,7 @@ app/design/frontend/base/default/template/msp/link.phtml            app/design/f
 app/design/frontend/base/default/template/msp/default.phtml            app/design/frontend/base/default/template/msp/default.phtml
 app/design/frontend/base/default/template/msp/idealissuers.phtml            app/design/frontend/base/default/template/msp/idealissuers.phtml
 app/design/frontend/base/default/template/msp/linkText.phtml            app/design/frontend/base/default/template/msp/linkText.phtml
+app/design/frontend/base/default/template/msp/afterpay.phtml            app/design/frontend/base/default/template/msp/afterpay.phtml
 app/design/frontend/base/default/template/msp/einvoice.phtml            app/design/frontend/base/default/template/msp/einvoice.phtml
 app/design/frontend/base/default/template/msp/bno.phtml            app/design/frontend/base/default/template/msp/bno.phtml
 app/design/frontend/base/default/template/msp/agreements.phtml            app/design/frontend/base/default/template/msp/agreements.phtml
@@ -33,6 +34,7 @@ lib/multisafepay/MultiSafepay.combined.php            lib/multisafepay/MultiSafe
 # media
 media/msp/it/msp_kbc.png            media/msp/it/msp_kbc.png
 media/msp/it/msp_visa.png            media/msp/it/msp_visa.png
+media/msp/it/msp_trustly.png            media/msp/it/msp_trustly.png
 media/msp/it/msp_directebanking.png            media/msp/it/msp_directebanking.png
 media/msp/it/msp_ebon.png            media/msp/it/msp_ebon.png
 media/msp/it/msp_einvoice.png            media/msp/it/msp_einvoice.png
@@ -45,6 +47,7 @@ media/msp/it/msp_mastercard.png            media/msp/it/msp_mastercard.png
 media/msp/it/msp_payafter.png            media/msp/it/msp_payafter.png
 media/msp/it/msp_sportenfit.png            media/msp/it/msp_sportenfit.png
 media/msp/it/msp_directdebit.png            media/msp/it/msp_directdebit.png
+media/msp/it/msp_betaalplan.png            media/msp/it/msp_betaalplan.png
 media/msp/it/msp_parfumcadeaukaart.png            media/msp/it/msp_parfumcadeaukaart.png
 media/msp/it/msp_klarna.png            media/msp/it/msp_klarna.png
 media/msp/it/msp_fashiongiftcard.png            media/msp/it/msp_fashiongiftcard.png
@@ -55,6 +58,7 @@ media/msp/it/msp_beautyandwellness.png            media/msp/it/msp_beautyandwell
 media/msp/it/msp_ferbuy.png            media/msp/it/msp_ferbuy.png
 media/msp/it/msp_vvvgiftcard.png            media/msp/it/msp_vvvgiftcard.png
 media/msp/it/msp_wijncadeau.png            media/msp/it/msp_wijncadeau.png
+media/msp/it/msp_afterpay.png            media/msp/it/msp_afterpay.png
 media/msp/it/msp_webgift.png            media/msp/it/msp_webgift.png
 media/msp/it/msp_eps.png            media/msp/it/msp_eps.png
 media/msp/it/msp_ideal.png            media/msp/it/msp_ideal.png
@@ -85,6 +89,7 @@ media/msp/ideallogos/0801.gif            media/msp/ideallogos/0801.gif
 media/msp/ideallogos/0751.gif            media/msp/ideallogos/0751.gif
 media/msp/ideallogos/0721.gif            media/msp/ideallogos/0721.gif
 media/msp/ideallogos/4371.gif            media/msp/ideallogos/4371.gif
+media/msp/ideallogos/1234.gif            media/msp/ideallogos/1234.gif
 media/msp/ideallogos/3151.gif            media/msp/ideallogos/3151.gif
 media/msp/ideallogos/0511.gif            media/msp/ideallogos/0511.gif
 media/msp/ideallogos/0761.gif            media/msp/ideallogos/0761.gif
@@ -92,6 +97,7 @@ media/msp/ideallogos/0161.gif            media/msp/ideallogos/0161.gif
 media/msp/ideallogos/0771.gif            media/msp/ideallogos/0771.gif
 media/msp/nl/msp_kbc.png            media/msp/nl/msp_kbc.png
 media/msp/nl/msp_visa.png            media/msp/nl/msp_visa.png
+media/msp/nl/msp_trustly.png            media/msp/nl/msp_trustly.png
 media/msp/nl/msp_directebanking.png            media/msp/nl/msp_directebanking.png
 media/msp/nl/msp_ebon.png            media/msp/nl/msp_ebon.png
 media/msp/nl/msp_einvoice.png            media/msp/nl/msp_einvoice.png
@@ -104,6 +110,7 @@ media/msp/nl/msp_mastercard.png            media/msp/nl/msp_mastercard.png
 media/msp/nl/msp_payafter.png            media/msp/nl/msp_payafter.png
 media/msp/nl/msp_sportenfit.png            media/msp/nl/msp_sportenfit.png
 media/msp/nl/msp_directdebit.png            media/msp/nl/msp_directdebit.png
+media/msp/nl/msp_betaalplan.png            media/msp/nl/msp_betaalplan.png
 media/msp/nl/msp_parfumcadeaukaart.png            media/msp/nl/msp_parfumcadeaukaart.png
 media/msp/nl/msp_klarna.png            media/msp/nl/msp_klarna.png
 media/msp/nl/msp_fashiongiftcard.png            media/msp/nl/msp_fashiongiftcard.png
@@ -114,6 +121,7 @@ media/msp/nl/msp_beautyandwellness.png            media/msp/nl/msp_beautyandwell
 media/msp/nl/msp_ferbuy.png            media/msp/nl/msp_ferbuy.png
 media/msp/nl/msp_vvvgiftcard.png            media/msp/nl/msp_vvvgiftcard.png
 media/msp/nl/msp_wijncadeau.png            media/msp/nl/msp_wijncadeau.png
+media/msp/nl/msp_afterpay.png            media/msp/nl/msp_afterpay.png
 media/msp/nl/msp_webgift.png            media/msp/nl/msp_webgift.png
 media/msp/nl/msp_eps.png            media/msp/nl/msp_eps.png
 media/msp/nl/msp_ideal.png            media/msp/nl/msp_ideal.png
@@ -136,6 +144,7 @@ media/msp/nl/button.png            media/msp/nl/button.png
 media/msp/nl/msp_paysafecard.png            media/msp/nl/msp_paysafecard.png
 media/msp/de/msp_kbc.png            media/msp/de/msp_kbc.png
 media/msp/de/msp_visa.png            media/msp/de/msp_visa.png
+media/msp/de/msp_trustly.png            media/msp/de/msp_trustly.png
 media/msp/de/msp_directebanking.png            media/msp/de/msp_directebanking.png
 media/msp/de/msp_ebon.png            media/msp/de/msp_ebon.png
 media/msp/de/msp_einvoice.png            media/msp/de/msp_einvoice.png
@@ -148,6 +157,7 @@ media/msp/de/msp_mastercard.png            media/msp/de/msp_mastercard.png
 media/msp/de/msp_payafter.png            media/msp/de/msp_payafter.png
 media/msp/de/msp_sportenfit.png            media/msp/de/msp_sportenfit.png
 media/msp/de/msp_directdebit.png            media/msp/de/msp_directdebit.png
+media/msp/de/msp_betaalplan.png            media/msp/de/msp_betaalplan.png
 media/msp/de/msp_parfumcadeaukaart.png            media/msp/de/msp_parfumcadeaukaart.png
 media/msp/de/msp_klarna.png            media/msp/de/msp_klarna.png
 media/msp/de/msp_fashiongiftcard.png            media/msp/de/msp_fashiongiftcard.png
@@ -158,6 +168,7 @@ media/msp/de/msp_beautyandwellness.png            media/msp/de/msp_beautyandwell
 media/msp/de/msp_ferbuy.png            media/msp/de/msp_ferbuy.png
 media/msp/de/msp_vvvgiftcard.png            media/msp/de/msp_vvvgiftcard.png
 media/msp/de/msp_wijncadeau.png            media/msp/de/msp_wijncadeau.png
+media/msp/de/msp_afterpay.png            media/msp/de/msp_afterpay.png
 media/msp/de/msp_webgift.png            media/msp/de/msp_webgift.png
 media/msp/de/msp_eps.png            media/msp/de/msp_eps.png
 media/msp/de/msp_ideal.png            media/msp/de/msp_ideal.png
@@ -180,6 +191,7 @@ media/msp/de/button.png            media/msp/de/button.png
 media/msp/de/msp_paysafecard.png            media/msp/de/msp_paysafecard.png
 media/msp/fr/msp_kbc.png            media/msp/fr/msp_kbc.png
 media/msp/fr/msp_visa.png            media/msp/fr/msp_visa.png
+media/msp/fr/msp_trustly.png            media/msp/fr/msp_trustly.png
 media/msp/fr/msp_directebanking.png            media/msp/fr/msp_directebanking.png
 media/msp/fr/msp_ebon.png            media/msp/fr/msp_ebon.png
 media/msp/fr/msp_einvoice.png            media/msp/fr/msp_einvoice.png
@@ -192,6 +204,7 @@ media/msp/fr/msp_mastercard.png            media/msp/fr/msp_mastercard.png
 media/msp/fr/msp_payafter.png            media/msp/fr/msp_payafter.png
 media/msp/fr/msp_sportenfit.png            media/msp/fr/msp_sportenfit.png
 media/msp/fr/msp_directdebit.png            media/msp/fr/msp_directdebit.png
+media/msp/fr/msp_betaalplan.png            media/msp/fr/msp_betaalplan.png
 media/msp/fr/msp_parfumcadeaukaart.png            media/msp/fr/msp_parfumcadeaukaart.png
 media/msp/fr/msp_klarna.png            media/msp/fr/msp_klarna.png
 media/msp/fr/msp_fashiongiftcard.png            media/msp/fr/msp_fashiongiftcard.png
@@ -202,6 +215,7 @@ media/msp/fr/msp_beautyandwellness.png            media/msp/fr/msp_beautyandwell
 media/msp/fr/msp_ferbuy.png            media/msp/fr/msp_ferbuy.png
 media/msp/fr/msp_vvvgiftcard.png            media/msp/fr/msp_vvvgiftcard.png
 media/msp/fr/msp_wijncadeau.png            media/msp/fr/msp_wijncadeau.png
+media/msp/fr/msp_afterpay.png            media/msp/fr/msp_afterpay.png
 media/msp/fr/msp_webgift.png            media/msp/fr/msp_webgift.png
 media/msp/fr/msp_eps.png            media/msp/fr/msp_eps.png
 media/msp/fr/msp_ideal.png            media/msp/fr/msp_ideal.png
@@ -224,6 +238,7 @@ media/msp/fr/button.png            media/msp/fr/button.png
 media/msp/fr/msp_paysafecard.png            media/msp/fr/msp_paysafecard.png
 media/msp/es/msp_kbc.png            media/msp/es/msp_kbc.png
 media/msp/es/msp_visa.png            media/msp/es/msp_visa.png
+media/msp/es/msp_trustly.png            media/msp/es/msp_trustly.png
 media/msp/es/msp_directebanking.png            media/msp/es/msp_directebanking.png
 media/msp/es/msp_ebon.png            media/msp/es/msp_ebon.png
 media/msp/es/msp_einvoice.png            media/msp/es/msp_einvoice.png
@@ -236,6 +251,7 @@ media/msp/es/msp_mastercard.png            media/msp/es/msp_mastercard.png
 media/msp/es/msp_payafter.png            media/msp/es/msp_payafter.png
 media/msp/es/msp_sportenfit.png            media/msp/es/msp_sportenfit.png
 media/msp/es/msp_directdebit.png            media/msp/es/msp_directdebit.png
+media/msp/es/msp_betaalplan.png            media/msp/es/msp_betaalplan.png
 media/msp/es/msp_parfumcadeaukaart.png            media/msp/es/msp_parfumcadeaukaart.png
 media/msp/es/msp_klarna.png            media/msp/es/msp_klarna.png
 media/msp/es/msp_fashiongiftcard.png            media/msp/es/msp_fashiongiftcard.png
@@ -246,6 +262,7 @@ media/msp/es/msp_beautyandwellness.png            media/msp/es/msp_beautyandwell
 media/msp/es/msp_ferbuy.png            media/msp/es/msp_ferbuy.png
 media/msp/es/msp_vvvgiftcard.png            media/msp/es/msp_vvvgiftcard.png
 media/msp/es/msp_wijncadeau.png            media/msp/es/msp_wijncadeau.png
+media/msp/es/msp_afterpay.png            media/msp/es/msp_afterpay.png
 media/msp/es/msp_webgift.png            media/msp/es/msp_webgift.png
 media/msp/es/msp_eps.png            media/msp/es/msp_eps.png
 media/msp/es/msp_ideal.png            media/msp/es/msp_ideal.png
@@ -268,6 +285,7 @@ media/msp/es/button.png            media/msp/es/button.png
 media/msp/es/msp_paysafecard.png            media/msp/es/msp_paysafecard.png
 media/msp/en/msp_kbc.png            media/msp/en/msp_kbc.png
 media/msp/en/msp_visa.png            media/msp/en/msp_visa.png
+media/msp/en/msp_trustly.png            media/msp/en/msp_trustly.png
 media/msp/en/msp_directebanking.png            media/msp/en/msp_directebanking.png
 media/msp/en/msp_ebon.png            media/msp/en/msp_ebon.png
 media/msp/en/msp_einvoice.png            media/msp/en/msp_einvoice.png
@@ -280,6 +298,7 @@ media/msp/en/msp_mastercard.png            media/msp/en/msp_mastercard.png
 media/msp/en/msp_payafter.png            media/msp/en/msp_payafter.png
 media/msp/en/msp_sportenfit.png            media/msp/en/msp_sportenfit.png
 media/msp/en/msp_directdebit.png            media/msp/en/msp_directdebit.png
+media/msp/en/msp_betaalplan.png            media/msp/en/msp_betaalplan.png
 media/msp/en/msp_parfumcadeaukaart.png            media/msp/en/msp_parfumcadeaukaart.png
 media/msp/en/msp_klarna.png            media/msp/en/msp_klarna.png
 media/msp/en/msp_fashiongiftcard.png            media/msp/en/msp_fashiongiftcard.png
@@ -290,6 +309,7 @@ media/msp/en/msp_beautyandwellness.png            media/msp/en/msp_beautyandwell
 media/msp/en/msp_ferbuy.png            media/msp/en/msp_ferbuy.png
 media/msp/en/msp_vvvgiftcard.png            media/msp/en/msp_vvvgiftcard.png
 media/msp/en/msp_wijncadeau.png            media/msp/en/msp_wijncadeau.png
+media/msp/en/msp_afterpay.png            media/msp/en/msp_afterpay.png
 media/msp/en/msp_webgift.png            media/msp/en/msp_webgift.png
 media/msp/en/msp_eps.png            media/msp/en/msp_eps.png
 media/msp/en/msp_ideal.png            media/msp/en/msp_ideal.png
@@ -315,6 +335,7 @@ media/msp/button.png            media/msp/button.png
 skin/adminhtml/default/default/css/MultiSafepay/config.css            skin/adminhtml/default/default/css/MultiSafepay/config.css
 skin/adminhtml/default/default/images/msp/nl/msp_kbc.png            skin/adminhtml/default/default/images/msp/nl/msp_kbc.png
 skin/adminhtml/default/default/images/msp/nl/msp_visa.png            skin/adminhtml/default/default/images/msp/nl/msp_visa.png
+skin/adminhtml/default/default/images/msp/nl/msp_trustly.png            skin/adminhtml/default/default/images/msp/nl/msp_trustly.png
 skin/adminhtml/default/default/images/msp/nl/msp_directebanking.png            skin/adminhtml/default/default/images/msp/nl/msp_directebanking.png
 skin/adminhtml/default/default/images/msp/nl/msp_ebon.png            skin/adminhtml/default/default/images/msp/nl/msp_ebon.png
 skin/adminhtml/default/default/images/msp/nl/msp_einvoice.png            skin/adminhtml/default/default/images/msp/nl/msp_einvoice.png
@@ -327,6 +348,7 @@ skin/adminhtml/default/default/images/msp/nl/msp_mastercard.png            skin/
 skin/adminhtml/default/default/images/msp/nl/msp_payafter.png            skin/adminhtml/default/default/images/msp/nl/msp_payafter.png
 skin/adminhtml/default/default/images/msp/nl/msp_sportenfit.png            skin/adminhtml/default/default/images/msp/nl/msp_sportenfit.png
 skin/adminhtml/default/default/images/msp/nl/msp_directdebit.png            skin/adminhtml/default/default/images/msp/nl/msp_directdebit.png
+skin/adminhtml/default/default/images/msp/nl/msp_betaalplan.png            skin/adminhtml/default/default/images/msp/nl/msp_betaalplan.png
 skin/adminhtml/default/default/images/msp/nl/msp_parfumcadeaukaart.png            skin/adminhtml/default/default/images/msp/nl/msp_parfumcadeaukaart.png
 skin/adminhtml/default/default/images/msp/nl/msp_klarna.png            skin/adminhtml/default/default/images/msp/nl/msp_klarna.png
 skin/adminhtml/default/default/images/msp/nl/msp_fashiongiftcard.png            skin/adminhtml/default/default/images/msp/nl/msp_fashiongiftcard.png
@@ -337,6 +359,7 @@ skin/adminhtml/default/default/images/msp/nl/msp_beautyandwellness.png          
 skin/adminhtml/default/default/images/msp/nl/msp_ferbuy.png            skin/adminhtml/default/default/images/msp/nl/msp_ferbuy.png
 skin/adminhtml/default/default/images/msp/nl/msp_vvvgiftcard.png            skin/adminhtml/default/default/images/msp/nl/msp_vvvgiftcard.png
 skin/adminhtml/default/default/images/msp/nl/msp_wijncadeau.png            skin/adminhtml/default/default/images/msp/nl/msp_wijncadeau.png
+skin/adminhtml/default/default/images/msp/nl/msp_afterpay.png            skin/adminhtml/default/default/images/msp/nl/msp_afterpay.png
 skin/adminhtml/default/default/images/msp/nl/msp_webgift.png            skin/adminhtml/default/default/images/msp/nl/msp_webgift.png
 skin/adminhtml/default/default/images/msp/nl/msp_eps.png            skin/adminhtml/default/default/images/msp/nl/msp_eps.png
 skin/adminhtml/default/default/images/msp/nl/msp_ideal.png            skin/adminhtml/default/default/images/msp/nl/msp_ideal.png
