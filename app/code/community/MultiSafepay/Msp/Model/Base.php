@@ -321,7 +321,7 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
         $payment_method_quote = $quote->getPayment();
         $payment = $order->getPayment();
 
-        if ($usedMethod != $payment->getMethod()) {
+        if ($usedMethod != $payment->getMethod() && !empty($usedMethod)) {
             $payment->setMethod($usedMethod);
             $payment->save();
             $payment_method_quote->setMethod($usedMethod);
@@ -674,16 +674,16 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
                 $invoice->getOrder()->setCustomerNoteNotify(false);
                 $invoice->getOrder()->setIsInProcess(true);
                 $order->addStatusHistoryComment('Automatically invoiced by MultiSafepay invoicer.', false);
-                $transactionSave = Mage::getModel('core/resource_transaction')->addObject($invoice)->addObject($invoice->getOrder());
-                $transactionSave->save();
+                //$transactionSave = Mage::getModel('core/resource_transaction')->addObject($invoice)->addObject($invoice->getOrder());
+                //$transactionSave->save();
 
                 $payment = $order->getPayment();
 
-                $transaction = $payment->getTransaction($this->mspDetails['ewallet']['id']);
+                /*$transaction = $payment->getTransaction($this->mspDetails['ewallet']['id']);
                 if (is_object($transaction)) {
                     $transaction->setAdditionalInformation(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS, $this->transdetails);
                     $transaction->save();
-                }
+                }*/
 
                 if ($this->_config["updatetransaction"]) {
                     $invoiceId = $invoice->getIncrementId();

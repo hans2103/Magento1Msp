@@ -17,14 +17,35 @@
         echo '<br /><br/>';
     }
     ?>
-    <?php $_banks = $this->getIdealIssuers(); ?>
-    <select id="<?php echo $_code ?>_bank" name="payment[<?php echo $_code ?>_bank]" class="input-text validate-text required-entry">
-      <option value=""><?php echo $this->__('Selecteer een bank...'); ?></option>
-      <?php foreach ($_banks as $bank) { ?>
-          <option value="<?php echo $bank['code']['VALUE'] ?>"><?php echo $bank['description']['VALUE'] ?></option>
-      <?php } ?>
-    </select>
-
+    <?php $_banks = $this->getIdealIssuers(); 
+        
+    
+    ?>
+   <label style="padding:0;" class="required">Selecteer uw bank: <em>*</em></label>
+	<br/>
+	<?php foreach ($_banks as $bank) { ?>
+		<label>
+          
+          <?php 
+          $fileWithPath = 'msp' . DS . 'ideallogos' . DS . $bank['code']['VALUE'] . '.' . 'gif';
+            $iconFileDir = Mage::getBaseDir(Mage_Core_Model_Store::URL_TYPE_MEDIA) . DS . $fileWithPath;
+            if (file_exists($iconFileDir)) {
+                $iconFileUrl = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA) . $fileWithPath;
+              ?>
+            <input type="radio" name="payment[<?php echo $_code ?>_bank]" value="<?php echo $bank['code']['VALUE']; ?>">
+			<span style="display:block;float:left;width:45px;"><img src="<?php echo $iconFileUrl;?>"></span>&nbsp;<?php echo $bank['description']['VALUE']; ?>
+            <?php }else{
+                ?>
+                <input type="radio" name="payment[<?php echo $_code ?>_bank]" value="<?php echo $bank['code']['VALUE']; ?>">
+                <?php echo $bank['description']['VALUE']; ?>
+            <?php 
+                
+            }
+          ?>
+		</label>
+		<br/>
+	<?php } ?>
+	
   </li>
 
 </ul>

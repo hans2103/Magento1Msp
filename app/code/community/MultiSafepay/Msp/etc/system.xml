@@ -9,7 +9,7 @@
 <config>
     <tabs>
         <ms translate="label">
-            <label><![CDATA[<div style="display:inline-block;color:#00adee;text-transform: capitalize;font-size: 120%;font-weight:900;font-family:Tahoma, Geneva, sans-serif;">Multi</div><div style="display:inline-block;color:black;text-transform: capitalize;font-size: 120%;font-weight:900;font-family:Tahoma, Geneva, sans-serif;">Safepay</div><div style="display: inline-block;vertical-align: middle;border: 3px dotted #666;width:8px;height:8px;border-radius:8px;margin-bottom:3px;margin-left:3px;"></div>&nbsp;&nbsp;]]> (2.2.7)</label>
+            <label><![CDATA[<div style="display:inline-block;color:#00adee;text-transform: capitalize;font-size: 120%;font-weight:900;font-family:Tahoma, Geneva, sans-serif;">Multi</div><div style="display:inline-block;color:black;text-transform: capitalize;font-size: 120%;font-weight:900;font-family:Tahoma, Geneva, sans-serif;">Safepay</div><div style="display: inline-block;vertical-align: middle;border: 3px dotted #666;width:8px;height:8px;border-radius:8px;margin-bottom:3px;margin-left:3px;"></div>&nbsp;&nbsp;]]> (2.2.8)</label>
             <sort_order>301</sort_order>
             <!--<class>admin-system-config-msp</class>-->
         </ms>

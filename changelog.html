@@ -6,12 +6,38 @@
 
 <body>
 	<div id="container" style="width:900px; margin-left:100">
-
-		<div id="version" style="background-color:#E0E0E0 ;">
+	
+			<div id="version" style="background-color:#E0E0E0 ;">
+			<b>Release Notes - Magento 2.2.8 (June 21st, 2016)</b>
+		</div>
+		<p>
+			<b>Improvements</b>
+			<hr size=1 color="#E0E0E0";>
+			<ul>
+				<li>Added E-Invoicing.</li>
+				<li>Payment links are now only requested when creating new orders in the Magento backend, not when editing an order, resulting in a new order.</li>
+            </ul>
+			<br/>
+			<b>Fixes</b>
+			<hr size=1 color="#E0E0E0";>
+			<ul>
+				<li>Fixed an undefined notice within the logs.</li>
+				<li>Resolved an issue resulting in the tansactional data not being set, such as; parent_id and additional_information</li>
+            </ul>
+			<b>Changes</b>
+			<hr size=1 color="#E0E0E0";>
+			<ul>
+				<li>Updated Bancontact image</li>
+				<li>Changed the ideal issuer selection from dropdown to radio buttions with the bank's logo.</li>
+            </ul>			
+		</p>
+		<br/>
+		<br/>	
+	
+			<div id="version" style="background-color:#E0E0E0 ;">
 			<b>Release Notes - Magento 2.2.7 (May 26th, 2016)</b>
 		</div>
 		<p>
-		
 			<b>Improvements</b>
 			<hr size=1 color="#E0E0E0";>
 			<ul>
@@ -21,26 +47,67 @@
 				<li>Improvements were made to the confirmation page URL.</li>
 				<li>Added improvements for the refunding of foreign currencies.</li>
             </ul>
-			<br/>			
-
+			<br/>
 			<b>Fixes</b>
 			<hr size=1 color="#E0E0E0";>
 			<ul>
 				<li>Resolved undefined notices.</li>
 				<li>Resolved issues when refunding orders that have discounts.</li>
 				<li>Resolved a bug when using webshopgiftcard.</li>
-				<li>Resolved the doubled shippingtax bug causing incorrect invoice and/or creditmemo amounts.</li>				
+				<li>Resolved the doubled shippingtax bug causing incorrect invoice and/or creditmemo amounts.</li>
             </ul>
-			
 			<b>Changes</b>
 			<hr size=1 color="#E0E0E0";>
 			<ul>
 				<li>Removed the refunding of fees.</li>
+            </ul>			
 		</p>
 		<br/>
-		<br/>	
+		<br/>
 	
+				<div id="version" style="background-color:#E0E0E0 ;">
+			<b>Release Notes - Magento 2.2.6 (March 10th, 2016)</b>
+		</div>
+		<p>
+			<b>Fixes</b>
+			<hr size=1 color="#E0E0E0";>
+			<ul>
+				<li>Resolved incorrect tax amount visible in the invoice when using a fee.</li>
+            </ul>
+		</p>
+		<br/>
+		<br/>
 	
+			<div id="version" style="background-color:#E0E0E0 ;">
+			<b>Release Notes - Magento 2.2.5 (March 4th, 2016)</b>
+		</div>
+		<p>
+			<b>New features</b>
+			<hr size=1 color="#E0E0E0";>
+			<ul>
+				<li>Added DotPay as payment method.</li>
+				<!--<li>Added e-Invoicing as a payment method.</li>-->
+			</ul>
+			<br/>
+			<b>Improvements</b>
+			<hr size=1 color="#E0E0E0";>
+			<ul>
+				<li>Invoices now show the correct payment method.</li>
+            </ul>
+			<br/>
+			<b>Fixes</b>
+			<hr size=1 color="#E0E0E0";>
+			<ul>
+				<li>Resolved issues preventing orders from being opened once paid with PayPal or Banktransfer.</li>
+				<li>Resolved error code 1035 occurring when refunding.</li>
+				<li>Resolved creditmemo issues.</li>
+				<li>The total order amount of orders paid with Fast Checkout now include the shipping costs.</li>
+            </ul>
+		</p>
+		<br/>
+		<br/>
+		
+		
 		<div id="version" style="background-color:#E0E0E0 ;">
 			<b>Release Notes - Magento 2.2.2 (Dec 28th, 2015)</b>
 		</div>
