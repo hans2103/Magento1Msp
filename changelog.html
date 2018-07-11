@@ -7,34 +7,21 @@
 <body>
 	<div id="container" style="width:900px; margin-left:100">
 	<div id="version" style="background-color:#E0E0E0 ;">
-			<b>Release Notes - Magento 2.3.1 (Nov 4, 2016)</b>
+			<b>Release Notes - Magento 2.3.2 (Jan 25th, 2017)</b>
 		</div>
 		<p>
-			<b>Improvements</b>
-			<hr size=1 color="#E0E0E0";>
-			<ul>
-				<li>Added support for a "Creditcard" gateway. This adds a creditcard payment method with radio selections for the different creditcard payment methods.</li>
-				<li>Added option to enable or disable the paymenlink creation for manually added orders.</li>
-            </ul>
-			<br/>
 			<b>Fixes</b>
 			<hr size=1 color="#E0E0E0";>
 			<ul>
-				<li>Resolved a bug which caused group restrictions not to work for Klarna/Pay After Delivery/E-invoice payment methods.</li>
-				<li>Added a check on the birthday value, to replace dashes for Klarna/Pay After Delivery.</li>
-            </ul>
-			<br/>
-			<b>Changes</b>
-			<hr size=1 color="#E0E0E0";>
-			<ul>
-				<li>Changed the YourGift logo.</li>
+				<li>Removed whitespace which resulted in the PHP error "headers already sent" being triggered when selecting the Creditcard gateway</li>
+				<li>Resolved an issue when used with OneStepCheckout causing the wrong gateway to be used.</li>
             </ul>			
 		</p>
 		<br/>
 		<br/>		
 	
 	<div id="version" style="background-color:#E0E0E0 ;">
-			<b>Release Notes - Magento 2.3.0 (Okt 12, 2016)</b>
+			<b>Release Notes - Magento 2.3.0 (Okt 12th, 2016)</b>
 		</div>
 		<p>
 			<b>Improvements</b>
