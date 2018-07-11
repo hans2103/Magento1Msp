@@ -38,7 +38,7 @@ class MultiSafepay_Msp_Helper_Data extends Mage_Core_Helper_Abstract {
         if ($return == '') {
             //$return = $paymentTitle;
         }
-        echo $return;
+        echo $return; 
         //return  $return;
     }
 
@@ -48,7 +48,7 @@ class MultiSafepay_Msp_Helper_Data extends Mage_Core_Helper_Abstract {
      * @return string
      */
     public function getFeeLabel($code) {
-        $feeDescription = Mage::getStoreConfig('msp/' . $code . '/fee_description');
+        $feeDescription = Mage::getStoreConfig('msp_gateways/' . $code . '/fee_description');
 
         return $feeDescription ? $feeDescription : $this->__('MultiSafepay servicekosten');
     }

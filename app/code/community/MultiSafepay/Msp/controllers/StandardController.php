@@ -217,7 +217,7 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
         $storeId = Mage::app()->getStore()->getStoreId();
         $config = Mage::getStoreConfig('mspcheckout' . "/settings", $storeId);
 
-        if (isset($config["account_id"])) {
+        if ($config["active"]) {//if (isset($config["account_id"])) {
             $msp = new MultiSafepay();
             $msp->test = ($config["test_api"] == 'test');
             $msp->merchant['account_id'] = $config["account_id"];

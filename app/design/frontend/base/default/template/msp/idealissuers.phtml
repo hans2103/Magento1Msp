@@ -9,7 +9,7 @@
 <?php $_code = $this->getMethodCode() ?>
 <ul  class="form-list" id="payment_form_<?php echo $_code ?>" style="display:none">	
     <li>
-        <?php $instructions = Mage::getStoreConfig('msp/' . $this->getMethodCode() . '/instructions', Mage::app()->getStore()->getId()); ?>		
+        <?php $instructions = Mage::getStoreConfig('msp_gateways/' . $this->getMethodCode() . '/instructions', Mage::app()->getStore()->getId()); ?>		
 
         <?php
         if ($instructions != '') {
