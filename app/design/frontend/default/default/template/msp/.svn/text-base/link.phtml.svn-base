@@ -1,0 +1,2 @@
+<a class="msp_checkout_link" href="<?php echo Mage::getUrl("msp/checkout/redirect"); ?>"><img src="<?php echo $this->getSkinUrl('images/msp/button.png');?>" style="margin-left: -0px;"/></a>
+

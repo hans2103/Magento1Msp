@@ -1,0 +1,11 @@
+To prevent multiple clicks to "Place Order" button in checkout Magento file must be modifed (not plugin file).
+
+Locate line 77 (Magento version 1.4.2) in file skin/frontend/base/default/js/opcheckout.js
+
+Change:
+if (this.loadWaiting) {
+
+To:
+if (this.loadWaiting && (this.loadWaiting != "review")) {
+
+NOTE: To see the patch working javascript file must be reloaded. Often browser takes unmodifed opcheckout.js file from cache which does not affect button behavior.

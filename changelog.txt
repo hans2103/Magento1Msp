@@ -1,0 +1,113 @@
+1.2.9.x
+ - New order e-mail option is active, you can now set when you want to send the order emails.
+ - Quantity didn't got updated correct when some statusses got processed.
+ - Fix bug that allowed the processing of the same status multiple times. Check added so that a status will only be processed once
+ - New feature added that allows for reopening cancelled orders. If a cancelled order got paid by using second chance etc, the order will be processed again
+   and an invoice is created etc.
+ - Added ebon
+ - added babygiftcard
+ - added boekenbon
+ - added erotiekbon
+ - added fijncadeau
+ - added webshopgiftcard
+ - added parfumnl
+ - added parfumcadeaukaart
+
+
+1.2.8:
+ - Canceled Orders will now actualy be canceled
+ - STATE_CANCELED changed to STATE_PENDING due to second chance
+
+1.2.7:
+ - Better handling of manual invoice creation
+ - Extra lock check that if an error occures the status message is Not OK
+ - use_shipping_notification set to false to overcome issue with "Cannot send order to ##Specified## country
+
+1.2.6:
+ - Payment Overview Canceled status for: Void, Declined & Expired
+ - Send email on Processing (instead of initial)
+ - Manual create invoices for orders
+
+1.2.5:
+ - If currency is different then Euro, Convert to Euro
+ - Added Webshop GiftCards to gateways
+ - fixed magento coupon codes in fast checkout
+
+1.2.4:
+ - empty cart after success fix
+ - analytics conversion fix
+
+1.2.3:
+ - added Maestro
+ - fixed bug with language fast checkout
+ - allow 'free' flatrate shipping (price 0)
+ - some minor changes
+ 
+1.2.2:
+ - added option to use Magento table rate shipping method
+ - fixed 'enabled' setting for Magento 1.3.x.x
+ - added option to enter google analytics ID for use on the fast checkout page
+ - added option to add a 'accept agreements' field to fast checkout
+ - added option to add a 'company' field to fast checkout
+ - added option to send new order mail after payment (instead of after msp notification)
+ 
+1.2.1:
+ - added setting for payment gateway language
+
+1.2.0:
+ - added fast checkout
+ - restructured code
+ - added status history messages
+ - added debug/log option
+ - changed order states for different statusses
+ - cancel orders when possible
+ - onestepcheckout check for cancel action
+ 
+1.1.1:
+ - fixed sending the right notification_url with the 'old' plugin
+ - fixed gateway select with only one gateway
+ - fixed socket version
+ - fixed creating order from admin
+ - fixed problem with virtual products
+ - various small changes
+
+1.1.0:
+ - option for seperate payment methods (Gateways version)
+ - redesigned plugin structure
+ - fixed compatibility issues with Magento 1.4
+ - fixed/changed status updates. custom statusses now supported
+ - changed name in transaction description from view name to store name
+ - cancel order when the payment is cancelled in MultiSafepay
+ - added option for automatic redirection back to shop after payment
+ - added option to mail the invoice after creation
+ - added dutch locale
+
+1.0.8:
+ - fixed amount issue due to intval rounding
+
+1.0.7:
+ - fixed conversion to base currency when using forgeign currencies
+ - fixed error with address processing
+ - fixed problem with not using the correct new order status
+
+1.0.6:
+ - fixed &apos;Invalid amount&apos; error
+ - added spanish and french locale options
+
+1.0.5:
+ - return link now displays the Store Name instead of the Store View Name
+
+1.0.4:
+ - new cancel feature
+ - added per-store configuration
+
+1.0.3:
+ - fixed encoding issue 
+
+1.0.2:
+ - added &amp;apos;complete status&amp;apos; configuration field
+ - added option to autocreate an invoice 
+
+1.0.1:
+ - added sort order
+ - fixed the item list for configurable products
