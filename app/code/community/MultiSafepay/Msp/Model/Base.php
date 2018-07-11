@@ -674,8 +674,8 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
                 $invoice->getOrder()->setCustomerNoteNotify(false);
                 $invoice->getOrder()->setIsInProcess(true);
                 $order->addStatusHistoryComment('Automatically invoiced by MultiSafepay invoicer.', false);
-                //$transactionSave = Mage::getModel('core/resource_transaction')->addObject($invoice)->addObject($invoice->getOrder());
-                //$transactionSave->save();
+                $transactionSave = Mage::getModel('core/resource_transaction')->addObject($invoice)->addObject($invoice->getOrder());
+                $transactionSave->save();
 
                 $payment = $order->getPayment();
 
