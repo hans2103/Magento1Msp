@@ -55,8 +55,8 @@ class MultiSafepay_Msp_Block_Adminhtml_Servicecost_Totals_Creditmemo extends Mag
             $creditmemo = $this->getCreditMemo();
             $creditmemo->setBaseTaxAmount($creditmemo->getBaseTaxAmount() + $tax);
             $creditmemo->setTaxAmount($creditmemo->getTaxAmount() + $tax);
-            $creditmemo->setBaseGrandTotal($creditmemo->getBaseGrandTotal() + $amount + $tax);
-            $creditmemo->setGrandTotal($creditmemo->getGrandTotal() + $amount + $tax);
+            $creditmemo->setBaseGrandTotal($creditmemo->getBaseGrandTotal());
+            $creditmemo->setGrandTotal($creditmemo->getGrandTotal());
         }
         return $this;
     }

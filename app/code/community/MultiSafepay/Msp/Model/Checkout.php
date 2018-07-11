@@ -130,6 +130,11 @@ class MultiSafepay_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
                 $this->api->customer['housenumber'] = $billing->getStreet(2);
                 $this->api->customer['address1'] = $billing->getStreet(1);
             }
+
+            if ($billing->getStreet(3) != '') {
+                $this->api->customer['housenumber'] .= ' ' . $billing->getStreet(3);
+            }
+
             $api->customer['firstname'] = $billing->getFirstname();
             $api->customer['lastname'] = $billing->getLastname();
             $api->customer['address2'] = $billing->getStreet(2);
@@ -143,6 +148,10 @@ class MultiSafepay_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
 
         if ($shipping) {
             $api->parseDeliveryAddress($shipping->getStreet(1));
+
+            if ($shipping->getStreet(3) != '') {
+                $api->delivery['housenumber'] .= ' ' . $shipping->getStreet(3);
+            }
             $api->delivery['firstname'] = $shipping->getFirstname();
             $api->delivery['lastname'] = $shipping->getLastname();
             $api->delivery['address2'] = $shipping->getStreet(2);
@@ -943,301 +952,314 @@ class MultiSafepay_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
 
     protected function _createQwindoOrder($data, $response)
     {
+        //We ramdom sleep the callback to avoid duplicate orders on callbacks processed at the same time
+        sleep(rand(1, 10));
 
-        $orders = Mage::getModel('sales/order')->getCollection()->addAttributeToFilter('ext_order_id', $data['transaction_id']);
+        if (!file_exists(Mage::getBaseDir('log') . $data['transaction_id'] . '.log')) {
 
-        if (count($orders)) {
-            $this->getBase()->log("Existing order found (%d), canceling create order", count($orders));
-            return;
-        }
+            Mage::log($data['transaction_id'], null, $data['transaction_id'] . '.log', true);
 
+            $orders = Mage::getModel('sales/order')->getCollection()->addAttributeToFilter('ext_order_id', $data['transaction_id']);
 
-        try {
-            /*
-             * START NEW ORDER CREATEN CODE
-             */
-            $websiteId = Mage::app()->getWebsite()->getId();
-            $store = Mage::app()->getStore();
-            $store_id = $store->getId();
-
-
-            $shipping_address = array(
-                'firstname' => $data['delivery']['first_name'],
-                'lastname' => $data['delivery']['last_name'],
-                'street' => array(
-                    '0' => $data['delivery']['address1'],
-                    '1' => $data['delivery']['house_number'],
-                ),
-                'city' => $data['delivery']['city'],
-                'region_id' => '',
-                'region' => '',
-                'postcode' => $data['delivery']['zip_code'],
-                'country_id' => strtoupper($data['delivery']['country']),
-                'telephone' => $data['delivery']['phone1'],
-            );
-
-            $billing_address = array(
-                'firstname' => $data['customer']['first_name'],
-                'lastname' => $data['customer']['last_name'],
-                'street' => array(
-                    '0' => $data['customer']['address1'],
-                    '1' => $data['customer']['house_number'],
-                ),
-                'city' => $data['customer']['city'],
-                'region_id' => '',
-                'region' => '',
-                'postcode' => $data['customer']['zip_code'],
-                'country_id' => strtoupper($data['customer']['country']),
-                'telephone' => $data['customer']['phone1'],
-            );
-
-            $customer = Mage::getModel("customer/customer");
-            $customer->website_id = $websiteId;
-            $customer->setStore($store);
-
-            // Customer Information
-            $firstname = $data['customer']['first_name'];
-            $lastname = $data['customer']['last_name'];
-            $email = $data['customer']['email'];
-            $passwordLength = 10;
-            $password = $customer->generatePassword($passwordLength);
-
-            try {
-                $customer->firstname = $firstname;
-                $customer->lastname = $lastname;
-                $customer->email = $email;
-                $customer->password_hash = md5($password);
-                $customer->setPassword($password);
-
-                if ($customer->save()) {
-                    $customAddress = Mage::getModel('customer/address');
-                    $customAddress->setData($shipping_address)->setCustomerId($customer->getId())->setIsDefaultBilling('0')->setIsDefaultShipping('1')->setSaveInAddressBook('1');
-                    try {
-                        $customAddress->save();
-                    } catch (Exception $ex) {
-                        
-                    }
-
-                    $customAddress = Mage::getModel('customer/address');
-                    $customAddress->setData($billing_address)->setCustomerId($customer->getId())->setIsDefaultBilling('1')->setIsDefaultShipping('0')->setSaveInAddressBook('1');
-                    try {
-                        $customAddress->save();
-                    } catch (Exception $ex) {
-                        
-                    }
-
-                    $customerId = $customer->getId();
-                    if ($config["send_new_account_email"]) {
-                        $customer->sendNewAccountEmail();
-                    }
-                } else {
-                    $customerId = '0';
-                }
-            } catch (Exception $e) {
-                $customer->loadByEmail($email);
-                $customerId = $customer->getId();
+            if (count($orders)) {
+                $this->getBase()->log("Existing order found (%d), canceling create order", count($orders));
+                return;
             }
 
-            /* ------------------------------------------------------------------------
-              Load Customer
-              ------------------------------------------------------------------------ */
 
-            $customer = Mage::getModel('customer/customer')->load($customerId);
-
-
-            /* ------------------------------------------------------------------------
-              Payment and Shipping Method
-              ------------------------------------------------------------------------ */
-            $payment_method = 'mspcheckout';
-            $shipping_method = $data['order_adjustment']['shipping']['flat_rate_shipping']['id'] . '_' . $data['order_adjustment']['shipping']['flat_rate_shipping']['provider'];
+            try {
+                /*
+                 * START NEW ORDER CREATEN CODE
+                 */
+                $websiteId = Mage::app()->getWebsite()->getId();
+                $store = Mage::app()->getStore();
+                $store_id = $store->getId();
 
 
+                $shipping_address = array(
+                    'firstname' => $data['delivery']['first_name'],
+                    'lastname' => $data['delivery']['last_name'],
+                    'street' => array(
+                        '0' => $data['delivery']['address1'],
+                        '1' => $data['delivery']['house_number'],
+                    ),
+                    'city' => $data['delivery']['city'],
+                    'region_id' => '',
+                    'region' => '',
+                    'postcode' => $data['delivery']['zip_code'],
+                    'country_id' => strtoupper($data['delivery']['country']),
+                    'telephone' => $data['delivery']['phone1'],
+                );
 
-            /* ------------------------------------------------------------------------
-              Create a Quote
-              ------------------------------------------------------------------------ */
-            $quote = Mage::getModel('sales/quote')->setStoreId($store_id)->load($data['transaction_id'])->setIsActive(true);
+                $billing_address = array(
+                    'firstname' => $data['customer']['first_name'],
+                    'lastname' => $data['customer']['last_name'],
+                    'street' => array(
+                        '0' => $data['customer']['address1'],
+                        '1' => $data['customer']['house_number'],
+                    ),
+                    'city' => $data['customer']['city'],
+                    'region_id' => '',
+                    'region' => '',
+                    'postcode' => $data['customer']['zip_code'],
+                    'country_id' => strtoupper($data['customer']['country']),
+                    'telephone' => $data['customer']['phone1'],
+                );
 
-            $quote->assignCustomer($customer);
+                $customer = Mage::getModel("customer/customer");
+                $customer->website_id = $websiteId;
+                $customer->setStore($store);
 
-            $quote->setSendConfirmation(0);
+                // Customer Information
+                $firstname = $data['customer']['first_name'];
+                $lastname = $data['customer']['last_name'];
+                $email = $data['customer']['email'];
+                $passwordLength = 10;
+                $password = $customer->generatePassword($passwordLength);
 
-            /* ------------------------------------------------------------------------
-              Add products to Quote
-              ------------------------------------------------------------------------ */
+                try {
+                    $customer->firstname = $firstname;
+                    $customer->lastname = $lastname;
+                    $customer->email = $email;
+                    $customer->password_hash = md5($password);
+                    $customer->setPassword($password);
 
-            foreach ($data['shopping_cart']['items'] as $item) {
-                $product = Mage::getModel('catalog/product')->load($item['merchant_item_id']);
-                $options = array();
-                $customOption = array();
-
-                if (isset($item['options']) && !empty($item['options'])) {
-                    foreach ($item['options'] as $option) {
-                        $parentIds = Mage::getModel('catalog/product_type_grouped')->getParentIdsByChild($product->getId());
-                        if (!$parentIds)
-                            $parentIds = Mage::getModel('catalog/product_type_configurable')->getParentIdsByChild($product->getId());
-                        if (isset($parentIds[0])) {
-                            $parent = Mage::getModel('catalog/product')->load($parentIds[0]);
+                    if ($customer->save()) {
+                        $customAddress = Mage::getModel('customer/address');
+                        $customAddress->setData($shipping_address)->setCustomerId($customer->getId())->setIsDefaultBilling('0')->setIsDefaultShipping('1')->setSaveInAddressBook('1');
+                        try {
+                            $customAddress->save();
+                        } catch (Exception $ex) {
+                            
                         }
 
+                        $customAddress = Mage::getModel('customer/address');
+                        $customAddress->setData($billing_address)->setCustomerId($customer->getId())->setIsDefaultBilling('1')->setIsDefaultShipping('0')->setSaveInAddressBook('1');
+                        try {
+                            $customAddress->save();
+                        } catch (Exception $ex) {
+                            
+                        }
 
-                        if ($parent->getTypeId() === Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE) {
-                            $paramsSuperAttribute = array('super_attribute' => array());
-                            foreach ($parent->getTypeInstance(true)->getConfigurableAttributes($parent) as $attribute) {
-                                $options[$attribute->getProductAttribute()->getAttributeId()] = (int) $product->getData($attribute->getProductAttribute()->getAttributeCode());
+                        $customerId = $customer->getId();
+                        if ($config["send_new_account_email"]) {
+                            $customer->sendNewAccountEmail();
+                        }
+                    } else {
+                        $customerId = '0';
+                    }
+                } catch (Exception $e) {
+                    $customer->loadByEmail($email);
+                    $customerId = $customer->getId();
+                }
+
+                /* ------------------------------------------------------------------------
+                  Load Customer
+                  ------------------------------------------------------------------------ */
+
+                $customer = Mage::getModel('customer/customer')->load($customerId);
+
+
+                /* ------------------------------------------------------------------------
+                  Payment and Shipping Method
+                  ------------------------------------------------------------------------ */
+                $payment_method = 'mspcheckout';
+                $shipping_method = $data['order_adjustment']['shipping']['flat_rate_shipping']['id'] . '_' . $data['order_adjustment']['shipping']['flat_rate_shipping']['provider'];
+
+
+
+                /* ------------------------------------------------------------------------
+                  Create a Quote
+                  ------------------------------------------------------------------------ */
+                $quote = Mage::getModel('sales/quote')->setStoreId($store_id)->load($data['transaction_id'])->setIsActive(true);
+
+                $quote->assignCustomer($customer);
+
+                $quote->setSendConfirmation(0);
+
+                /* ------------------------------------------------------------------------
+                  Add products to Quote
+                  ------------------------------------------------------------------------ */
+
+                foreach ($data['shopping_cart']['items'] as $item) {
+                    $product = Mage::getModel('catalog/product')->load($item['merchant_item_id']);
+                    $options = array();
+                    $customOption = array();
+
+                    if (isset($item['options']) && !empty($item['options'])) {
+                        foreach ($item['options'] as $option) {
+                            $parentIds = Mage::getModel('catalog/product_type_grouped')->getParentIdsByChild($product->getId());
+                            if (!$parentIds)
+                                $parentIds = Mage::getModel('catalog/product_type_configurable')->getParentIdsByChild($product->getId());
+                            if (isset($parentIds[0])) {
+                                $parent = Mage::getModel('catalog/product')->load($parentIds[0]);
+                            } else {
+                                $parent = $product;
                             }
-                        }
 
 
-                        //set custom options
-                        foreach ($parent->getOptions() as $value) {
-                            if (is_object($value)) {
-                                $optionobjects = $value->getValues();
-                                $values = array();
-                                foreach ($optionobjects as $options2) {
-                                    $data_option = $options2->getData();
+                            if ($parent->getTypeId() === Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE) {
+                                $paramsSuperAttribute = array('super_attribute' => array());
+                                foreach ($parent->getTypeInstance(true)->getConfigurableAttributes($parent) as $attribute) {
+                                    $options[$attribute->getProductAttribute()->getAttributeId()] = (int) $product->getData($attribute->getProductAttribute()->getAttributeCode());
+                                }
+                            }
 
-                                    if ($data_option['option_id'] == $option['set_id']) {
-                                        $customOption[$option['set_id']] = $option['id'];
+
+                            //set custom options
+                            foreach ($parent->getOptions() as $value) {
+                                if (is_object($value)) {
+                                    $optionobjects = $value->getValues();
+                                    $values = array();
+                                    foreach ($optionobjects as $options2) {
+                                        $data_option = $options2->getData();
+
+                                        if ($data_option['option_id'] == $option['set_id']) {
+                                            $customOption[$option['set_id']] = $option['id'];
+                                        }
                                     }
                                 }
                             }
                         }
+                        $productInfo = array(
+                            'qty' => $item['quantity'],
+                            'product' => $item['merchant_item_id'],
+                            'super_attribute' => $options,
+                            'options' => $customOption
+                        );
+
+                        //assign products with options
+                        $quote->addProduct($parent, new Varien_Object($productInfo));
+                    } else {
+                        $productInfo = array(
+                            'qty' => $item['quantity'],
+                            'product' => $item['merchant_item_id']
+                        );
+
+                        //assign products with options
+                        $quote->addProduct($product, new Varien_Object($productInfo));
                     }
-                    $productInfo = array(
-                        'qty' => $item['quantity'],
-                        'product' => $item['merchant_item_id'],
-                        'super_attribute' => $options,
-                        'options' => $customOption
-                    );
+                }
 
-                    //assign products with options
-                    $quote->addProduct($parent, new Varien_Object($productInfo));
+                /* ------------------------------------------------------------------------
+                  Assign Address, Shipping and Payment methods
+                  ------------------------------------------------------------------------ */
+
+                $billingAddress = $quote->getBillingAddress()->addData($billing_address);
+                $shippingAddress = $quote->getShippingAddress()->addData($shipping_address);
+
+                $shippingAddress->setCollectShippingRates(true)
+                        ->setShippingMethod($shipping_method)
+                        ->setPaymentMethod($payment_method);
+
+                $shippingAddress->collectShippingRates();
+                $shippingAddress->setCollectShippingRates(true)
+                        ->setShippingMethod($shipping_method)
+                        ->setPaymentMethod($payment_method);
+
+                $quote->getPayment()->importData(array('method' => $payment_method));
+
+                $quote->collectTotals()->save();
+                /* ---------------------------------------------------------------------- */
+
+                /* ------------------------------------------------------------------------
+                  SECTION : CHECKOUT
+                  ------------------------------------------------------------------------ */
+                $convertQuote = Mage::getModel('sales/convert_quote');
+
+
+
+                if ($quote->getIsVirtual()) {
+                    $order = $convertQuote->addressToOrder($quote->getBillingAddress());
                 } else {
-                    $productInfo = array(
-                        'qty' => $item['quantity'],
-                        'product' => $item['merchant_item_id']
-                    );
-
-                    //assign products with options
-                    $quote->addProduct($product, new Varien_Object($productInfo));
-                }
-            }
-
-            /* ------------------------------------------------------------------------
-              Assign Address, Shipping and Payment methods
-              ------------------------------------------------------------------------ */
-
-            $billingAddress = $quote->getBillingAddress()->addData($billing_address);
-            $shippingAddress = $quote->getShippingAddress()->addData($shipping_address);
-
-            $shippingAddress->setCollectShippingRates(true)
-                    ->setShippingMethod($shipping_method)
-                    ->setPaymentMethod($payment_method);
-
-            $shippingAddress->collectShippingRates();
-            $shippingAddress->setCollectShippingRates(true)
-                    ->setShippingMethod($shipping_method)
-                    ->setPaymentMethod($payment_method);
-
-            $quote->getPayment()->importData(array('method' => $payment_method));
-
-            $quote->collectTotals()->save();
-            /* ---------------------------------------------------------------------- */
-
-            /* ------------------------------------------------------------------------
-              SECTION : CHECKOUT
-              ------------------------------------------------------------------------ */
-            $convertQuote = Mage::getModel('sales/convert_quote');
-
-
-
-            if ($quote->getIsVirtual()) {
-                $order = $convertQuote->addressToOrder($quote->getBillingAddress());
-            } else {
-                $order = $convertQuote->addressToOrder($quote->getShippingAddress());
-            }
-
-
-            $order->setExtOrderId($data['transaction_id']);
-            $order->setExtCustomerId($customerId);
-
-
-
-            // assign payment method
-            $quotePayment = $quote->getPayment();
-
-            $quotePayment->setMethod($quote->getPayment()->getMethod());
-
-            $quote->setPayment($quotePayment);
-
-            $orderPayment = $convertQuote->paymentToOrderPayment($quotePayment);
-
-            $order->setBillingAddress($convertQuote->addressToOrderAddress($quote->getBillingAddress()));
-            $order->setPayment($convertQuote->paymentToOrderPayment($quote->getPayment()));
-
-            if (!$quote->getIsVirtual()) {
-                $order->setShippingAddress($convertQuote->addressToOrderAddress($quote->getShippingAddress()));
-            }
-
-            // set payment options
-            $order->setPayment($convertQuote->paymentToOrderPayment($quote->getPayment()));
-
-            // order products
-            $items = $quote->getAllItems();
-
-            foreach ($items as $item) {
-                //@var $item Mage_Sales_Model_Quote_Item
-                $orderItem = $convertQuote->itemToOrderItem($item);
-
-                if ($item->getParentItem()) {
-                    $orderItem->setParentItem($order->getItemByQuoteItemId($item->getParentItem()->getId()));
+                    $order = $convertQuote->addressToOrder($quote->getShippingAddress());
                 }
 
-                $order->addItem($orderItem);
-            }
+
+                $order->setExtOrderId($data['transaction_id']);
+                $order->setExtCustomerId($customerId);
 
 
-            $new_status = $this->getSectionConfigData("settings/order_status");
 
-            $customFieldData = '';
-            if (!empty($data['custom_fields'])) {
-                $customFieldData .= Mage::helper("msp")->__("<br/><br/><strong>Custom field data:</strong><br/>");
+                // assign payment method
+                $quotePayment = $quote->getPayment();
 
-                foreach ($data['custom_fields'] as $name => $value) {
-                    $customFieldData .= $name . ': ' . $value . '<br/>';
+                $quotePayment->setMethod($quote->getPayment()->getMethod());
+
+                $quote->setPayment($quotePayment);
+
+                $orderPayment = $convertQuote->paymentToOrderPayment($quotePayment);
+
+                $order->setBillingAddress($convertQuote->addressToOrderAddress($quote->getBillingAddress()));
+                $order->setPayment($convertQuote->paymentToOrderPayment($quote->getPayment()));
+
+                if (!$quote->getIsVirtual()) {
+                    $order->setShippingAddress($convertQuote->addressToOrderAddress($quote->getShippingAddress()));
                 }
+
+                // set payment options
+                $order->setPayment($convertQuote->paymentToOrderPayment($quote->getPayment()));
+
+                // order products
+                $items = $quote->getAllItems();
+
+                foreach ($items as $item) {
+                    //@var $item Mage_Sales_Model_Quote_Item
+                    $orderItem = $convertQuote->itemToOrderItem($item);
+
+                    if ($item->getParentItem()) {
+                        $orderItem->setParentItem($order->getItemByQuoteItemId($item->getParentItem()->getId()));
+                    }
+
+                    $order->addItem($orderItem);
+                }
+
+
+                $new_status = $this->getSectionConfigData("settings/order_status");
+
+                $customFieldData = '';
+                if (!empty($data['custom_fields'])) {
+                    $customFieldData .= Mage::helper("msp")->__("<br/><br/><strong>Custom field data:</strong><br/>");
+
+                    foreach ($data['custom_fields'] as $name => $value) {
+                        $customFieldData .= $name . ': ' . $value . '<br/>';
+                    }
+                }
+
+                $order->addStatusToHistory($new_status, Mage::helper("msp")->__("Qwindo order created") . '<br/>' . Mage::helper("msp")->__("Quote ID: <strong>%s</strong>", $data['transaction_id']) . $customFieldData);
+
+
+                // Update stock
+                Mage::dispatchEvent('sales_model_service_quote_submit_before', array('order' => $order, 'quote' => $quote));
+
+
+                $order->setCanShipPartiallyItem(false);
+                $order->place();
+                $order->save();
+                $order->setEmailSent(false);
+                $order->sendNewOrderEmail();
+                $order->setEmailSent(true);
+                $order->save();
+                $quote->setIsActive(0);
+                $quote->save();
+                /*
+                 * END NEW ORDER CREATEON CODE
+                 */
+            } catch (Exception $e) {
+                $error = '{
+	                    "success": false, 
+	                    "data": {
+	                        "error_code": "QW-10002",
+	                        "error": "Could not create or update the order:' . $e->getMessage() . '"
+	                        }
+	                    }'
+                ;
+                Mage::log($error, null, 'Order creation failed ' . $data['transaction_id'] . '.log', true);
+                Mage::app()->getResponse()->setHeader('HTTP/1.0', 500, true);
+                Mage::app()->getResponse()->setHttpResponseCode(500);
+                Mage::app()->getResponse()->setBody($error);
+                return;
             }
-
-            $order->addStatusToHistory($new_status, Mage::helper("msp")->__("Qwindo order created") . '<br/>' . Mage::helper("msp")->__("Quote ID: <strong>%s</strong>", $data['transaction_id']) . $customFieldData);
-
-
-            // Update stock
-            Mage::dispatchEvent('sales_model_service_quote_submit_before', array('order' => $order, 'quote' => $quote));
-
-
-            $order->setCanShipPartiallyItem(false);
-            $order->place();
-            $order->save();
-            $order->setEmailSent(false);
-            $order->sendNewOrderEmail();
-            $order->setEmailSent(true);
-            $order->save();
-            $quote->setIsActive(0);
-            $quote->save();
-            /*
-             * END NEW ORDER CREATEON CODE
-             */
-        } catch (Exception $e) {
-            echo '{
-                    "success": false, 
-                    "data": {
-                        "error_code": "QW-10002",
-                        "error": "Could not create or update the order:' . $e->getMessage() . '"
-                        }
-                    }'
-            ;
-            exit;
         }
     }
 

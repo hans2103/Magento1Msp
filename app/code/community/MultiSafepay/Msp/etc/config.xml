@@ -9,7 +9,7 @@
 <config>
     <modules>
         <MultiSafepay_Msp>
-            <version>2.3.6</version>
+            <version>2.4.0</version>
         </MultiSafepay_Msp>
     </modules>
     <global>
@@ -159,7 +159,7 @@
       
             <!-- START QWINDO OBSERVERS -->
 
-            <!--<catalog_product_save_before>
+            <catalog_product_save_before>
                 <observers>
                     <catalog_product_save_before>
                         <class>msp/observer_qwindo</class>
@@ -260,7 +260,7 @@
                 </observers>
             </sales_order_creditmemo_save_after>
 
-      -->
+      
       
             <!-- END QWINDO OBSERVERS -->
      
@@ -365,6 +365,7 @@
                 <reserved_status>pending</reserved_status>
                 <void_status>canceled</void_status>
                 <declined_status>canceled</declined_status>
+                <chargeback_status>canceled</chargeback_status>
                 <refunded_status>canceled</refunded_status>
                 <partial_refunded_status>canceled</partial_refunded_status>
                 <expired_status>canceled</expired_status>
@@ -456,6 +457,11 @@
                 <model>msp/gateway_belfius</model>
                 <title>MSP Belfius</title>
             </msp_belfius>
+            <msp_idealqr>
+                <active>1</active>
+                <model>msp/gateway_idealqr</model>
+                <title>MSP iDEAL QR</title>
+            </msp_idealqr>
             <msp_mastercard>
                 <active>1</active>
                 <model>msp/gateway_mastercard</model>
@@ -618,6 +624,7 @@
                 <reserved_status>pending</reserved_status>
                 <void_status>canceled</void_status>
                 <declined_status>canceled</declined_status>
+                <chargeback_status>canceled</chargeback_status>
                 <refunded_status>canceled</refunded_status>
                 <partial_refunded_status>canceled</partial_refunded_status>
                 <expired_status>canceled</expired_status>
@@ -745,6 +752,13 @@
                 <allowed_currency>EUR</allowed_currency>
                 <lang>nl</lang>
             </msp_belfius>
+            <msp_idealqr translate="title" module="msp">
+                <active>0</active>
+                <model>msp/gateway_idealqr</model>
+                <title>iDEAL QR</title>
+                <allowed_currency>EUR</allowed_currency>
+                <lang>nl</lang>
+            </msp_idealqr>
             <msp_mastercard translate="title" module="msp">
                 <active>0</active>
                 <model>msp/gateway_mastercard</model>
@@ -961,6 +975,7 @@
                 <reserved_status>pending</reserved_status>
                 <void_status>canceled</void_status>
                 <declined_status>canceled</declined_status>
+                <chargeback_status>canceled</chargeback_status>
                 <refunded_status>canceled</refunded_status>
                 <partial_refunded_status>canceled</partial_refunded_status>
                 <expired_status>canceled</expired_status>

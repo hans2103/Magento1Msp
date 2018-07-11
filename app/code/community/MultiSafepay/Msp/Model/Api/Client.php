@@ -92,7 +92,6 @@ class Client
           print_r($request_headers);
           print_r($http_body);exit; */
 
-
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLINFO_HEADER_OUT, true);
         curl_setopt($ch, CURLOPT_ENCODING, "");
@@ -105,8 +104,14 @@ class Client
         $body = curl_exec($ch);
         $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
+		
+		if($httpcode == null  && !Mage::app()->getStore()->isAdmin()){
+			return false;
+		}
 
-        if ($api_method == 'qwindo') {
+		
+
+        if ($api_method == 'qwindo' ) {
             if ($httpcode == "401") {
                 throw new Exception("Qwindo authorization failed, please check your Qwindo key and Hash ID. Data not updated at Qwindo.");
             }
@@ -121,6 +126,22 @@ class Client
             if ($api_method != 'qwindo') {
 
                 throw new Exception("Unable to communicate with the MultiSafepay payment server (" . curl_errno($ch) . "): " . curl_error($ch) . ".");
+            } else {
+
+				if(Mage::app()->getStore()->isAdmin()){
+						throw new Exception("Unable to submit data to qwindo (" . curl_errno($ch) . "): " . curl_error($ch) . ".");
+				}else{
+
+	                echo '{
+	                    "success": false, 
+	                    "data": {
+	                        "error_code": "QW-10002",
+	                        "error": "Could not create or update the order:' . curl_errno($ch) . "): " . curl_error($ch) . '"
+	                        }
+	                    }'
+	                ;
+	                exit;
+                }
             }
         }
 

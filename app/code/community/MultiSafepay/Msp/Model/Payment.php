@@ -60,6 +60,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object
         'msp_ing',
         'msp_kbc',
         'msp_belfius',
+        'msp_idealqr',
         'msp_banktransfer',
         'msp_maestro',
         'msp_paypal',
@@ -349,6 +350,9 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object
             $this->api->customer['address1'] = $billing->getStreet(1);
         }
 
+        if ($billing->getStreet(3) != '') {
+            $this->api->customer['housenumber'] .= ' ' . $billing->getStreet(3);
+        }
 
         $this->api->customer['locale'] = Mage::app()->getLocale()->getLocaleCode(); //Mage::app()->getLocale()->getDefaultLocale();
         $this->api->customer['firstname'] = $billing->getFirstname();
@@ -376,6 +380,10 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object
             if ($this->api->delivery['housenumber'] == '') {
                 $this->api->delivery['housenumber'] = $shipping->getStreet(2);
                 $this->api->delivery['address1'] = $shipping->getStreet(1);
+            }
+
+            if ($shipping->getStreet(3) != '') {
+                $this->api->delivery['housenumber'] .= ' ' . $shipping->getStreet(3);
             }
 
             $this->api->delivery['firstname'] = $shipping->getFirstname();
@@ -1056,6 +1064,10 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object
                 $this->api->customer['address1'] = $billing->getStreet(1);
             }
 
+            if ($billing->getStreet(3) != '') {
+                $this->api->customer['housenumber'] .= ' ' . $billing->getStreet(3);
+            }
+
             $api->customer['firstname'] = $billing->getFirstname();
             $api->customer['lastname'] = $billing->getLastname();
             //$api->customer['address2']           =     $billing->getStreet(2);
@@ -1081,6 +1093,10 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object
             if ($api->delivery['housenumber'] == '') {
                 $api->delivery['housenumber'] = $shipping->getStreet(2);
                 $api->delivery['address1'] = $shipping->getStreet(1);
+            }
+
+            if ($shipping->getStreet(3) != '') {
+                $this->api->delivery['housenumber'] .= ' ' . $shipping->getStreet(3);
             }
 
             $api->delivery['firstname'] = $shipping->getFirstname();
@@ -1141,6 +1157,8 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object
             }
 
             $url = Mage::getUrl("checkout/onepage/success/", array("_secure" => true));
+        } elseif ($this->_gateway == 'INGHOME' || $this->_gateway == 'KBC') {
+            $url = $api->startDirectXMLTransaction();
         } else {
             //$url = $this->api->startCheckout();
             $url = $api->startTransaction();
@@ -1177,12 +1195,14 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object
                 Mage::app()->getFrontController()->getResponse()->setRedirect(Mage::getUrl('checkout/cart'));
                 Mage::app()->getResponse()->sendResponse();
             }
-            $newState = Mage_Sales_Model_Order::STATE_CANCELED;
-            $statusMessage = Mage::helper("msp")->__("Canceleld because of transaction request error");
-            $newStatus = $this->getConfigData("void_status");
+            if ($order->getState() != Mage_Sales_Model_Order::STATE_PROCESSING && !$order->hasInvoices()) {
+                $newState = Mage_Sales_Model_Order::STATE_CANCELED;
+                $statusMessage = Mage::helper("msp")->__("Canceleld because of transaction request error");
+                $newStatus = $this->getConfigData("void_status");
 
-            $order->cancel(); // this trigers stock updates
-            $order->setState($newState, $newStatus, $statusMessage)->save();
+                $order->cancel(); // this trigers stock updates
+                $order->setState($newState, $newStatus, $statusMessage)->save();
+            }
             exit;
         }
 
@@ -1292,7 +1312,10 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object
         $status = strtolower($status);
 
         // update order status in Magento
-        $ret = $base->updateStatus($order, $status, $api->details);
+        $ret = false;
+        if ($orderexist) {
+            $ret = $base->updateStatus($order, $status, $api->details);
+        }
 
         // unlock
         $base->unlock();

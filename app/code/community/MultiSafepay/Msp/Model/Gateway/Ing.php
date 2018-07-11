@@ -5,6 +5,6 @@ class MultiSafepay_Msp_Model_Gateway_Ing extends MultiSafepay_Msp_Model_Gateway_
 
     protected $_code = "msp_ing";
     public $_model = "ing";
-    public $_gateway = "ING";
+    public $_gateway = "INGHOME";
 
 }
