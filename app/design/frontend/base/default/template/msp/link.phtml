@@ -23,13 +23,13 @@ if (Mage::getStoreConfig('mspcheckout/settings/disable_checkout')
         var proceedButtons = document.getElementsByClassName('btn-proceed-checkout'), i;
 
         for (var i = 0; i < proceedButtons.length; i++) {
-          proceedButtons[i].style.display = 'none';
+            proceedButtons[i].style.display = 'none';
         }
 
         var checkoutButtons = document.getElementsByClassName('checkout-button'), i;
 
         for (var i = 0; i < checkoutButtons.length; i++) {
-          checkoutButtons[i].style.display = 'none';
+            checkoutButtons[i].style.display = 'none';
         }
 
     </script>
@@ -37,6 +37,6 @@ if (Mage::getStoreConfig('mspcheckout/settings/disable_checkout')
 <?php } ?>
 
 <a class="msp_checkout_link" href="<?php echo Mage::getUrl("msp/checkout/redirect") ?>">
-  <img src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA) . 'msp' . DS . $lang_code . DS . 'button.png' ?>" style="margin-left: -0px;"/>
+    <img src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA) . 'msp' . DS . $lang_code . DS . 'button.png' ?>" style="margin-left: -0px;"/>
 </a>
 

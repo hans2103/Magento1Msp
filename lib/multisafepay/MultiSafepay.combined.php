@@ -956,7 +956,9 @@ class MultiSafepay
 				<var2>' . $this->xmlEscape($this->transaction['var2']) . '</var2>
 				<var3>' . $this->xmlEscape($this->transaction['var3']) . '</var3>
 				<items>' . $this->xmlEscape($this->transaction['items']) . '</items>
-				<manual>' . $this->xmlEscape($this->transaction['manual']) . '</manual>
+                <manual>' . $this->xmlEscape($this->transaction['manual']) . '</manual>
+                <daysactive>' . $this->xmlEscape($this->transaction['daysactive']) . '</daysactive>
+                <secondsactive>' . $this->xmlEscape($this->transaction['secondsactive']) . '</secondsactive>
         <gateway>' . $this->xmlEscape($this->transaction['gateway']) . '</gateway>
 			</transaction>
 			<signature>' . $this->xmlEscape($this->signature) . '</signature>
@@ -2589,7 +2591,7 @@ class MspCart
         ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . '.');
         require_once('library/googlerequest.php');
         $GRequest = new GoogleRequest($this->merchant_id, $this->merchant_key, $this->server_url == "https://checkout.google.com/" ?
-                        "Production" : "sandbox", $this->currency);
+                "Production" : "sandbox", $this->currency);
         $GRequest->SetProxy($proxy);
         $GRequest->SetCertificatePath($certPath);
 
@@ -2654,7 +2656,7 @@ class MspCart
         if ($this->variant == "text") {
             $data .= "<div align=center><form method=\"POST\" action=\"" .
                     $url . "\"" . ($this->googleAnalytics_id ?
-                            " onsubmit=\"setUrchinInputCode();\"" : "") . ">
+                    " onsubmit=\"setUrchinInputCode();\"" : "") . ">
                 <input type=\"image\" name=\"Checkout\" alt=\"Checkout\" 
                 src=\"" . $this->server_url . "buttons/checkout.gif?merchant_id=" .
                     $this->merchant_id . "&w=" . $width . "&h=" . $height . "&style=" .
@@ -2746,7 +2748,7 @@ class MspCart
         if ($this->variant == "text") {
             $data .= "<div align=center><form method=\"POST\" action=\"" .
                     $this->checkout_url . "\"" . ($this->googleAnalytics_id ?
-                            " onsubmit=\"setUrchinInputCode();\"" : "") . ">
+                    " onsubmit=\"setUrchinInputCode();\"" : "") . ">
                 <input type=\"hidden\" name=\"cart\" value=\"" .
                     base64_encode($this->GetXML()) . "\">
                 <input type=\"hidden\" name=\"signature\" value=\"" .
@@ -2782,7 +2784,7 @@ class MspCart
                     " width=\"" . $width . "\" /></div>";
         }
         if ($showtext) {
-            $data .="<div align=\"center\"><a href=\"javascript:void(window.ope" .
+            $data .= "<div align=\"center\"><a href=\"javascript:void(window.ope" .
                     "n('http://checkout.google.com/seller/what_is_google_checkout.html'" .
                     ",'whatischeckout','scrollbars=0,resizable=1,directories=0,height=2" .
                     "50,width=400'));\" onmouseover=\"return window.status = 'What is G" .
@@ -2828,7 +2830,7 @@ class MspCart
         if ($this->variant == "text") {
             $data .= "<div align=center><form method=\"POST\" action=\"" .
                     $this->checkout_url . "\"" . ($this->googleAnalytics_id ?
-                            " onsubmit=\"setUrchinInputCode();\"" : "") . ">
+                    " onsubmit=\"setUrchinInputCode();\"" : "") . ">
                 <input type=\"hidden\" name=\"buyButtonCart\" value=\"" .
                     base64_encode($this->GetXML()) . "//separator//" .
                     base64_encode($this->CalcHmacSha1($this->GetXML())) . "\">
@@ -2864,7 +2866,7 @@ class MspCart
                     " width=\"" . $width . "\" /></div>";
         }
         if ($showtext) {
-            $data .="<div align=\"center\"><a href=\"javascript:void(window.ope" .
+            $data .= "<div align=\"center\"><a href=\"javascript:void(window.ope" .
                     "n('http://checkout.google.com/seller/what_is_google_checkout.html'" .
                     ",'whatischeckout','scrollbars=0,resizable=1,directories=0,height=2" .
                     "50,width=400'));\" onmouseover=\"return window.status = 'What is G" .
@@ -2932,7 +2934,7 @@ class MspCart
         if ($this->variant == "text") {
             $data .= "<div align=\"center\"><form method=\"POST\" action=\"" .
                     $this->checkoutForm_url . "\"" . ($this->googleAnalytics_id ?
-                            " onsubmit=\"setUrchinInputCode();\"" : "") . ">";
+                    " onsubmit=\"setUrchinInputCode();\"" : "") . ">";
 
             $request = $this->GetXML();
             require_once('xml-processing/gc_xmlparser.php');
