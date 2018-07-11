@@ -5,12 +5,12 @@
  * @category MultiSafepay
  * @package  MultiSafepay_Msp
  */
-class MultiSafepay_Msp_Model_Gateway_PayAfter extends MultiSafepay_Msp_Model_Gateway_Abstract {
+class MultiSafepay_Msp_Model_Gateway_Einvoice extends MultiSafepay_Msp_Model_Gateway_Abstract {
 
-    protected $_code = "msp_payafter";
-    public $_model = "payafter";
-    public $_gateway = "PAYAFTER";
-    protected $_formBlockType = 'msp/bno';
+    protected $_code = "msp_einvoice";
+    public $_model = "einvoice";
+    public $_gateway = "EINVOICE";
+   // protected $_formBlockType = 'msp/einvoice';
     protected $_canUseCheckout = true;
     public $giftcards = array(
         'msp_webgift',
@@ -37,6 +37,7 @@ class MultiSafepay_Msp_Model_Gateway_PayAfter extends MultiSafepay_Msp_Model_Gat
         'msp_ideal',
         'msp_dotpay',
         'msp_payafter',
+        'msp_einvoice',
         'msp_klarna',
         'msp_mistercash',
         'msp_visa',
@@ -54,11 +55,11 @@ class MultiSafepay_Msp_Model_Gateway_PayAfter extends MultiSafepay_Msp_Model_Gat
     public function __construct() {
         $availableByIP = true;
 
-        if (Mage::getStoreConfig('msp_gateways/msp_payafter/ip_check')) {
+        if (Mage::getStoreConfig('msp_gateways/msp_einvoice/ip_check')) {
             if ($this->_isTestMode()) {
-                $data = Mage::getStoreConfig('msp_gateways/msp_payafter/ip_filter_test');
+                $data = Mage::getStoreConfig('msp_gateways/msp_einvoice/ip_filter_test');
             } else {
-                $data = Mage::getStoreConfig('msp_gateways/msp_payafter/ip_filter');
+                $data = Mage::getStoreConfig('msp_gateways/msp_einvoice/ip_filter');
             }
 
             if (!in_array($_SERVER["REMOTE_ADDR"], explode(';', $data))) {
@@ -106,12 +107,19 @@ class MultiSafepay_Msp_Model_Gateway_PayAfter extends MultiSafepay_Msp_Model_Gat
         } else {
             $accountnumber = '';
         }
+        
+        
+        if (isset($_POST['payment']['phonenumber'])) {
+            $phonenumber = $_POST['payment']['phonenumber'];
+        } else {
+            $phonenumber = '';
+        }
 
         $url = $this->getModelUrl("msp/standard/redirect/issuer/" . $this->_issuer);
         if (!strpos($url, "?"))
-            $url .= '?birthday=' . $birthday . '&accountnumber=' . $accountnumber;
+            $url .= '?birthday=' . $birthday . '&accountnumber=' . $accountnumber. '&phonenumber=' . $phonenumber;
         else
-            $url .= '&birthday=' . $birthday . '&accountnumber=' . $accountnumber;
+            $url .= '&birthday=' . $birthday . '&accountnumber=' . $accountnumber. '&phonenumber=' . $phonenumber;
         return $url;
     }
 
@@ -122,7 +130,7 @@ class MultiSafepay_Msp_Model_Gateway_PayAfter extends MultiSafepay_Msp_Model_Gat
      * @return bool
      */
     protected function _isTestMode($store = null) {
-        $mode = Mage::getStoreConfig('msp_gateways/msp_payafter/test_api_pad', $store);
+        $mode = Mage::getStoreConfig('msp_gateways/msp_einvoice/test_api_pad', $store);
 
         return $mode == MultiSafepay_Msp_Model_Config_Sources_Accounts::TEST_MODE;
     }

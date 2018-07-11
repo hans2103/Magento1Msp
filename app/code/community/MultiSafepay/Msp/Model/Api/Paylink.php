@@ -27,6 +27,7 @@ class MultiSafepay_Msp_Model_Api_Paylink {
         'currency' => '',
         'amount' => '',
         'days_active' => '',
+        "gateway_reset"
     );
     public $signature;
     public $api_url;
@@ -43,7 +44,9 @@ class MultiSafepay_Msp_Model_Api_Paylink {
     public $availablePaymentMethodCodes = array(
         'msp' => '',
         'msp_ideal' => 'IDEAL',
+        'msp_dotpay' => 'DOTPAY',
         //'msp_payafter', for now we dont allow payafter manual transaction requests
+        //'msp_einvoice', for now we dont allow einvoice manual transaction requests
         'msp_mistercash' => 'MISTERCASH',
         'msp_visa' => 'VISA',
         'msp_mastercard' => 'MASTERCARD',
@@ -110,7 +113,7 @@ class MultiSafepay_Msp_Model_Api_Paylink {
         $mapi->merchant['site_code'] = $this->merchant['security_code'];
 
         $mapi->test = $this->test;
-          $mapi->merchant['notification_url'] = Mage::getUrl("msp/standard/notification", array("_secure" => true, "_store"=> $order->getStoreId())) . '&type=initial';
+        $mapi->merchant['notification_url'] = Mage::getUrl("msp/standard/notification", array("_secure" => true, "_store"=> $order->getStoreId())) . '&type=initial';
         $mapi->merchant['cancel_url'] = Mage::getUrl("msp/standard/cancel", array("_secure" => true, "_store"=> $order->getStoreId()));
         $mapi->merchant['redirect_url'] = Mage::getUrl("msp/standard/return", array("_secure" => true, "_store"=> $order->getStoreId()));
 
@@ -121,7 +124,10 @@ class MultiSafepay_Msp_Model_Api_Paylink {
             $mapi->customer['address1'] = $billing->getStreet(1);
         }
 
-        $mapi->customer['locale'] = Mage::app()->getLocale()->getLocaleCode(); //Mage::app()->getLocale()->getDefaultLocale();
+		$locale= Mage::getStoreConfig('general/locale/code', $order->getStoreId());
+
+
+        $mapi->customer['locale'] = $locale;//Mage::app()->getLocale()->getLocaleCode(); //Mage::app()->getLocale()->getDefaultLocale();
         $mapi->customer['firstname'] = $billing->getFirstname();
         $mapi->customer['lastname'] = $billing->getLastname();
         $mapi->customer['zipcode'] = $billing->getPostcode();
@@ -136,7 +142,12 @@ class MultiSafepay_Msp_Model_Api_Paylink {
         $mapi->transaction['currency'] = $this->transaction['currency'];
         $mapi->transaction['var3'] = Mage::app()->getStore()->getStoreId();
         $mapi->transaction['description'] = 'Order #' . $this->transaction['id'] . ' at ' . $storename;
-        $mapi->transaction['gateway'] = $this->availablePaymentMethodCodes[$pm_code];
+        
+        if($this->transaction['gateway_reset']){
+	    	$mapi->transaction['gateway'] = '';
+	    }else{
+        	$mapi->transaction['gateway'] = $this->availablePaymentMethodCodes[$pm_code];
+       	}
         $mapi->transaction['items'] = $items;
         $mapi->transaction['daysactive'] = $this->transaction['days_active'];
 

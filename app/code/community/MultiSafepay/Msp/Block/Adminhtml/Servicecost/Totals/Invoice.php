@@ -6,7 +6,7 @@ class MultiSafepay_Msp_Block_Adminhtml_Servicecost_Totals_Invoice extends Mage_A
         parent::_initTotals();
 
         $source = $this->getSource();
-        $amount = $source->getOrder()->getServicecostPdf();
+        $amount = $source->getOrder()->getServicecost();
         $method = $source->getOrder()->getPayment()->getMethodInstance();
 
         $code = $source->getOrder()->getPayment()->getMethod();

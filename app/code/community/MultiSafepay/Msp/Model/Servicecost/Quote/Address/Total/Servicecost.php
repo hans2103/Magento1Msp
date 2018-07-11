@@ -10,7 +10,9 @@ class MultiSafepay_Msp_Model_Servicecost_Quote_Address_Total_Servicecost extends
         'msp',
         'mspcheckout',
         'msp_ideal',
+        'msp_dotpay',
         'msp_payafter',
+        'msp_einvoice',
         'msp_klarna',
         'msp_mistercash',
         'msp_visa',
@@ -67,7 +69,9 @@ class MultiSafepay_Msp_Model_Servicecost_Quote_Address_Total_Servicecost extends
     );
     public $gateways = array(
         'msp_ideal',
+        'msp_dotpay',
         'msp_payafter',
+        'msp_einvoice',
         'msp_klarna',
         'msp_mistercash',
         'msp_visa',

@@ -7,6 +7,15 @@
   padding-top: 12px;
 }
 
+#msp_gateways_msp_dotpay-head{
+  background-image: url("../../images/msp/nl/msp_dotpay.png");
+  background-position-x: 0px;
+  background-repeat: no-repeat;
+  padding-left: 60px;
+  min-height: 30px;
+  padding-top: 12px;
+}
+
 #msp_gateways_msp_klarna-head{
   background-image: url("../../images/msp/nl/msp_klarna.png");
   background-position-x: 0px;
@@ -18,6 +27,15 @@
 
 #msp_gateways_msp_payafter-head{
   background-image: url("../../images/msp/nl/msp_payafter.png");
+  background-position-x: 0px;
+  background-repeat: no-repeat;
+  padding-left: 60px;
+  min-height: 30px;
+  padding-top: 12px;
+}
+
+#msp_gateways_msp_einvoice-head{
+  background-image: url("../../images/msp/nl/msp_einvoice.png");
   background-position-x: 0px;
   background-repeat: no-repeat;
   padding-left: 60px;

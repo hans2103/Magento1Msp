@@ -70,7 +70,7 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
 
         $paymentModel->setParams($this->getRequest()->getParams());
 
-        if ($selected_gateway != 'PAYAFTER' && $selected_gateway != 'KLARNA') {
+        if ($selected_gateway != 'PAYAFTER' && $selected_gateway != 'KLARNA' && $selected_gateway != 'EINVOICE') {
             $paymentLink = $paymentModel->startTransaction();
         } else {
             $paymentLink = $paymentModel->startPayAfterTransaction();
@@ -109,8 +109,21 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
         $session->setLastOrderId($order->getId());
         $session->setLastRealOrderId($order->getIncrementId());
 
-        // End fix
-        $this->_redirect("checkout/onepage/success?utm_nooverride=1", array("_secure" => true));
+        //$url = Mage::getUrl('checkout/onepage/success?utm_nooverride=1&__store', array("__secure" => true, "__store"=> $order->getStoreId()));
+        $url = Mage::getUrl('checkout/onepage/success?utm_nooverride', array(
+		    '_current' => true,
+		    '_use_rewrite' => true,
+		    '_secure' => true,
+		    '_store' => $order->getStoreId(),
+		    '_store_to_url' => true
+		));
+      header('Content-type: text/html; charset=utf-8');
+        header("Location: " . $url, true);
+        header("Connection: close", true);
+        header("Content-Length: 0", true);
+        exit;
+        //$this->_redirect($url);
+        //$this->_redirect("checkout/onepage/success?utm_nooverride=1", array("__secure" => true, "__store"=> $order->getStoreId()));
     }
 
     /**
@@ -141,6 +154,7 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
         if (Mage::getStoreConfig('payment/msp/keep_cart', $quote->getStoreId()) ||
                 Mage::getStoreConfig('msp/settings/keep_cart', $quote->getStoreId()) ||
                 $quote->getPayment()->getMethod() == 'msp_payafter' ||
+                $quote->getPayment()->getMethod() == 'msp_einvoice' ||
                 $quote->getPayment()->getMethod() == 'msp_klarna') {
 
             if ($quoteId = $checkout->getLastQuoteId()) {
@@ -216,7 +230,7 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
         $storeId = Mage::app()->getStore()->getStoreId();
         $config = Mage::getStoreConfig('mspcheckout' . "/settings", $storeId);
 
-        if ($config["active"]) {//if (isset($config["account_id"])) {
+        if ( isset($config["active"]) && $config["active"]) {//if (isset($config["account_id"])) {
             $msp = new MultiSafepay();
             $msp->test = ($config["test_api"] == 'test');
             $msp->merchant['account_id'] = $config["account_id"];

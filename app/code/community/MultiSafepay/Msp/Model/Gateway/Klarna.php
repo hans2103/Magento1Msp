@@ -35,7 +35,9 @@ class MultiSafepay_Msp_Model_Gateway_Klarna extends MultiSafepay_Msp_Model_Gatew
     );
     public $gateways = array(
         'msp_ideal',
+        'msp_dotpay',
         'msp_payafter',
+        'msp_einvoice',
         'msp_klarna',
         'msp_mistercash',
         'msp_visa',

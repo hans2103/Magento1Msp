@@ -9,7 +9,7 @@
 <config>
   <modules>
     <MultiSafepay_Msp>
-      <version>2.2.2</version>
+      <version>2.2.5</version>
     </MultiSafepay_Msp>
   </modules>
   <global>
@@ -280,6 +280,11 @@
         <model>msp/gateway_payafter</model>
         <title>MSP Betaal na Ontvangst</title>
       </msp_payafter>
+      <msp_einvoice>
+        <active>1</active>
+        <model>msp/gateway_einvoice</model>
+        <title>MSP E-Invoice</title>
+      </msp_einvoice>
       <msp_klarna>
         <active>1</active>
         <model>msp/gateway_klarna</model>
@@ -290,6 +295,11 @@
         <model>msp/gateway_amex</model>
         <title>MSP American Express</title>
       </msp_amex>
+      <msp_dotpay>
+        <active>1</active>
+        <model>msp/gateway_dotpay</model>
+        <title>MSP Dotpay</title>
+      </msp_dotpay>
       <msp_mistercash>
         <active>1</active>
         <model>msp/gateway_mistercash</model>
@@ -486,6 +496,16 @@
         <max_order_total>300</max_order_total>
         <send_request_after_shipping>0</send_request_after_shipping>
       </msp_payafter>
+      <msp_einvoice translate="title" module="msp">
+        <active>0</active>
+        <model>msp/gateway_einvoice</model>
+        <title>E-Invoice</title>
+        <allowed_currency>EUR</allowed_currency>
+        <lang>nl</lang>
+        <min_order_total>15</min_order_total>
+        <max_order_total>300</max_order_total>
+        <send_request_after_shipping>0</send_request_after_shipping>
+      </msp_einvoice>
       <msp_klarna translate="title" module="msp">
         <active>0</active>
         <model>msp/gateway_klarna</model>
@@ -503,6 +523,13 @@
         <allowed_currency>EUR</allowed_currency>
         <lang>nl</lang>
       </msp_amex>
+      <msp_dotpay translate="title" module="msp">
+        <active>0</active>
+        <model>msp/gateway_dotpay</model>
+        <title>Dotpay</title>
+        <allowed_currency>EUR</allowed_currency>
+        <lang>nl</lang>
+      </msp_dotpay>
       <msp_mistercash translate="title" module="msp">
         <active>0</active>
         <model>msp/gateway_mistercash</model>
