@@ -49,6 +49,7 @@ class MultiSafepay_Msp_Model_Gateway_Klarna extends MultiSafepay_Msp_Model_Gatew
         'msp_ing',
         'msp_kbc',
         'msp_belfius',
+        'msp_idealqr',
         'msp_banktransfer',
         'msp_maestro',
         'msp_paypal',
@@ -75,9 +76,9 @@ class MultiSafepay_Msp_Model_Gateway_Klarna extends MultiSafepay_Msp_Model_Gatew
             }
         }
 
-        
+
         $storeId = Mage::app()->getStore()->getId();
-        
+
         if (in_array($this->_code, $this->gateways)) {
             $this->_configCode = 'msp_gateways';
             $this->_module = 'msp_gateways';

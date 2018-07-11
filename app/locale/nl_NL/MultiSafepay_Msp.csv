@@ -118,7 +118,17 @@
 "Please retry placing your order and select a different payment method.", "U kunt uw order nog steeds afronden door te kiezen voor een andere betaalmethode."
 "We are sorry to inform you that your request for payment after delivery has been denied by Multifactor.<BR /> If you have questions about this rejection, you can checkout the FAQ on the website of Multifactor", "Het spijt ons u te moeten informeren dat u Betaal na Ontvangst verzoek niet is geaccepteerd door Multifactor.<BR /> Mocht u vragen hebben over uw afwijzing, dan kunt u de  FAQ op de website van  Multifactor"
 "You can also contact Multifactor by calling 020-8500533 (at least 2 hours after this rejection) or by sending an email to "," raadplegen. U kunt tevens contact opnemen met Multifactor via telefoonnummer 020-8500533 (Minimaal 2 uur na de afwijzing) of door het sturen van een e-mail naar: "
-
-
-
-
+"Seconds active before transaction requests expires?", "Seconden voordat een transactie verloopt?"
+"Days active before transaction requests expires?", "Dagen voordat een transactie verloopt?"
+"When configured it will overrule the days active configuration", "Indien geconfigureerd zal dit de dagen configuratie overschrijven"
+"Custom. refund description", "Omschrijving voor terugbetaling"
+"This option is used to allow the payment selection at MultiSafepay when creating payment links for orders created in the Magento Backend and with a preselected MultiSafepay payment method", "Deze optie wordt gebruikt zodat de betaalkeuze gemaakt wordt bij MultiSafepay voor handmatig aangemaakte orders in de Magento backend"
+"Create a payment link for manually created orders?", "Betaallink aanmaken voor handmatig aangemaakte orders?"
+"A payment link will be created when adding an order using the Magento backend.", "Een betaallink zal worden aangemaakt wanneer er een handmatig order wordt aangemaakt via de Magento backend."
+"Select Creditcards to enable in checkout", "Selecteer creditcards welke aangezet moeten worden in de checkout"
+"Disable normal checkout", "Uitschakelen normale checkout"
+"When you only offer Fastcheckout you can use this option to disable the normal checkout (hides the buttons to go to the checkout)", "Wanneer u alleen Fastcheckout aanbiedt, kunt u deze optie gebruiken om de normale checkout uit te schakelen (verbergt de knoppen om naar de checkout te gaan)"
+"Allow Qwindo Product Feed", "Toestaan Qwindo Product Feed"
+"With this option enabled, Qwindo can request your product feed", "Als deze optie is ingeschakeld, kan Qwindo de product feed opvragen"
+"Disable Fastcheckout pay buttons", "Schakel Fastcheckout betaalknoppen uit"
+"Qwindo wil use Fastcheckout as a payment method while creating an order so Fastcheckout must be enabled. With this function you can disable the pay buttons when you only want to enable Qwindo and don't wan't to show Fastcheckout", "Qwindo gebruikt Fastcheckout als betaalmethode bij het aanmaken van een order, dus Fastcheckout moet aanstaan. Met deze optie kunt u de betaalknoppen uitschakelen als u alleen Qwindo wilt inschakelen en geen Fastcheckout wilt laten zien."

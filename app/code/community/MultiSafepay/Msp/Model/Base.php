@@ -40,6 +40,7 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object
         'ING' => 'msp_ing',
         'KBC' => 'msp_kbc',
         'BELFIUS' => 'msp_belfius',
+        'IDEALQR' => 'msp_idealqr',
         'MASTERCARD' => 'msp_mastercard',
         'BANKTRANS' => 'msp_banktransfer',
         'MAESTRO' => 'msp_maestro',
@@ -232,6 +233,7 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object
         $statusUncleared = $this->getConfigData("uncleared_status");
         $statusVoid = $this->getConfigData("void_status");
         $statusDeclined = $this->getConfigData("declined_status");
+        $statusChargeback = $this->getConfigData("chargeback_status");
         $statusExpired = $this->getConfigData("expired_status");
         $statusRefunded = $this->getConfigData("refunded_status");
         $statusPartialRefunded = $this->getConfigData("partial_refunded_status");
@@ -243,9 +245,14 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object
             return true;
         }
 
-        $usedMethod = $this->methodMap[$mspDetails['paymentdetails']['type']];
+        if ($order->getState() == Mage_Sales_Model_Order::STATE_CLOSED) {
+            return true;
+        }
 
-
+        $usedMethod = "";
+        if (!empty($mspDetails['paymentdetails']['type'])) {
+            $usedMethod = $this->methodMap[$mspDetails['paymentdetails']['type']];
+        }
 
         /**
          *    Create the transaction details array
@@ -408,6 +415,10 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object
                     $order->setState($newState, $newStatus, $statusMessage)->save();
                     $orderSaved = true;
                 }
+                break;
+            case "chargedback":
+                $statusMessage = Mage::helper("msp")->__("Transaction chargeback");
+                $newStatus = $statusChargeback;
                 break;
             case "expired":
                 $newState = Mage_Sales_Model_Order::STATE_CANCELED;
@@ -649,6 +660,7 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object
         $statusUncleared = $this->getConfigData("uncleared_status");
         $statusVoid = $this->getConfigData("void_status");
         $statusDeclined = $this->getConfigData("declined_status");
+        $statusChargeback = $this->getConfigData("chargeback_status");
         $statusExpired = $this->getConfigData("expired_status");
         $statusRefunded = $this->getConfigData("refunded_status");
         $statusPartialRefunded = $this->getConfigData("partial_refunded_status");
@@ -748,6 +760,10 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object
                     $order->setState($newState, $newStatus, $statusMessage)->save();
                     $orderSaved = true;
                 }
+                break;
+            case "chargedback":
+                $statusMessage = Mage::helper("msp")->__("Transaction chargeback");
+                $newStatus = $statusChargeback;
                 break;
             case "expired":
                 $newState = Mage_Sales_Model_Order::STATE_CANCELED;
@@ -1045,7 +1061,9 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object
                     $msp->updateInvoice();
 
                     if ($msp->error) {
-                        echo 'update trans error';
+                        //Disabled as this gives an error when using Qwindo Test Panel. 
+                        //This needs to be rewritten correctly. Disabled now as the error was not used
+                        //echo 'update trans error';
                     }
                 }
 

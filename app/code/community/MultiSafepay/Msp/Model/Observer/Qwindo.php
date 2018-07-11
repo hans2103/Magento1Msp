@@ -41,22 +41,9 @@ class MultiSafepay_Msp_Model_Observer_Qwindo extends MultiSafepay_Msp_Model_Obse
             $category_ids = array();
             foreach ($cats as $category_id) {
                 $_cat = Mage::getModel('catalog/category')->load($category_id);
-                $cattrans = array();
-                foreach ($storeCollection as $store) {
-                    $store_id = $store->getId();
-                    $language = Mage::getStoreConfig('general/locale/code', $store->getId());
-                    $defaultStoreCategory = Mage::getModel('catalog/category');
-                    $defaultStoreCategory->setStoreId($store_id);
-                    $defaultStoreCategory->load($category_id);
-                    $cattrans[$language] = $defaultStoreCategory->getName();
+                if ($_cat->getIsActive()) {
+                    $category_ids[] = $category_id;
                 }
-                $maincat = $cattrans;
-                if ($subcats == '') {
-                    // $maincat = $subcats = $_cat->getName();
-                } else {
-                    $subcats .= ">" . $_cat->getName();
-                }
-                $category_ids[] = $category_id;
             }
 
             $product_data = array();
@@ -91,7 +78,6 @@ class MultiSafepay_Msp_Model_Observer_Qwindo extends MultiSafepay_Msp_Model_Obse
             $product_data['brand'] = $product->getBrand();
             $product_data['weight'] = $product->getWeight();
             $product_data['weight_unit'] = 'kg';
-            $product_data['primary_category'] = $maincat;
             $product_data['category_ids'] = $category_ids;
             $product_data['product_url'] = $product->getProductUrl();
             $product_data['product_image_urls'] = array();
@@ -686,6 +672,72 @@ class MultiSafepay_Msp_Model_Observer_Qwindo extends MultiSafepay_Msp_Model_Obse
         return $this;
     }
 
+    public function getChildCategories($children, $category, $language, $store_id)
+    {
+        $children['id'] = $category->getId();
+        $children['title'][$language] = $category->getName();
+        if ($category->getMspCashback()) {
+            $children['cashback'] = $category->getMspCashback();
+        }
+
+        if ($category->hasChildren()) {
+            foreach ($category->getChildren() as $child) {
+                $children['children'][] = $this->getChildCategories($children, $child, $language, $store_id);
+            }
+        }
+        return $children;
+    }
+
+    function getCategoryTree($recursionLevel, $storeId = 1)
+    {
+        $parent = Mage::app()->getStore()->getRootCategoryId();
+        $tree = Mage::getResourceModel('catalog/category_tree');
+        /* @var $tree Mage_Catalog_Model_Resource_Category_Tree */
+
+        $nodes = $tree->loadNode($parent)->loadChildren($recursionLevel)->getChildren();
+        $tree->addCollectionData(null, false, $parent);
+
+        $categoryTreeData = array();
+        foreach ($nodes as $node) {
+            $categoryTreeData[] = $this->getNodeChildrenData($node);
+        }
+
+        return $categoryTreeData;
+    }
+
+    function getNodeChildrenData(Varien_Data_Tree_Node $node)
+    {
+        if (strlen($code = Mage::app()->getRequest()->getParam('store'))) { // store level
+            $store_id = Mage::getModel('core/store')->load($code)->getId();
+        } elseif (strlen($code = $code = Mage::app()->getRequest()->getParam('website'))) { // website level
+            $website_id = Mage::getModel('core/website')->load($code)->getId();
+            $store_id = Mage::app()->getWebsite($website_id)->getDefaultStore()->getId();
+        } else { // default level
+            $store_id = 0;
+        }
+
+        $language = Mage::getStoreConfig('general/locale/code', $store_id);
+        $data = array();
+        $data['id'] = $node->getData('entity_id');
+        $data['title'][$language] = $node->getData('name');
+
+        $childCategory = Mage::getModel('catalog/category');
+        $childCategory->setStoreId($store_id);
+        $childCategory->load($node->getData('entity_id'));
+        if ($childCategory->getMspCashback()) {
+            $data['cashback'] = $childCategory->getMspCashback();
+        }
+
+        foreach ($node->getChildren() as $childNode) {
+            if (!array_key_exists('children', $data)) {
+                $data['children'] = array();
+            }
+
+            $data['children'][] = $this->getNodeChildrenData($childNode);
+        }
+        return $data;
+    }
+
     public function push_category_data(Varien_Event_Observer $observer)
     {
         $qwindo_enabled = Mage::getStoreConfig('qwindo/settings/allow_fcofeed');
@@ -697,45 +749,57 @@ class MultiSafepay_Msp_Model_Observer_Qwindo extends MultiSafepay_Msp_Model_Obse
         }
 
         if ($qwindo_enabled) {
-            $recursionLevel = 10;
-            $parent = Mage::app()->getStore()->getRootCategoryId();
-            $tree = Mage::getResourceModel('catalog/category_tree');
-            $nodes = $tree->loadNode($parent)->loadChildren($recursionLevel)->getChildren();
-            $tree->addCollectionData(null, false, $parent);
-            $categoryTreeData = array();
-            $stores = array();
-            $storeCollection = Mage::getModel('core/store')->getCollection();
+            if (!Mage::helper('catalog/category_flat')->isEnabled()) {
+                $categoryTreeData = $this->getCategoryTree(3);
+            } else {
+                $stores = array();
+                $storeCollection = Mage::getModel('core/store')->getCollection();
+                $categoryTreeData = array();
+                $_helper = Mage::helper('catalog/category');
+                $_categories = $_helper->getStoreCategories(false, true, true);
 
-            foreach ($nodes as $node) {
-                $cattrans = array();
-                foreach ($storeCollection as $store) {
-                    $store_id = $store->getId();
-                    $language = Mage::getStoreConfig('general/locale/code', $store->getId());
-                    $defaultStoreCategory = Mage::getModel('catalog/category');
-                    $defaultStoreCategory->setStoreId($store_id);
-                    $defaultStoreCategory->load($node->getId());
-                    $cattrans['id'] = $node->getId();
-                    $cattrans['title'][$language] = $defaultStoreCategory->getName();
-                }
+                if (count($_categories) > 0) {
+                    foreach ($_categories as $_category) {
+                        $_category = Mage::getModel('catalog/category')->load($_category->getId());
+                        $cattrans = array();
+                        foreach ($storeCollection as $store) {
+                            $store_id = $store->getId();
+                            $language = Mage::getStoreConfig('general/locale/code', $store->getId());
+                            $cattrans['id'] = $_category->getId();
+                            $cattrans['title'][$language] = $_category->getName();
 
+                            if ($_category->getMspCashback()) {
+                                $cattrans['cashback'] = $_category->getMspCashback();
+                            }
+                        }
 
-                foreach ($node->getChildren() as $child) {
-                    $children = array();
-                    $childs = array();
+                        $_subcategories = $_category->getChildrenCategories();
+                        if (count($_subcategories) > 0) {
+                            foreach ($_subcategories as $_subcategory) {
+                                $children = array();
+                                $childs = array();
 
-                    foreach ($storeCollection as $store) {
-                        $store_id = $store->getId();
-                        $language = Mage::getStoreConfig('general/locale/code', $store->getId());
-                        $childCategory = Mage::getModel('catalog/category');
-                        $childCategory->setStoreId($store_id);
-                        $childCategory->load($child->getId());
-                        $children['id'] = $child->getId();
-                        $children['title'][$language] = $childCategory->getName();
+                                foreach ($storeCollection as $store) {
+                                    $store_id = $store->getId();
+                                    $language = Mage::getStoreConfig('general/locale/code', $store->getId());
+                                    $children['id'] = $_subcategory->getId();
+                                    $children['title'][$language] = $_subcategory->getName();
+                                    if ($_subcategory->getMspCashback()) {
+                                        $children['cashback'] = $_subcategory->getMspCashback();
+                                    }
+                                }
+                                $cattrans['children'][] = $children;
+                            }
+                        }
+                        if (!empty($cattrans)) {
+                            $categoryTreeData[] = $cattrans;
+                        }
                     }
-                    $cattrans['children'][] = $children;
                 }
-                $categoryTreeData[] = $cattrans;
             }
+
+
+
             $json = json_encode($categoryTreeData);
 
             $msp = new Client;
@@ -781,12 +845,9 @@ class MultiSafepay_Msp_Model_Observer_Qwindo extends MultiSafepay_Msp_Model_Obse
             $event = $observer->getEvent();
             $_item = $event->getItem();
             //if ((int)$_item->getData('qty') != (int)$_item->getOrigData('qty')) {
-            $product = Mage::getModel('catalog/product');
-            $product->load($product->getIdBySku($_item->getSku()));
-            $stockItem = Mage::getModel('cataloginventory/stock_item')->loadByProduct($product->getId());
             $params = array();
             $params['product_id'] = $_item->getProductId();
-            $params['stock'] = (INT) $stockItem->getQty();
+            $params['stock'] = (INT) $_item->getData('qty');
             $json = json_encode($params);
             $msp = new Client;
             $msp->auth = $this->getAuthorization($qwindo_api_url . '/api/stock/product', $json, $observer);

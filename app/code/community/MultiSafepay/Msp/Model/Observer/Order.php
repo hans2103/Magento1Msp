@@ -32,6 +32,7 @@ class MultiSafepay_Msp_Model_Observer_Order extends MultiSafepay_Msp_Model_Obser
         'msp_ing',
         'msp_kbc',
         'msp_belfius',
+        'msp_idealqr',
         'msp_banktransfer',
         'msp_maestro',
         'msp_paypal',

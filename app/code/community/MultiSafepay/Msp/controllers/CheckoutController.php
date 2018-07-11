@@ -155,7 +155,6 @@ class MultiSafepay_Msp_CheckoutController extends Mage_Core_Controller_Front_Act
 
         if (isset($headers['Content-Type']) && $headers['Content-Type'] == 'application/json') {
             $store = $storeId = Mage::app()->getStore();
-
             $json = file_get_contents('php://input');
             $api_key = Mage::getStoreConfig("msp/settings/api_key", $storeId);
             $url = Mage::helper('core/url')->getCurrentUrl();
@@ -176,12 +175,23 @@ class MultiSafepay_Msp_CheckoutController extends Mage_Core_Controller_Front_Act
             if ($keys_match == true) {
                 $data = json_decode(file_get_contents('php://input'), true);
                 $checkout = Mage::getModel('msp/checkout');
+
+                //we only process completed qwindo transactions to avoid bulk test orders beeing added to Magento
+                if ($data['status'] !== "completed" && $data['status'] !== "uncleared") {
+                    echo 'ok';
+                    exit;
+                }
+
+
                 $done = $checkout->qwindoNotification($data, $this->getResponse());
                 if ($done) {
-                    echo '{"success": true, "data": {}}';
-                    exit;
+                    $json_message = '{"success": true, "data": {}}';
+                    $this->getResponse()->setHeader('HTTP/1.0', 200, true);
+                    $this->getResponse()->setHttpResponseCode(200);
+                    $this->getResponse()->setBody($json_message);
+                    return;
                 } else {
-                    echo '{
+                    $error = '{
                     "success": false, 
                     "data": {
                         "error_code": "QW-10001",
@@ -189,10 +199,13 @@ class MultiSafepay_Msp_CheckoutController extends Mage_Core_Controller_Front_Act
                         }
                     }'
                     ;
-                    exit;
+                    $this->getResponse()->setHeader('HTTP/1.0', 500, true);
+                    $this->getResponse()->setHttpResponseCode(500);
+                    $this->getResponse()->setBody($error);
+                    return;
                 }
             } else {
-                echo '{
+                $error = '{
                     "success": false, 
                     "data": {
                         "error_code": "QW-10000",
@@ -200,57 +213,63 @@ class MultiSafepay_Msp_CheckoutController extends Mage_Core_Controller_Front_Act
                         }
                     }'
                 ;
-                exit;
+                $this->getResponse()->setHeader('HTTP/1.0', 403, true);
+                $this->getResponse()->setHttpResponseCode(403);
+                $this->getResponse()->setBody($error);
+                return;
             }
         } else {
-            $transactionId = $this->getRequest()->getQuery('transactionid');
-            $isInitial = ($this->getRequest()->getQuery('type') == 'initial') ? true : false;
-            $isShipping = ($this->getRequest()->getQuery('type') == 'shipping') ? true : false;
+            if (empty($json)) {
 
-            /** @var $checkout MultiSafepay_Msp_Model_Checkout */
-            $checkout = Mage::getModel('msp/checkout');
+                $transactionId = $this->getRequest()->getQuery('transactionid');
+                $isInitial = ($this->getRequest()->getQuery('type') == 'initial') ? true : false;
+                $isShipping = ($this->getRequest()->getQuery('type') == 'shipping') ? true : false;
 
-            // Is this notification about new shipping rates?
-            if ($isShipping) {
-                $this->handleShippingRatesNotification($checkout);
-                return;
-            }
+                /** @var $checkout MultiSafepay_Msp_Model_Checkout */
+                $checkout = Mage::getModel('msp/checkout');
 
-            // Check if this is a fastcheckout notification
-            if ((!$isInitial) && (!$this->isFCONotification($transactionId))) {
-                //Mage::log("Redirecting to standard method notification URL...", null, "multisafepay.log");
-                $redirect = Mage::getUrl("msp/standard/notification/");
-                header('HTTP/1.1 307 Temporary Redirect');
-                header('Location: ' . $redirect);
-                exit;
-            }
-
-            // Is this notification about new shipping address?
-            if ($this->isShippingMethodsNotification()) {
-                $this->handleShippingMethodsNotification($checkout);
-                return;
-            }
-
-            $done = $checkout->notification($transactionId, $isInitial);
-
-            if (!$return) {
-                if ($isInitial) {
-                    $returnUrl = Mage::getUrl("msp/checkout/return", array("_secure" => true)) . '?transactionid=' . $transactionId;
-
-                    $storeId = Mage::getModel('sales/quote')->load($transactionId)->getStoreId();
-                    $storeName = Mage::app()->getGroup($storeId)->getName();
-
-                    // display return message
-                    $this->getResponse()->setBody('Return to <a href="' . $returnUrl . '">' . $storeName . '</a>');
-                } else {
-                    if ($done) {
-                        $this->getResponse()->setBody('ok');
-                    } else {
-                        $this->getResponse()->setBody('ng');
-                    }
+                // Is this notification about new shipping rates?
+                if ($isShipping) {
+                    $this->handleShippingRatesNotification($checkout);
+                    return;
                 }
-            } else {
-                return true;
+
+                // Check if this is a fastcheckout notification
+                if ((!$isInitial) && (!$this->isFCONotification($transactionId))) {
+                    //Mage::log("Redirecting to standard method notification URL...", null, "multisafepay.log");
+                    $redirect = Mage::getUrl("msp/standard/notification/");
+                    header('HTTP/1.1 307 Temporary Redirect');
+                    header('Location: ' . $redirect);
+                    exit;
+                }
+
+                // Is this notification about new shipping address?
+                if ($this->isShippingMethodsNotification()) {
+                    $this->handleShippingMethodsNotification($checkout);
+                    return;
+                }
+
+                $done = $checkout->notification($transactionId, $isInitial);
+
+                if (!$return) {
+                    if ($isInitial) {
+                        $returnUrl = Mage::getUrl("msp/checkout/return", array("_secure" => true)) . '?transactionid=' . $transactionId;
+
+                        $storeId = Mage::getModel('sales/quote')->load($transactionId)->getStoreId();
+                        $storeName = Mage::app()->getGroup($storeId)->getName();
+
+                        // display return message
+                        $this->getResponse()->setBody('Return to <a href="' . $returnUrl . '">' . $storeName . '</a>');
+                    } else {
+                        if ($done) {
+                            $this->getResponse()->setBody('ok');
+                        } else {
+                            $this->getResponse()->setBody('ng');
+                        }
+                    }
+                } else {
+                    return true;
+                }
             }
         }
     }

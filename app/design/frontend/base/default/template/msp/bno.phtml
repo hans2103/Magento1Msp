@@ -3,7 +3,7 @@
         <li>
             <?php if ($this->getMethodCode() == 'msp_payafter') { ?>
                 <label for="birthday" 				style="width:200px!important;">Geboortedatum (dd-mm-yyyy):</label>
-                <input name='payment[birthday]' 			value="" 	id="birthday"/>	
+                <input name='payment[birthday]' value="<?php echo $this->getBirthday(); ?>" id="birthday"/>
                 <br />
                 <label for="accountnumber" 		style="width:200px!important;">Rekeningnummer:</label>
                 <input name='payment[accountnumber]' 		value="" 	id="accountnumber"/>	

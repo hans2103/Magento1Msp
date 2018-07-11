@@ -55,6 +55,7 @@ class MultiSafepay_Msp_Model_Api_Paylink
         'msp_ing' => 'ING',
         'msp_kbc' => 'KBC',
         'msp_belfius' => 'Belfius',
+        'msp_idealqr' => 'IDEALQR',
         'msp_ferbuy' => 'FERBUY',
         'msp_mastercard' => 'MASTERCARD',
         'msp_banktransfer' => 'BANKTRANS',
@@ -131,6 +132,10 @@ class MultiSafepay_Msp_Model_Api_Paylink
         if ($mapi->customer['housenumber'] == '') {
             $mapi->customer['housenumber'] = $billing->getStreet(2);
             $mapi->customer['address1'] = $billing->getStreet(1);
+        }
+
+        if ($billing->getStreet(3) != '') {
+            $mapi->customer['housenumber'] .= ' ' . $billing->getStreet(3);
         }
 
         $locale = Mage::getStoreConfig('general/locale/code', $order->getStoreId());

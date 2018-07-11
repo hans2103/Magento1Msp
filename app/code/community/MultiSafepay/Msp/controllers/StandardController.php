@@ -390,26 +390,9 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
 
                 foreach ($cats as $category_id) {
                     $_cat = Mage::getModel('catalog/category')->load($category_id);
-                    $cattrans = array();
-                    foreach ($storeCollection as $store) {
-                        $store_id = $store->getId();
-                        $language = Mage::getStoreConfig('general/locale/code', $store->getId());
-                        $defaultStoreCategory = Mage::getModel('catalog/category');
-                        $defaultStoreCategory->setStoreId($store_id);
-                        $defaultStoreCategory->load($category_id);
-                        if ($defaultStoreCategory->getName()) {
-                            $cattrans['title'][$language] = $defaultStoreCategory->getName();
-                        }
+                    if ($_cat->getIsActive()) {
+                        $category_ids[] = $category_id;
                     }
-
-                    $maincat = $cattrans;
-                    if ($subcats == '') {
-                        // $maincat = $subcats = $_cat->getName();
-                    } else {
-                        $subcats .= ">" . $_cat->getName();
-                    }
-
-                    $category_ids[] = $category_id;
                 }
 
                 $product_data = array();
@@ -453,7 +436,6 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
                     $product_data['primary_category'] = $maincat;
                 }
                 $product_data['category_ids'] = $category_ids;
-                //$product_data['secundary_category'] = $subcats;
                 $product_data['product_url'] = $product->getProductUrl();
                 $product_data['product_image_urls'] = array();
 
@@ -476,7 +458,7 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
                     $store_id = $store->getId();
                     $language = Mage::getStoreConfig('general/locale/code', $store->getId());
 
-                    $productdata = Mage::getModel('catalog/product')->setStoreId($store_id)->load($product_id);
+                    $productdata = Mage::getModel('catalog/product')->setStoreId($store_id)->load($productId);
                     $product_data['short_product_description'][$language] = (substr(iconv("UTF-8", "UTF-8//IGNORE", $productdata->getShortDescription()), 0)) ? substr(iconv("UTF-8", "UTF-8//IGNORE", $productdata->getShortDescription()), 0) : "No short description available";
                     $product_data['long_product_description'][$language] = (substr(iconv("UTF-8", "UTF-8//IGNORE", $productdata->getDescription()), 0)) ? substr(iconv("UTF-8", "UTF-8//IGNORE", $productdata->getDescription()), 0) : "No description available";
                 }
@@ -609,6 +591,8 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
                                 $variant->stock = (INT) $stockItem->getQty();
                                 $variant->sale_price = number_format((float) $product->getFinalPrice(), 2, '.', '');
                                 $variant->retail_price = number_format((float) $product->getPrice(), 2, '.', '');
+                                $variant->weight = $product_child->getWeight();
+                                $variant->weight_unit = 'kg';
 
                                 if ($product_child->getMspCashback()) {
                                     $variant->cashback = $product_child->getMspCashback();
@@ -680,6 +664,8 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
                                 $variant->stock = (INT) $stockItem->getQty();
                                 $variant->sale_price = number_format((float) $product->getFinalPrice(), 2, '.', '');
                                 $variant->retail_price = number_format((float) $product->getPrice(), 2, '.', '');
+                                $variant->weight = $childproduct->getWeight();
+                                $variant->weight_unit = 'kg';
 
                                 if ($childproduct->getMspCashback()) {
                                     $variant->cashback = $childproduct->getMspCashback();
@@ -711,6 +697,126 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
                             }
                         }
                     }
+                    $product_data['variants'] = $variants;
+                } elseif ($product->getTypeId() == "grouped") {
+                    $variants = array();
+                    /*
+                     * GET product variant (options) and add them as variants
+                     */
+
+                    $collection = Mage::getModel('catalog/product_type_grouped')->getAssociatedProductCollection($product);
+
+                    $processed = array();
+                    $prices = array();
+                    foreach ($collection as $childproduct) {
+
+                        if (!in_array($childproduct->getId(), $processed)) {
+
+                            $product_child = Mage::getModel('catalog/product')->load($childproduct->getId());
+
+                            $variant = new stdclass();
+                            $variant->product_id = $product_child->getId();
+                            $processed[] = $product_child->getId();
+                            $variant->sku_number = $product_child->getSku();
+                            if ($product_child->getGtin()) {
+                                $variant->gtin = $product_child->getGtin();
+                                $variant->unique_identifier = true;
+                            } else {
+                                $variant->gtin = null;
+                                $variant->unique_identifier = false;
+                            }
+                            $product_data['mpn'] = $product_child->getMpn();
+
+                            if ($product_child->getImage() && $product_child->getImage() != 'no_selection') {
+                                $mainimage = new stdclass();
+                                $mainimage->url = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA) . 'catalog/product' . $product_child->getImage();
+                                $mainimage->main = true;
+                                $variant->product_image_urls = array();
+                                $variant->product_image_urls[] = $mainimage;
+                            }
+
+                            $childimages = $product_child->getMediaGalleryImages();
+                            if (!empty($childimages)) {
+                                foreach ($product_child->getMediaGalleryImages() as $image) {
+                                    $subimage = new stdclass();
+                                    $subimage->url = $image->getUrl();
+                                    $subimage->main = false;
+                                    $variant->product_image_urls[] = $subimage;
+                                }
+                            }
+                            $stockItem = Mage::getModel('cataloginventory/stock_item')->loadByProduct($product_child->getId());
+                            $variant->stock = (INT) $stockItem->getQty();
+                            $variant->sale_price = number_format((float) $product_child->getFinalPrice(), 2, '.', '');
+                            $variant->retail_price = number_format((float) $product_child->getPrice(), 2, '.', '');
+                            $variant->weight = $product_child->getWeight();
+                            $variant->weight_unit = 'kg';
+                            if ($product_child->getMspCashback()) {
+                                $variant->cashback = $product_child->getMspCashback();
+                            }
+
+
+
+                            $prices[] = $variant->sale_price;
+
+                            $attrchild = array();
+                            $attributes = $product_child->getAttributes();
+                            //print_r($attributes);exit;
+                            foreach ($storeCollection as $store) {
+                                $store_id = $store->getId();
+                                Mage::app()->setCurrentStore($store_id);
+                                $language = Mage::getStoreConfig('general/locale/code', $store_id);
+                                foreach ($attributes as $attribute) {
+                                    if ($attribute->getIsVisibleOnFront()) {
+                                        $_coditionDefault = $product_child->getResource()->getAttribute($attribute->getAttributeCode())->setStoreId($store_id)->getFrontend()->getValue($product_child);
+                                        $langlabels = $attribute->getStoreLabels();
+                                        if (isset($langlabels[$store_id]) && $_coditionDefault != NULL) {
+                                            $attrchild[$attribute->getAttributeCode()][$language] = array('label' => $langlabels[$store_id], 'value' => $_coditionDefault);
+                                        } elseif ($_coditionDefault) {
+                                            $attrchild[$attribute->getAttributeCode()][$language] = array('label' => $attribute->getFrontendLabel(), 'value' => $_coditionDefault);
+                                        }
+                                    }
+                                }
+                            }
+                            if (!empty($attrchild)) {
+                                $variant->attributes = $attrchild;
+                            }
+                            $variants[] = $variant;
+                        }
+                    }
+
+                    /**
+                     * Get child product tax rule. We need to set this as the main product is of type grouped and does not have this value.
+                     * */
+                    $taxRules = Mage::getModel('tax/sales_order_tax')->getCollection();
+                    $taxCalculation = Mage::getModel('tax/calculation');
+                    $request = $taxCalculation->getRateRequest(null, null, null, $store);
+                    $tax_rule = new stdclass();
+                    $rules = array();
+
+                    $collection = Mage::getModel('tax/calculation_rule')->getCollection();
+                    if ($collection->getSize()) {
+                        $collection->addCustomerTaxClassesToResult()->addProductTaxClassesToResult()->addRatesToResult();
+                    }
+                    if ($collection->getSize()) {
+                        foreach ($collection as $rule) {
+                            $rule_data = $rule->getData();
+                            if (in_array($product_child->getTaxClassId(), $rule_data['product_tax_classes'])) {
+                                foreach ($rule_data['tax_rates'] as $key => $rate_id) {
+                                    $rate = Mage::getSingleton('tax/calculation_rate')->load($rate_id);
+                                    $rate_info = $rate->getData();
+                                    $rules[$rate_info['tax_country_id']] = $rate_info['rate'];
+                                    $tax_rule->name = $rule_data['code'];
+                                }
+                            }
+                        }
+                    };
+
+                    $tax_rule->id = $product_child->getTaxClassId();
+                    $tax_rule->rules = $rules;
+                    $product_data['tax'] = $tax_rule;
+
+
+                    $product_data['from_price'] = min($prices);
                     $product_data['variants'] = $variants;
                 }
 
@@ -746,7 +852,7 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
                         }
                     }
                 }
-                if ($product->getName() != null) {
+                if ($product->getName() != null && $product->getTypeId() != "bundle" && $product->getTypeId() != "downloadable") {
                     $json[] = $product_data;
                 }
             }
@@ -757,30 +863,26 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
             $json = array();
             $product = Mage::getModel('catalog/product')->load($product_id);
 
+            if ($product->getTypeId() == "bundle" || $product->getTypeId() == "downloadable") {
+                echo '{
+                        "success": false, 
+                        "data": {
+                            "error_code": "QW-4005",
+                            "error": "Product type not supported."
+                            }
+                        }'
+                ;
+                exit;
+            }
+
             $maincat = $subcats = '';
             $cats = $product->getCategoryIds();
             $category_ids = array();
             foreach ($cats as $category_id) {
                 $_cat = Mage::getModel('catalog/category')->load($category_id);
-                $cattrans = array();
-                foreach ($storeCollection as $store) {
-                    $store_id = $store->getId();
-                    $language = Mage::getStoreConfig('general/locale/code', $store->getId());
-                    $defaultStoreCategory = Mage::getModel('catalog/category');
-                    $defaultStoreCategory->setStoreId($store_id);
-                    $defaultStoreCategory->load($category_id);
-                    if($defaultStoreCategory->getName()){
-                    	$cattrans['title'][$language] = $defaultStoreCategory->getName();
-                    }
+                if ($_cat->getIsActive()) {
+                    $category_ids[] = $category_id;
                 }
-                $maincat = $cattrans;
-                if ($subcats == '') {
-                    // $maincat = $subcats = $_cat->getName();
-                } else {
-                    $subcats .= ">" . $_cat->getName();
-                }
-
-                $category_ids[] = $category_id;
             }
 
             $product_data = array();
@@ -820,11 +922,7 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
             $product_data['brand'] = $product->getBrand();
             $product_data['weight'] = $product->getWeight();
             $product_data['weight_unit'] = 'kg';
-            if ($maincat) {
-                $product_data['primary_category'] = $maincat;
-            }
             $product_data['category_ids'] = $category_ids;
-            //$product_data['SecondaryCategory'] = $subcats;
             $product_data['product_url'] = $product->getProductUrl();
             $product_data['product_image_urls'] = array();
 
@@ -984,6 +1082,8 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
                         $variant->stock = (INT) $stockItem->getQty();
                         $variant->sale_price = number_format((float) $childproduct->getFinalPrice(), 2, '.', '');
                         $variant->retail_price = number_format((float) $childproduct->getPrice(), 2, '.', '');
+                        $variant->weight = $product_child->getWeight();
+                        $variant->weight_unit = 'kg';
 
                         if ($product_child->getMspCashback()) {
                             $variant->cashback = $product_child->getMspCashback();
@@ -1066,7 +1166,8 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
                         $variant->stock = (INT) $stockItem->getQty();
                         $variant->sale_price = number_format((float) $product_child->getFinalPrice(), 2, '.', '');
                         $variant->retail_price = number_format((float) $product_child->getPrice(), 2, '.', '');
-
+                        $variant->weight = $product_child->getWeight();
+                        $variant->weight_unit = 'kg';
                         if ($product_child->getMspCashback()) {
                             $variant->cashback = $product_child->getMspCashback();
                         }
@@ -1178,6 +1279,56 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
         return json_encode($json);
     }
 
+    function getCategoryTree($recursionLevel, $storeId = 1)
+    {
+        $parent = 0; //Mage::app()->getStore()->getRootCategoryId();    
+        $tree = Mage::getResourceModel('catalog/category_tree');
+        /* @var $tree Mage_Catalog_Model_Resource_Category_Tree */
+
+        $nodes = $tree->loadNode($parent)->loadChildren($recursionLevel)->getChildren();
+        $tree->addCollectionData(null, false, $parent);
+
+        $categoryTreeData = array();
+        foreach ($nodes as $node) {
+            $categoryTreeData[] = $this->getNodeChildrenData($node);
+        }
+
+        return $categoryTreeData;
+    }
+
+    function getNodeChildrenData(Varien_Data_Tree_Node $node)
+    {
+        if (strlen($code = Mage::app()->getRequest()->getParam('store'))) { // store level
+            $store_id = Mage::getModel('core/store')->load($code)->getId();
+        } elseif (strlen($code = $code = Mage::app()->getRequest()->getParam('website'))) { // website level
+            $website_id = Mage::getModel('core/website')->load($code)->getId();
+            $store_id = Mage::app()->getWebsite($website_id)->getDefaultStore()->getId();
+        } else { // default level
+            $store_id = 0;
+        }
+
+        $language = Mage::getStoreConfig('general/locale/code', $store_id);
+        $data = array();
+        $data['id'] = $node->getData('entity_id');
+        $data['title'][$language] = $node->getData('name');
+
+        $childCategory = Mage::getModel('catalog/category');
+        $childCategory->setStoreId($store_id);
+        $childCategory->load($node->getData('entity_id'));
+        if ($childCategory->getMspCashback()) {
+            $data['cashback'] = $childCategory->getMspCashback();
+        }
+
+        foreach ($node->getChildren() as $childNode) {
+            if (!array_key_exists('children', $data)) {
+                $data['children'] = array();
+            }
+
+            $data['children'][] = $this->getNodeChildrenData($childNode);
+        }
+        return $data;
+    }
+
     /*
      * 	Function that generates a JSON Categories feed.
      */
@@ -1185,55 +1336,7 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
     public function getCategoriesFeed()
     {
         if (!Mage::helper('catalog/category_flat')->isEnabled()) {
-            $recursionLevel = 10;
-            $parent = Mage::app()->getStore()->getRootCategoryId();
-            $tree = Mage::getResourceModel('catalog/category_tree');
-            $nodes = $tree->loadNode($parent)->loadChildren($recursionLevel)->getChildren();
-            $tree->addCollectionData(null, false, $parent);
-            $categoryTreeData = array();
-            $stores = array();
-            $storeCollection = Mage::getModel('core/store')->getCollection();
-
-            foreach ($nodes as $node) {
-                $cattrans = array();
-                //we need to get transalations per view
-                foreach ($storeCollection as $store) {
-                    $store_id = $store->getId();
-                    $language = Mage::getStoreConfig('general/locale/code', $store->getId());
-                    $defaultStoreCategory = Mage::getModel('catalog/category');
-                    $defaultStoreCategory->setStoreId($store_id);
-                    $defaultStoreCategory->load($node->getId());
-                    $cattrans['id'] = $node->getId();
-                    if ($defaultStoreCategory->getName()) {
-                        $cattrans['title'][$language] = $defaultStoreCategory->getName();
-                    }
-
-                    if ($defaultStoreCategory->getMspCashback()) {
-                        $cattrans['cashback'] = $defaultStoreCategory->getMspCashback();
-                    }
-                }
-
-
-                foreach ($node->getChildren() as $child) {
-                    $children = array();
-                    $childs = array();
-
-                    foreach ($storeCollection as $store) {
-                        $store_id = $store->getId();
-                        $language = Mage::getStoreConfig('general/locale/code', $store->getId());
-                        $childCategory = Mage::getModel('catalog/category');
-                        $childCategory->setStoreId($store_id);
-                        $childCategory->load($child->getId());
-                        $children['id'] = $child->getId();
-                        $children['title'][$language] = $childCategory->getName();
-                        if ($childCategory->getMspCashback()) {
-                            $children['cashback'] = $childCategory->getMspCashback();
-                        }
-                    }
-                    $cattrans['children'][] = $children;
-                }
-                $categoryTreeData[] = $cattrans;
-            }
+            $categoryTreeData = $this->getCategoryTree(3);
         } else {
             $stores = array();
             $storeCollection = Mage::getModel('core/store')->getCollection();
@@ -1430,7 +1533,6 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
         //all method
         $carriers = Mage::getStoreConfig('carriers', Mage::app()->getStore()->getId());
 
-
         foreach ($carriers as $carrierCode => $carrierConfig) {
             if ($carrierConfig['active']) {
                 if ($specific_request == false) {
@@ -1454,12 +1556,50 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
                     $dataoptions = str_replace($remove, "", $options);
                     $countries = explode(',', $dataoptions);
 
+                    /**
+                     * Get Shipping tax rule
+                     * */
+                    $shipping_tax_id = Mage::getStoreConfig('tax/classes/shipping_tax_class', Mage::app()->getStore()->getId());
+                    $taxRules = Mage::getModel('tax/sales_order_tax')->getCollection();
+                    $taxCalculation = Mage::getModel('tax/calculation');
+                    $request = $taxCalculation->getRateRequest(null, null, null, Mage::app()->getStore());
+                    $tax_rule = new stdclass();
+                    $rules = array();
+
+                    $collection = Mage::getModel('tax/calculation_rule')->getCollection();
+                    if ($collection->getSize()) {
+                        $collection->addCustomerTaxClassesToResult()->addProductTaxClassesToResult()->addRatesToResult();
+                    }
+                    if ($collection->getSize()) {
+                        foreach ($collection as $rule) {
+                            $rule_data = $rule->getData();
+                            if (in_array($shipping_tax_id, $rule_data['product_tax_classes'])) {
+
+                                foreach ($rule_data['tax_rates'] as $key => $rate_id) {
+                                    $rate = Mage::getSingleton('tax/calculation_rate')->load($rate_id);
+                                    $rate_info = $rate->getData();
+
+                                    foreach ($countries as $country) {
+                                        if ($country == $rate_info['tax_country_id']) {
+                                            $tax_name = $rule_data['code'];
+                                            $tax_rate = $rate_info['tax_country_id'] = $rate_info['rate'];
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     if (isset($carrierConfig['price']) && isset($carrierConfig['name']) && !empty($carrierConfig['name']) && isset($carrierConfig['model']) && $carrierConfig['model'] != "postnl_carrier/postnl") {
                         $method = new stdclass();
                         $method->id = $carrierCode;
                         $method->type = "flat_rate_shipping";
                         $method->provider = $carrierCode;
                         $method->name = $carrierConfig['name'];
+                        $method->tax->name = $tax_name;
+                        $method->tax->id = $shipping_tax_id;
+                        $method->tax->rate = $tax_rate;
+
                         $price = 0;
                         if ($carrierConfig['model'] == 'shipping/carrier_flatrate') {
                             if ($carrierConfig['type'] == 'I') {
@@ -1493,6 +1633,9 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
                             $method->provider = $carrierCode;
                             $method->name = $carrierConfig['name'];
                             $method->price = number_format((float) 0, 2, '.', '');
+                            $method->tax->name = $tax_name;
+                            $method->tax->id = $shipping_tax_id;
+                            $method->tax->rate = $tax_rate;
 
                             if (!empty($carrierConfig['specificcountry'])) {
                                 $areas = explode(',', $carrierConfig['specificcountry']);
@@ -1523,6 +1666,9 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
                             $method->provider = $rate->getData('method');
                             $method->name = $rate->getData('method_title');
                             $method->price = number_format((float) $rate->getData('price'), 2, '.', '');
+                            $method->tax->name = $tax_name;
+                            $method->tax->id = $shipping_tax_id;
+                            $method->tax->rate = $tax_rate;
 
                             if (!empty($carrierConfig['specificcountry'])) {
                                 $areas = explode(',', $carrierConfig['specificcountry']);
@@ -1555,6 +1701,74 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
                             $method->provider = $rate->getData('method');
                             $method->name = $rate->getData('method_title');
                             $method->price = number_format((float) $rate->getData('price'), 2, '.', '');
+                            $method->tax->name = $tax_name;
+                            $method->tax->id = $shipping_tax_id;
+                            $method->tax->rate = $tax_rate;
+
+                            if (!empty($carrierConfig['specificcountry'])) {
+                                $areas = explode(',', $carrierConfig['specificcountry']);
+                                foreach ($areas as $area) {
+                                    if (in_array($area, $countries)) {
+                                        $shippingMethods[] = $method;
+                                    }
+                                }
+                            } else {
+                                $shippingMethods[] = $method;
+                            }
+                        }
+                    } elseif ('pl_store_pickup/carrier_pickup' == $carrierConfig['model']) {
+                        $request = Mage::getModel('shipping/rate_request');
+                        $request->setPackageWeight($this->getRequest()->getParam('weight'));
+                        $request->setDestCountryId($countries[0]);
+                        $request->setDestPostcode($this->getRequest()->getParam('zipcode'));
+                        $request->setPackageQty($this->getRequest()->getParam('items_count'));
+                        $request->setPackageValue($this->getRequest()->getParam('amount'));
+                        $pl_pickup = Mage::getModel('pl_store_pickup/carrier_pickup')->collectRates($request);
+                        $rates = $this->getProtectedValue($pl_pickup, '_rates');
+                        foreach ($rates as $rate) {
+
+                            $method = new stdclass();
+                            $method->id = $rate->getData('carrier');
+                            $method->type = "flat_rate_shipping";
+                            $method->provider = $rate->getData('method');
+                            $method->name = $rate->getData('method_title');
+                            $method->price = number_format((float) $rate->getData('price'), 2, '.', '');
+                            $method->tax->name = $tax_name;
+                            $method->tax->id = $shipping_tax_id;
+                            $method->tax->rate = $tax_rate;
+
+                            if (!empty($carrierConfig['specificcountry'])) {
+                                $areas = explode(',', $carrierConfig['specificcountry']);
+                                foreach ($areas as $area) {
+                                    if (in_array($area, $countries)) {
+                                        $shippingMethods[] = $method;
+                                    }
+                                }
+                            } else {
+                                $shippingMethods[] = $method;
+                            }
+                        }
+                    } elseif ('paazl/carrier_paazl' == $carrierConfig['model']) {
+                        $request = Mage::getModel('shipping/rate_request');
+                        $request->setPackageWeight($this->getRequest()->getParam('weight'));
+                        $request->setDestCountryId($countries[0]);
+                        $request->setDestPostcode($this->getRequest()->getParam('zipcode'));
+                        $request->setPackageQty($this->getRequest()->getParam('items_count'));
+                        $request->setPackageValue($this->getRequest()->getParam('amount'));
+
+                        $paazl = Mage::getModel('paazl/carrier_paazl')->collectRates($request);
+                        $rates = $this->getProtectedValue($paazl, '_rates');
+
+                        foreach ($rates as $rate) {
+                            $method = new stdclass();
+                            $method->id = $rate->getData('carrier');
+                            $method->type = "flat_rate_shipping";
+                            $method->provider = $rate->getData('method');
+                            $method->name = $rate->getData('method_title');
+                            $method->price = number_format((float) $rate->getData('price'), 2, '.', '');
+                            $method->tax->name = $tax_name;
+                            $method->tax->id = $shipping_tax_id;
+                            $method->tax->rate = $tax_rate;
 
                             if (!empty($carrierConfig['specificcountry'])) {
                                 $areas = explode(',', $carrierConfig['specificcountry']);
@@ -1572,8 +1786,6 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
             }
         }
 
-
-
         $checkout = Mage::getModel("msp/checkout");
         if ($checkout->getSectionConfigData('checkout_custom_fields/fco_postnl')) {
             $method = new stdclass();
@@ -1581,8 +1793,13 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
             $method->name = 'Post NL - Pak je gemak';
             $method->type = "flat_rate_shipping";
             $method->provider = 'postnl';
+            $method->tax->name = $tax_name;
+            $method->tax->id = $shipping_tax_id;
+            $method->tax->rate = $tax_rate;
+
             //$method->taxid= null;
             $method->price = number_format((float) $checkout->getSectionConfigData('checkout_custom_fields/fco_postnl_amount'), 2, '.', '');
+
             /* $method->sort_order = $carrierConfig['sort_order'];
               $areas = explode(',', $carrierConfig['specificcountry']);
               $method->allowed_areas = array();
@@ -1616,7 +1833,6 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
                         $countries = explode(',', $dataoptions);
                         $country_id = $countries[0];
 
-
                         if ($country_id == $table_data['dest_country_id'] && $this->getRequest()->getParam('amount') >= $table_data['condition_value'] && $websiteId == $table_data['website_id']) {
                             $rate_price = number_format((float) $table_data['price'], 2, '.', '');
                         }
@@ -1634,6 +1850,9 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
                 $method->type = "flat_rate_shipping";
                 $method->provider = 'bestway';
                 $method->name = Mage::getStoreConfig('carriers/tablerate/title', Mage::app()->getStore()->getId());
+                $method->tax->name = $tax_name;
+                $method->tax->id = $shipping_tax_id;
+                $method->tax->rate = $tax_rate;
                 $method->price = $rate_price;
                 $ratecountries = Mage::getStoreConfig('carriers/tablerate/specificcountry', Mage::app()->getStore()->getId());
                 $ratecountcheck = explode(',', $ratecountries);
@@ -1677,210 +1896,245 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
         }
 
         $store_data = new stdclass();
-        foreach ($storeCollection as $store) {
-            //$store = Mage::app()->getStore();
-            //get languages
-            //$languages[] = Mage::getStoreConfig('general/locale/code', $store->getId());
-            //get allowed countries
-            $allowed = explode(",", Mage::getStoreConfig('general/country/allow'), Mage::app()->getStore()->getId());
-            $countries = array();
-            foreach ($allowed as $key => $value) {
-                $countriesdata = explode(",", $value);
-                foreach ($countriesdata as $index => $val) {
-                    $countries[] = $val;
-                }
+        $store = Mage::app()->getStore();
+        //foreach ($storeCollection as $store) {
+        //$store = Mage::app()->getStore();
+        //get languages
+        //$languages[] = Mage::getStoreConfig('general/locale/code', $store->getId());
+        //get allowed countries
+        $allowed = explode(",", Mage::getStoreConfig('general/country/allow'), Mage::app()->getStore()->getId());
+        $countries = array();
+        foreach ($allowed as $key => $value) {
+            $countriesdata = explode(",", $value);
+            foreach ($countriesdata as $index => $val) {
+                $countries[] = $val;
             }
-
-
-
-            /*
-             * Get ship to countries
-             * */
-            $shipto = array();
-            $carriers = Mage::getStoreConfig('carriers', Mage::app()->getStore()->getId());
-            foreach ($carriers as $carrierCode => $carrierConfig) {
-                if ($carrierConfig['active']) {
-                    if (!empty($carrierConfig['specificcountry'])) {
-                        $areas = explode(',', $carrierConfig['specificcountry']);
-                        foreach ($areas as $area) {
-                            if (!in_array($area, $shipto)) {
-                                $shipto[] = $area;
-                            }
-                        }
-                    } else {
-                        $allowed = explode(",", Mage::getStoreConfig('general/country/allow'), Mage::app()->getStore()->getId());
-
-                        foreach ($allowed as $key => $value) {
-                            $countriesdata = explode(",", $value);
-                            foreach ($countriesdata as $index => $val) {
-                                if (!in_array($val, $shipto)) {
-                                    $shipto[] = $val;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            $store_data->shipping_countries = $shipto;
-            $store_data->allowed_countries = $countries;
-
-            //get metadata per languages
-            $metadata[Mage::getStoreConfig('general/locale/code', $store->getId())]['metadata']['title'] = Mage::getStoreConfig('design/head/default_title', $store->getId());
-
-            $keywords = explode(",", Mage::getStoreConfig('design/head/default_keywords', $store->getId()));
-            $keywordsdata = array();
-            foreach ($keywords as $key => $value) {
-                $keywordsdata[] = trim($value);
-            }
-
-            $metadata[Mage::getStoreConfig('general/locale/code', $store->getId())]['metadata']['keywords'] = $keywordsdata;
-            $metadata[Mage::getStoreConfig('general/locale/code', $store->getId())]['metadata']['description'] = Mage::getStoreConfig('design/head/default_description', $store->getId());
-            $metadata[Mage::getStoreConfig('general/locale/code', $store->getId())]['description']['long'] = Mage::getStoreConfig('qwindo/settings/long_store_desc', $store->getId());
-            $metadata[Mage::getStoreConfig('general/locale/code', $store->getId())]['description']['short'] = Mage::getStoreConfig('qwindo/settings/short_store_desc', $store->getId());
-
-
-            $shipping1 = Mage::getStoreConfig('qwindo/shipping/usp1', $store->getId());
-            $shipping2 = Mage::getStoreConfig('qwindo/shipping/usp2', $store->getId());
-            $shipping3 = Mage::getStoreConfig('qwindo/shipping/usp3', $store->getId());
-            $shipping4 = Mage::getStoreConfig('qwindo/shipping/usp4', $store->getId());
-            $shipping5 = Mage::getStoreConfig('qwindo/shipping/usp5', $store->getId());
-            $shipping_usps = array();
-            $i = 1;
-            while ($i < 6) {
-                $shipping_usp = ${'shipping' . $i};
-                if (!empty($shipping_usp)) {
-                    $shipping_usps[] = $shipping_usp;
-                }
-                $metadata[Mage::getStoreConfig('general/locale/code', $store->getId())]['usps']['shipping'] = $shipping_usps;
-                $i++;
-            }
-
-            $global1 = Mage::getStoreConfig('qwindo/global/usp1', $store->getId());
-            $global2 = Mage::getStoreConfig('qwindo/global/usp2', $store->getId());
-            $global3 = Mage::getStoreConfig('qwindo/global/usp3', $store->getId());
-            $global4 = Mage::getStoreConfig('qwindo/global/usp4', $store->getId());
-            $global5 = Mage::getStoreConfig('qwindo/global/usp5', $store->getId());
-            $global_usps = array();
-            $i = 1;
-            while ($i < 6) {
-                $global_usp = ${'global' . $i};
-                if (!empty($global_usp)) {
-                    $global_usps[] = $global_usp;
-                }
-                $metadata[Mage::getStoreConfig('general/locale/code', $store->getId())]['usps']['global'] = $global_usps;
-                $i++;
-            }
-
-            $stock1 = Mage::getStoreConfig('qwindo/stock/usp1', $store->getId());
-            $stock2 = Mage::getStoreConfig('qwindo/stock/usp2', $store->getId());
-            $stock_usps = array();
-            $i = 1;
-            while ($i < 3) {
-                $stock_usp = ${'stock' . $i};
-                if (!empty($stock_usp)) {
-                    $stock_usps[] = $stock_usp;
-                }
-                $metadata[Mage::getStoreConfig('general/locale/code', $store)]['usps']['stock'] = $stock_usps;
-                $i++;
-            }
-
-
-
-
-
-            //Get tax calculation method 
-            switch (Mage::getStoreConfig('tax/calculation/algorithm', Mage::app()->getStore()->getId())) {
-                case Mage_Tax_Model_Calculation::CALC_UNIT_BASE:
-                    $tax_calculation = 'unit';
-                    break;
-                case Mage_Tax_Model_Calculation::CALC_ROW_BASE:
-                    $tax_calculation = 'row';
-                    break;
-                case Mage_Tax_Model_Calculation::CALC_TOTAL_BASE:
-                    $tax_calculation = 'total';
-                    break;
-                default:
-                    $tax_calculation = 'total';
-                    break;
-            }
-
-
-            $store_data->languages = $metadata;
-            $store_data->allowed_currencies = $allowed_currencies;
-            $store_data->stock_updates = Mage::getStoreConfig('qwindo/settings/stock', Mage::app()->getStore()->getId()) ? true : false;
-            $store_data->including_tax = Mage::getStoreConfig('tax/calculation/price_includes_tax', Mage::app()->getStore()->getId()) ? true : false;
-            $store_data->tax_calculation = $tax_calculation; //total,row or unit
-
-            /**
-             * Get Shipping tax rule
-             * */
-            $shipping_tax_id = Mage::getStoreConfig('tax/classes/shipping_tax_class', Mage::app()->getStore()->getId());
-            $taxRules = Mage::getModel('tax/sales_order_tax')->getCollection();
-            $taxCalculation = Mage::getModel('tax/calculation');
-            $request = $taxCalculation->getRateRequest(null, null, null, Mage::app()->getStore());
-            $shipping_tax_id = Mage::getStoreConfig('tax/classes/shipping_tax_class', Mage::app()->getStore()->getId());
-            $tax_rule = new stdclass();
-            $rules = array();
-
-            $collection = Mage::getModel('tax/calculation_rule')->getCollection();
-            if ($collection->getSize()) {
-                $collection->addCustomerTaxClassesToResult()->addProductTaxClassesToResult()->addRatesToResult();
-            }
-            if ($collection->getSize()) {
-                foreach ($collection as $rule) {
-                    $rule_data = $rule->getData();
-                    if (in_array($shipping_tax_id, $rule_data['product_tax_classes'])) {
-
-                        foreach ($rule_data['tax_rates'] as $key => $rate_id) {
-                            $rate = Mage::getSingleton('tax/calculation_rate')->load($rate_id);
-                            $rate_info = $rate->getData();
-
-                            $rules[$rate_info['tax_country_id']] = $rate_info['rate'];
-                        }
-                    }
-                }
-            };
-
-            $tax_rule->id = $shipping_tax_id;
-            $tax_rule->name = 'msp-shipping';
-            $tax_rule->rules = $rules;
-            $store_data->shipping_tax = $tax_rule;
-            $store_data->rounding_policy = 'UP'; //UP, DOWN, CEILING, HALF_UP, HALF_DOWN, HALF_EVEN
-            $store_data->require_shipping = true;
-            $store_data->base_url = $store->getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK);
-            $store_data->logo = Mage::getBaseUrl('media') . 'theme/' . Mage::getStoreConfig('qwindo/settings/store_image', Mage::app()->getStore()->getId());
-            $store_data->order_push_url = Mage::getUrl("msp/checkout/notification", array("_secure" => true)); //$store->getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK).'msp/standard/notification/';
-            $store_data->email = Mage::getStoreConfig('trans_email/ident_support/email', Mage::app()->getStore()->getId());
-            $store_data->contact_phone = Mage::getStoreConfig('general/store_information/phone', Mage::app()->getStore()->getId());
-            $store_data->address = Mage::getStoreConfig('qwindo/address/street', Mage::app()->getStore()->getId());
-            $store_data->housenumber = Mage::getStoreConfig('qwindo/address/housenumber', Mage::app()->getStore()->getId());
-            $store_data->zipcode = Mage::getStoreConfig('qwindo/address/zipcode', Mage::app()->getStore()->getId());
-            $store_data->city = Mage::getStoreConfig('qwindo/address/city', Mage::app()->getStore()->getId());
-            $store_data->country = Mage::getStoreConfig('general/store_information/merchant_country', Mage::app()->getStore()->getId());
-            $store_data->vat_nr = Mage::getStoreConfig('general/store_information/merchant_vat_number', Mage::app()->getStore()->getId());
-            $store_data->coc = Mage::getStoreConfig('qwindo/settings/coc', Mage::app()->getStore()->getId());
-            $store_data->terms_and_conditions = Mage::getStoreConfig('qwindo/settings/terms', Mage::app()->getStore()->getId());
-            $store_data->faq = Mage::getStoreConfig('qwindo/settings/faq', Mage::app()->getStore()->getId());
-            $store_data->open = Mage::getStoreConfig('qwindo/settings/open', Mage::app()->getStore()->getId());
-            $store_data->closed = Mage::getStoreConfig('qwindo/settings/closed', Mage::app()->getStore()->getId());
-            $store_data->days = array(
-                "sunday" => Mage::getStoreConfig('qwindo/settings/sunday', Mage::app()->getStore()->getId()) ? true : false,
-                "monday" => Mage::getStoreConfig('qwindo/settings/monday', Mage::app()->getStore()->getId()) ? true : false,
-                "tuesday" => Mage::getStoreConfig('qwindo/settings/tuesday', Mage::app()->getStore()->getId()) ? true : false,
-                "wednesday" => Mage::getStoreConfig('qwindo/settings/wednesday', Mage::app()->getStore()->getId()) ? true : false,
-                "thursday" => Mage::getStoreConfig('qwindo/settings/thursday', Mage::app()->getStore()->getId()) ? true : false,
-                "friday" => Mage::getStoreConfig('qwindo/settings/friday', Mage::app()->getStore()->getId()) ? true : false,
-                "saturday" => Mage::getStoreConfig('qwindo/settings/saturday', Mage::app()->getStore()->getId()) ? true : false
-            );
-            $store_data->social = array(
-                "facebook" => Mage::getStoreConfig('qwindo/social/facebook', Mage::app()->getStore()->getId()),
-                "twitter" => Mage::getStoreConfig('qwindo/social/twitter', Mage::app()->getStore()->getId()),
-                "linkedin" => Mage::getStoreConfig('qwindo/social/linkedin', Mage::app()->getStore()->getId())
-            );
-            //add store data to feed structure
-            $stores[] = $store_data;
         }
+
+
+
+        /*
+         * Get ship to countries
+         * */
+        $shipto = array();
+        $carriers = Mage::getStoreConfig('carriers', Mage::app()->getStore()->getId());
+        foreach ($carriers as $carrierCode => $carrierConfig) {
+            if ($carrierConfig['active']) {
+                if (!empty($carrierConfig['specificcountry'])) {
+                    $areas = explode(',', $carrierConfig['specificcountry']);
+                    foreach ($areas as $area) {
+                        if (!in_array($area, $shipto)) {
+                            $shipto[] = $area;
+                        }
+                    }
+                } else {
+                    $allowed = explode(",", Mage::getStoreConfig('general/country/allow'), Mage::app()->getStore()->getId());
+
+                    foreach ($allowed as $key => $value) {
+                        $countriesdata = explode(",", $value);
+                        foreach ($countriesdata as $index => $val) {
+                            if (!in_array($val, $shipto)) {
+                                $shipto[] = $val;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        $store_data->shipping_countries = $shipto;
+        $store_data->allowed_countries = $countries;
+
+        //get metadata per languages
+        $metadata[Mage::getStoreConfig('general/locale/code', $store->getId())]['metadata']['title'] = Mage::getStoreConfig('design/head/default_title', Mage::app()->getStore()->getId());
+
+        $keywords = explode(",", Mage::getStoreConfig('design/head/default_keywords', Mage::app()->getStore()->getId()));
+        $keywordsdata = array();
+        foreach ($keywords as $key => $value) {
+            $keywordsdata[] = trim($value);
+        }
+
+        $metadata[Mage::getStoreConfig('general/locale/code', $store->getId())]['metadata']['keywords'] = $keywordsdata;
+        $metadata[Mage::getStoreConfig('general/locale/code', $store->getId())]['metadata']['description'] = Mage::getStoreConfig('design/head/default_description', Mage::app()->getStore()->getId());
+        //$metadata[Mage::getStoreConfig('general/locale/code', $store->getId())]['description']['long'] = Mage::getStoreConfig('qwindo/settings/long_store_desc', Mage::app()->getStore()->getId());
+        //$metadata[Mage::getStoreConfig('general/locale/code', $store->getId())]['description']['short'] = Mage::getStoreConfig('qwindo/settings/short_store_desc', Mage::app()->getStore()->getId());
+
+
+        /* $shipping1 = Mage::getStoreConfig('qwindo/shipping/usp1', Mage::app()->getStore()->getId());
+          $shipping2 = Mage::getStoreConfig('qwindo/shipping/usp2', Mage::app()->getStore()->getId());
+          $shipping3 = Mage::getStoreConfig('qwindo/shipping/usp3', Mage::app()->getStore()->getId());
+          $shipping4 = Mage::getStoreConfig('qwindo/shipping/usp4', Mage::app()->getStore()->getId());
+          $shipping5 = Mage::getStoreConfig('qwindo/shipping/usp5', Mage::app()->getStore()->getId());
+          $shipping_usps = array();
+          $i = 1;
+          while ($i < 6) {
+          $shipping_usp = ${'shipping' . $i};
+          if (!empty($shipping_usp)) {
+          $shipping_usps[] = $shipping_usp;
+          }
+          $metadata[Mage::getStoreConfig('general/locale/code', $store)]['usps']['shipping'] = $shipping_usps;
+          $i++;
+          }
+
+          $global1 = Mage::getStoreConfig('qwindo/global/usp1', Mage::app()->getStore()->getId());
+          $global2 = Mage::getStoreConfig('qwindo/global/usp2', Mage::app()->getStore()->getId());
+          $global3 = Mage::getStoreConfig('qwindo/global/usp3', Mage::app()->getStore()->getId());
+          $global4 = Mage::getStoreConfig('qwindo/global/usp4', Mage::app()->getStore()->getId());
+          $global5 = Mage::getStoreConfig('qwindo/global/usp5', Mage::app()->getStore()->getId());
+          $global_usps = array();
+          $i = 1;
+          while ($i < 6) {
+          $global_usp = ${'global' . $i};
+          if (!empty($global_usp)) {
+          $global_usps[] = $global_usp;
+          }
+          $metadata[Mage::getStoreConfig('general/locale/code', $store)]['usps']['global'] = $global_usps;
+          $i++;
+          }
+
+          $stock1 = Mage::getStoreConfig('qwindo/stock/usp1', Mage::app()->getStore()->getId());
+          $stock2 = Mage::getStoreConfig('qwindo/stock/usp2', Mage::app()->getStore()->getId());
+          $stock_usps = array();
+          $i = 1;
+          while ($i < 3) {
+          $stock_usp = ${'stock' . $i};
+          if (!empty($stock_usp)) {
+          $stock_usps[] = $stock_usp;
+          }
+          $metadata[Mage::getStoreConfig('general/locale/code', $store)]['usps']['stock'] = $stock_usps;
+          $i++;
+          }
+
+         */
+
+
+        //Get tax calculation method 
+        switch (Mage::getStoreConfig('tax/calculation/algorithm', Mage::app()->getStore()->getId())) {
+            case Mage_Tax_Model_Calculation::CALC_UNIT_BASE:
+                $tax_calculation = 'unit';
+                break;
+            case Mage_Tax_Model_Calculation::CALC_ROW_BASE:
+                $tax_calculation = 'row';
+                break;
+            case Mage_Tax_Model_Calculation::CALC_TOTAL_BASE:
+                $tax_calculation = 'total';
+                break;
+            default:
+                $tax_calculation = 'total';
+                break;
+        }
+
+
+        $store_data->languages = $metadata;
+        $store_data->allowed_currencies = $allowed_currencies;
+        $store_data->stock_updates = Mage::getStoreConfig('qwindo/settings/stock', Mage::app()->getStore()->getId()) ? true : false;
+        $store_data->including_tax = Mage::getStoreConfig('tax/calculation/price_includes_tax', Mage::app()->getStore()->getId()) ? true : false;
+        $store_data->tax_calculation = $tax_calculation; //total,row or unit
+
+        /**
+         * Get Shipping tax rule
+         * */
+        $shipping_tax_id = Mage::getStoreConfig('tax/classes/shipping_tax_class', Mage::app()->getStore()->getId());
+        $taxRules = Mage::getModel('tax/sales_order_tax')->getCollection();
+        $taxCalculation = Mage::getModel('tax/calculation');
+        $request = $taxCalculation->getRateRequest(null, null, null, Mage::app()->getStore());
+        $shipping_tax_id = Mage::getStoreConfig('tax/classes/shipping_tax_class', Mage::app()->getStore()->getId());
+        $tax_rule = new stdclass();
+        $rules = array();
+
+        $collection = Mage::getModel('tax/calculation_rule')->getCollection();
+        if ($collection->getSize()) {
+            $collection->addCustomerTaxClassesToResult()->addProductTaxClassesToResult()->addRatesToResult();
+        }
+        if ($collection->getSize()) {
+            foreach ($collection as $rule) {
+                $rule_data = $rule->getData();
+                if (in_array($shipping_tax_id, $rule_data['product_tax_classes'])) {
+
+                    foreach ($rule_data['tax_rates'] as $key => $rate_id) {
+                        $rate = Mage::getSingleton('tax/calculation_rate')->load($rate_id);
+                        $rate_info = $rate->getData();
+
+                        $rules[$rate_info['tax_country_id']] = $rate_info['rate'];
+                    }
+                }
+            }
+        };
+
+
+        $default_tax_id = Mage::getModel('customer/group')->load(0)->getTaxClassId();
+        $taxRules = Mage::getModel('tax/sales_order_tax')->getCollection();
+        $taxCalculation = Mage::getModel('tax/calculation');
+        $request = $taxCalculation->getRateRequest(null, null, null, Mage::app()->getStore());
+        $tax_rule = new stdclass();
+        $rules = array();
+
+        $collection = Mage::getModel('tax/calculation_rule')->getCollection();
+        if ($collection->getSize()) {
+            $collection->addCustomerTaxClassesToResult()->addProductTaxClassesToResult()->addRatesToResult();
+        }
+
+        if ($collection->getSize()) {
+
+            foreach ($collection as $rule) {
+                $rule_data = $rule->getData();
+                if (in_array($default_tax_id, $rule_data['customer_tax_classes'])) {
+                    foreach ($rule_data['tax_rates'] as $key => $rate_id) {
+                        $rate = Mage::getSingleton('tax/calculation_rate')->load($rate_id);
+                        $rate_info = $rate->getData();
+                        if (Mage::getStoreConfig('tax/defaults/country', Mage::app()->getStore()->getId()) == $rate_info['tax_country_id']) {
+                            $default_tax_name = $rule_data['code'];
+                            $default_tax_rate = $rate_info['tax_country_id'] = $rate_info['rate'];
+                        }
+                    }
+                }
+            }
+        }
+
+
+        $tax_rule->id = $shipping_tax_id;
+        $tax_rule->name = 'msp-shipping';
+        $tax_rule->rules = $rules;
+        $store_data->default_tax->name = $default_tax_name;
+        $store_data->default_tax->rate = $default_tax_rate;
+        $store_data->default_tax->id = $default_tax_id;
+
+        $store_data->shipping_tax = $tax_rule;
+        $store_data->rounding_policy = 'UP'; //UP, DOWN, CEILING, HALF_UP, HALF_DOWN, HALF_EVEN
+        $store_data->require_shipping = true;
+        $store_data->base_url = Mage::app()->getStore()->getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK);
+        //$store_data->logo = Mage::getBaseUrl('media') . 'theme/' . Mage::getStoreConfig('qwindo/settings/store_image', Mage::app()->getStore()->getId());
+        $store_data->order_push_url = Mage::getUrl("msp/checkout/notification", array("_secure" => true)); //$store->getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK).'msp/standard/notification/';
+        /* $store_data->email = Mage::getStoreConfig('trans_email/ident_support/email', Mage::app()->getStore()->getId());
+          $store_data->contact_phone = Mage::getStoreConfig('general/store_information/phone', Mage::app()->getStore()->getId());
+          $store_data->address = Mage::getStoreConfig('qwindo/address/street', Mage::app()->getStore()->getId());
+          $store_data->housenumber = Mage::getStoreConfig('qwindo/address/housenumber', Mage::app()->getStore()->getId());
+          $store_data->zipcode = Mage::getStoreConfig('qwindo/address/zipcode', Mage::app()->getStore()->getId());
+          $store_data->city = Mage::getStoreConfig('qwindo/address/city', Mage::app()->getStore()->getId()); */
+        $store_data->country = Mage::getStoreConfig('general/store_information/merchant_country'); /*
+          $store_data->vat_nr = Mage::getStoreConfig('general/store_information/merchant_vat_number', Mage::app()->getStore()->getId());
+          $store_data->coc = Mage::getStoreConfig('qwindo/settings/coc', Mage::app()->getStore()->getId());
+          $store_data->terms_and_conditions = Mage::getStoreConfig('qwindo/settings/terms', Mage::app()->getStore()->getId());
+          $store_data->faq = Mage::getStoreConfig('qwindo/settings/faq', Mage::app()->getStore()->getId());
+          $store_data->open = Mage::getStoreConfig('qwindo/settings/open', Mage::app()->getStore()->getId());
+          $store_data->closed = Mage::getStoreConfig('qwindo/settings/closed', Mage::app()->getStore()->getId());
+          $store_data->days = array(
+          "sunday" => Mage::getStoreConfig('qwindo/settings/sunday', Mage::app()->getStore()->getId()) ? true : false,
+          "monday" => Mage::getStoreConfig('qwindo/settings/monday', Mage::app()->getStore()->getId()) ? true : false,
+          "tuesday" => Mage::getStoreConfig('qwindo/settings/tuesday', Mage::app()->getStore()->getId()) ? true : false,
+          "wednesday" => Mage::getStoreConfig('qwindo/settings/wednesday', Mage::app()->getStore()->getId()) ? true : false,
+          "thursday" => Mage::getStoreConfig('qwindo/settings/thursday', Mage::app()->getStore()->getId()) ? true : false,
+          "friday" => Mage::getStoreConfig('qwindo/settings/friday', Mage::app()->getStore()->getId()) ? true : false,
+          "saturday" => Mage::getStoreConfig('qwindo/settings/saturday', Mage::app()->getStore()->getId()) ? true : false
+          );
+          $store_data->social = array(
+          "facebook" => Mage::getStoreConfig('qwindo/social/facebook', Mage::app()->getStore()->getId()),
+          "twitter" => Mage::getStoreConfig('qwindo/social/twitter', Mage::app()->getStore()->getId()),
+          "linkedin" => Mage::getStoreConfig('qwindo/social/linkedin', Mage::app()->getStore()->getId())
+          ); */
+        //add store data to feed structure
+        $stores[] = $store_data;
+        //}
 
         return json_encode($store_data);
     }
@@ -1994,37 +2248,39 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
         $store = $storeId = Mage::app()->getStore();
         $config = Mage::getStoreConfig('qwindo' . "/settings", $storeId);
         $headers = $this->emu_getallheaders();
+        $identifier = $this->getRequest()->getQuery('identifier');
 
         $api_key = Mage::getStoreConfig('qwindo/settings/qwindo_key', $store->getId());
         $url = html_entity_decode(Mage::helper('core/url')->getCurrentUrl());
 
         $hash_id = Mage::getStoreConfig('qwindo/settings/hash_id', $store->getId());
         $timestamp = $this->microtime_float();
-        $auth = explode('|', base64_decode($headers['Auth']));
-        $message = $url . $auth[0] . $hash_id;
-        $token = hash_hmac('sha512', $message, $api_key);
-        $message = $url . $auth[0] . $hash_id;
 
-        $this->getResponse()->clearHeaders()->setHeader('Content-Type', 'application/json', true);
-        $this->getResponse()->setHeader('X-Feed-Version', '1.0', true);
-        $this->getResponse()->setHeader('Shop-Type', 'Magento', true);
-        $this->getResponse()->setHeader('Shop-Version', Mage::getVersion(), true);
-        $this->getResponse()->setHeader('Plugin-Version', '2.3.6', true);
-        $identifier = $this->getRequest()->getQuery('identifier');
-        
-        if ($token !== $auth[1] and round($timestamp - $auth[0]) > 10) {
-            $keys_match = false;
-             //For shipping request no auth is needed so this is disabled to get working compatibility with FCO system
-            if($identifier == 'shipping'){
-	          	$keys_match = true;  
+        //For shipping request no auth is needed so this is disabled to get working compatibility with FCO system
+        if ($identifier != 'shipping') {
+            $auth = explode('|', base64_decode($headers['Auth']));
+            $message = $url . $auth[0] . $hash_id;
+            $token = hash_hmac('sha512', $message, $api_key);
+            $message = $url . $auth[0] . $hash_id;
+
+            $this->getResponse()->clearHeaders()->setHeader('Content-Type', 'application/json', true);
+            $this->getResponse()->setHeader('X-Feed-Version', '1.0', true);
+            $this->getResponse()->setHeader('Shop-Type', 'Magento', true);
+            $this->getResponse()->setHeader('Shop-Version', Mage::getVersion(), true);
+            $this->getResponse()->setHeader('Plugin-Version', '2.4.0', true);
+
+            if ($token !== $auth[1] and round($timestamp - $auth[0]) > 10) {
+                $keys_match = false;
+            } else {
+                $keys_match = true;
             }
         } else {
             $keys_match = true;
         }
-//$keys_match = true;
+
 
         if (!$config["allow_fcofeed"]) {
-            echo '{
+            $error = '{
                 "success": false, 
                 "data": {
                     "error_code": "QW-2000",
@@ -2032,14 +2288,17 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
                     }
                 }'
             ;
-            exit;
+            $this->getResponse()->setHeader('HTTP/1.0', 403, true);
+            $this->getResponse()->setHttpResponseCode(403);
+            $this->getResponse()->setBody($error);
+            return;
         }
 
 
         if ($config["allow_fcofeed"] && $keys_match == true) {
             $identifier = $this->getRequest()->getQuery('identifier');
             if ($identifier == null) {
-                echo '{
+                $error = '{
                     "success": false, 
                     "data": {
                         "error_code": "QW-1000",
@@ -2047,7 +2306,10 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
                         }
                     }'
                 ;
-                exit;
+                $this->getResponse()->setHeader('HTTP/1.0', 500, true);
+                $this->getResponse()->setHttpResponseCode(500);
+                $this->getResponse()->setBody($error);
+                return;
             }
 
             $json = '';
@@ -2057,7 +2319,7 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
                     try {
                         $json = $this->getProductsFeed();
                     } catch (Exception $e) {
-                        echo '{
+                        $error = '{
                         "success": false, 
                         "data": {
                             "error_code": "QW-4000",
@@ -2065,14 +2327,17 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
                             }
                         }'
                         ;
-                        exit;
+                        $this->getResponse()->setHeader('HTTP/1.0', 500, true);
+                        $this->getResponse()->setHttpResponseCode(500);
+                        $this->getResponse()->setBody($error);
+                        return;
                     }
                     break;
                 case "total_products":
                     try {
                         $json = $this->getTotalProductsFeed();
                     } catch (Exception $e) {
-                        echo '{
+                        $error = '{
                         "success": false, 
                         "data": {
                             "error_code": "QW-4001",
@@ -2080,14 +2345,17 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
                             }
                         }'
                         ;
-                        exit;
+                        $this->getResponse()->setHeader('HTTP/1.0', 500, true);
+                        $this->getResponse()->setHttpResponseCode(500);
+                        $this->getResponse()->setBody($error);
+                        return;
                     }
                     break;
                 case "categories":
                     try {
                         $json = $this->getCategoriesFeed();
                     } catch (Exception $e) {
-                        echo '{
+                        $error = '{
                         "success": false, 
                         "data": {
                             "error_code": "QW-6000",
@@ -2095,14 +2363,17 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
                             }
                         }'
                         ;
-                        exit;
+                        $this->getResponse()->setHeader('HTTP/1.0', 500, true);
+                        $this->getResponse()->setHttpResponseCode(500);
+                        $this->getResponse()->setBody($error);
+                        return;
                     }
                     break;
                 case "stock":
                     try {
                         $json = $this->getStockFeed();
                     } catch (Exception $e) {
-                        echo '{
+                        $error = '{
                         "success": false, 
                         "data": {
                             "error_code": "QW-7000",
@@ -2110,11 +2381,14 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
                             }
                         }'
                         ;
-                        exit;
+                        $this->getResponse()->setHeader('HTTP/1.0', 500, true);
+                        $this->getResponse()->setHttpResponseCode(500);
+                        $this->getResponse()->setBody($error);
+                        return;
                     }
                     break;
                 case "tax":
-                    echo '{
+                    $error = '{
                         "success": false, 
                         "data": {
                             "error_code": "QW-9000",
@@ -2122,13 +2396,16 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
                             }
                         }'
                     ;
-                    exit;
+                    $this->getResponse()->setHeader('HTTP/1.0', 500, true);
+                    $this->getResponse()->setHttpResponseCode(500);
+                    $this->getResponse()->setBody($error);
+                    return;
                     break;
                 case "shipping":
                     try {
                         $json = $this->getShippingFeed();
                     } catch (Exception $e) {
-                        echo '{
+                        $error = '{
                         "success": false, 
                         "data": {
                             "error_code": "QW-8000",
@@ -2136,11 +2413,14 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
                             }
                         }'
                         ;
-                        exit;
+                        $this->getResponse()->setHeader('HTTP/1.0', 500, true);
+                        $this->getResponse()->setHttpResponseCode(500);
+                        $this->getResponse()->setBody($error);
+                        return;
                     }
                     break;
                 case "languages":
-                    echo '{
+                    $error = '{
                         "success": false, 
                         "data": {
                             "error_code": "QW-9000",
@@ -2148,10 +2428,13 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
                             }
                         }'
                     ;
-                    exit;
+                    $this->getResponse()->setHeader('HTTP/1.0', 500, true);
+                    $this->getResponse()->setHttpResponseCode(500);
+                    $this->getResponse()->setBody($error);
+                    return;
                     break;
                 case "countries":
-                    echo '{
+                    $error = '{
                         "success": false, 
                         "data": {
                             "error_code": "QW-9000",
@@ -2159,10 +2442,13 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
                             }
                         }'
                     ;
-                    exit;
+                    $this->getResponse()->setHeader('HTTP/1.0', 500, true);
+                    $this->getResponse()->setHttpResponseCode(500);
+                    $this->getResponse()->setBody($error);
+                    return;
                     break;
                 case "metadata":
-                    echo '{
+                    $error = '{
                         "success": false, 
                         "data": {
                             "error_code": "QW-9000",
@@ -2170,13 +2456,16 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
                             }
                         }'
                     ;
-                    exit;
+                    $this->getResponse()->setHeader('HTTP/1.0', 500, true);
+                    $this->getResponse()->setHttpResponseCode(500);
+                    $this->getResponse()->setBody($error);
+                    return;
                     break;
                 case "stores":
                     try {
                         $json = $this->getStoresFeed();
                     } catch (Exception $e) {
-                        echo '{
+                        $error = '{
                         "success": false, 
                         "data": {
                             "error_code": "QW-5000",
@@ -2184,7 +2473,10 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
                             }
                         }'
                         ;
-                        exit;
+                        $this->getResponse()->setHeader('HTTP/1.0', 500, true);
+                        $this->getResponse()->setHttpResponseCode(500);
+                        $this->getResponse()->setBody($error);
+                        return;
                     }
                     break;
             }
@@ -2193,7 +2485,7 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
             echo $contents;
             //$this->getResponse()->setBody($json);
         } else {
-            echo '{
+            $error = '{
                     "success": false, 
                     "data": {
                         "error_code": "QW-3000",
@@ -2201,7 +2493,10 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
                         }
                     }'
             ;
-            exit;
+            $this->getResponse()->setHeader('HTTP/1.0', 403, true);
+            $this->getResponse()->setHttpResponseCode(403);
+            $this->getResponse()->setBody($error);
+            return;
         }
     }
 
@@ -2260,8 +2555,7 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
         return $out;
     }
 
-    public
-            function emu_getallheaders()
+    public function emu_getallheaders()
     {
         foreach ($_SERVER as $name => $value) {
             if (substr($name, 0, 5) == 'HTTP_') {

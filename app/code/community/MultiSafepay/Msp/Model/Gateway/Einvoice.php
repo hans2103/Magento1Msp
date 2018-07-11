@@ -50,6 +50,7 @@ class MultiSafepay_Msp_Model_Gateway_Einvoice extends MultiSafepay_Msp_Model_Gat
         'msp_ing',
         'msp_kbc',
         'msp_belfius',
+        'msp_idealqr',
         'msp_banktransfer',
         'msp_maestro',
         'msp_paypal',

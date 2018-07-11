@@ -25,6 +25,7 @@ class MultiSafepay_Msp_Model_Servicecost_Quote_Address_Total_Servicecost extends
         'msp_ing',
         'msp_kbc',
         'msp_belfius',
+        'msp_idealqr',
         'msp_banktransfer',
         'msp_maestro',
         'msp_paypal',
@@ -101,6 +102,7 @@ class MultiSafepay_Msp_Model_Servicecost_Quote_Address_Total_Servicecost extends
         'msp_ing',
         'msp_kbc',
         'msp_belfius',
+        'msp_idealqr',
     );
 
     public function __construct()

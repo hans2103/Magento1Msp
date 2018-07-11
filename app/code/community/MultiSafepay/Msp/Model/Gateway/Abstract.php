@@ -53,6 +53,7 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
         'msp_ing',
         'msp_kbc',
         'msp_belfius',
+        'msp_idealqr',
         'msp_banktransfer',
         'msp_maestro',
         'msp_paypal',
@@ -129,6 +130,7 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
         'msp_ing',
         'msp_kbc',
         'msp_belfius',
+        'msp_idealqr',
         'msp_amex',
         'msp_alipay',
         /* Start Paysafecard */
@@ -610,7 +612,7 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
         $mapi->merchant['site_code'] = $config['secure_code'];
         $mapi->merchant['api_key'] = $config['api_key'];
 
-        if ($config['custom_refund_desc'] !== '' && isset($config['custom_refund_desc'])) {
+        if (isset($config['custom_refund_desc']) && $config['custom_refund_desc'] !== '') {
             $mapi->transaction['description'] = $config['custom_refund_desc'];
         }
 
