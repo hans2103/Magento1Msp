@@ -29,7 +29,7 @@ class MultiSafepay_Msp_Helper_Data extends Mage_Core_Helper_Abstract {
             $iconFileDir = Mage::getBaseDir(Mage_Core_Model_Store::URL_TYPE_MEDIA) . DS . $fileWithPath;
             if (file_exists($iconFileDir)) {
                 $iconFileUrl = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA) . $fileWithPath;
-                $return = '<img src="' . $iconFileUrl . '" id="' . 'msp_' . $paymentCode . '" title="' . $paymentTitle . '" style="float:left;"/>&nbsp;';
+                $return = '<img src="' . $iconFileUrl . '" id="' . 'msp_' . $paymentCode . '" title="' . $paymentTitle . '" />&nbsp;';
                 if ($isShowImgWithName) {
                     //$return .= '<span class="gateway-title"> - ' . $paymentTitle . '</span>';
                 }

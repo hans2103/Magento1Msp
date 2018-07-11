@@ -721,7 +721,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
                 $price_without_tax = $price_with_tax / $divided_value;
                 $price = round($price_without_tax, 4);*/
                 
-                $price = number_format($this->_convertCurrency($ndata['original_price'], $currentCurrencyCode, $targetCurrencyCode), 4, '.', '');
+                $price = number_format($this->_convertCurrency($ndata['price'], $currentCurrencyCode, $targetCurrencyCode), 4, '.', '');
 
                 $tierprices = $proddata->getTierPrice();
                 if (count($tierprices) > 0) {
@@ -736,8 +736,8 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
 						  	$price_without_tax = $price_with_tax / $divided_value;
 						  	$price = round($price_without_tax, 4);*/
 						  	
-						  	if($ndata['original_price'] < $value->price){
-							  	$price = $ndata['original_price'];
+						  	if($ndata['price'] < $value->price){
+							  	$price = $ndata['price'];
 						  	}else{
 							  		$price = $value->price;
 						  	}
