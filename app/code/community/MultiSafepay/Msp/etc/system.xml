@@ -7,366 +7,17 @@
  */
 -->
 <config>
+    <tabs>
+        <ms translate="label">
+            <label><![CDATA[<div style="display:inline-block;color:#00adee;text-transform: capitalize;font-size: 120%;font-weight:900;font-family:Tahoma, Geneva, sans-serif;">Multi</div><div style="display:inline-block;color:black;text-transform: capitalize;font-size: 120%;font-weight:900;font-family:Tahoma, Geneva, sans-serif;">Safepay</div><div style="display: inline-block;vertical-align: middle;border: 3px dotted #666;width:8px;height:8px;border-radius:8px;margin-bottom:3px;margin-left:3px;"></div>&nbsp;&nbsp;]]> (2.2.0)</label>
+            <sort_order>301</sort_order>
+            <!--<class>admin-system-config-msp</class>-->
+        </ms>
+    </tabs>
     <sections>
-        <!-- begin: Main Settings ('Payment Methods' tab) -->
-        <payment>
-            <groups>
                 <msp translate="label" module="msp">
-                    <label>MultiSafepay - 2.1.2</label>
-                    <sort_order>671</sort_order>
-                    <show_in_default>1</show_in_default>
-                    <show_in_website>1</show_in_website>
-                    <show_in_store>1</show_in_store>
-                    <fields>
-                        <active translate="label">
-                            <label>Enabled</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>10</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </active>
-                        <title translate="label">
-                            <label>Title</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>20</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </title>
-                        <test_api translate="label comment">
-                            <label>Account type</label>
-                            <frontend_type>select</frontend_type>
-                          
-                            <source_model>msp/config_sources_accounts</source_model>
-                            <sort_order>30</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </test_api>
-                        <account_id translate="label">
-                            <label>Account ID</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>40</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </account_id>
-                        <site_id translate="label">
-                            <label>Site ID</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>50</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </site_id>
-                        <secure_code translate="label">
-                            <label>Site Code</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>60</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </secure_code>
-                        <api_key translate="label">
-                            <label>API Key</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>65</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </api_key>
-                        <daysactive translate="label">
-                            <label>Days active before requests expires?</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>66</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </daysactive>
-                        <use_refund_credit_memo translate="label comment">
-                            <label>Credit Memo</label>
-                            <comment>Use for refund?</comment>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>68</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </use_refund_credit_memo>
-                        <use_redirect translate="label comment">
-                            <label>Auto. redirect</label>
-                            <comment>Automatically redirects a customer back to the webshop after a succesful payment. (Skips MultiSafepay's 'Transaction Complete' screen)</comment>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>70</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </use_redirect>
-                        <use_onestepcheckout translate="label comment">
-                            <label>One Step Checkout</label>
-                            <comment>Are you using the One Step Checkout Module?</comment>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>71</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </use_onestepcheckout>
-                        <autocreate_invoice translate="label comment">
-                            <label>Create invoice after payment</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>90</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </autocreate_invoice>
-                        <mail_invoice translate="label comment">
-                            <label>E-mail invoice to customer</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>91</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </mail_invoice>
-                        <updatetransaction translate="label">
-                            <label>Send invoice ID to MultiSafepay</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>92</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </updatetransaction>
-                        <send_update_email translate="label comment">
-                            <label>Send the order update e-mail to customer</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>92</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </send_update_email>
-                        <keep_cart translate="label comment">
-                            <label>Keep the cart</label>
-                            <comment>Cart remains active when the customer returns to the webshop or cancels an order.</comment>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>93</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </keep_cart>
-                        <new_order_mail translate="label comment">
-                            <label>New order e-mail</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>msp/config_sources_order_email</source_model>
-                            <sort_order>77</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </new_order_mail>
-                        <allowed_currency translate="label">
-                            <label>Allowed Currency</label>
-                            <frontend_type>multiselect</frontend_type>
-                            <source_model>msp/config_sources_order_currency</source_model>
-                            <!--<source_model>msp/config_sources_order_email</source_model>-->
-                            <sort_order>14</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </allowed_currency>
-                        <allow_convert_currency translate="label comment">
-                            <label>Allow currency conversion to Euro</label>
-                            <comment>If store currency is not allowed by settings. Used for each gateway.</comment>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>15</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </allow_convert_currency>
-                        <instructions translate="label">
-                            <label>Instructions</label>
-                            <frontend_type>textarea</frontend_type>
-                            <sort_order>62</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </instructions>
-                        <instructions translate="label">
-                            <label>Instructions</label>
-                            <frontend_type>textarea</frontend_type>
-                            <sort_order>78</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </instructions>
-                        <order_status translate="label">
-                            <label>New order status</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_order_status</source_model>
-                            <sort_order>110</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </order_status>
-                        <complete_status translate="label">
-                            <label>Payment complete status</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_order_status</source_model>
-                            <sort_order>120</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </complete_status>
-                        <initialized_status translate="label">
-                            <label>Status: initialized</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_order_status</source_model>
-                            <sort_order>125</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </initialized_status>
-                        <initialized_banktransfer_status translate="label">
-                            <label>Status: initialized banktransfer</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_order_status</source_model>
-                            <sort_order>125</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </initialized_banktransfer_status>
-                        <uncleared_status translate="label">
-                            <label>Status: uncleared</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_order_status</source_model>
-                            <sort_order>130</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </uncleared_status>
-                        <reserved_status translate="label">
-                            <label>Status: reserved</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_order_status</source_model>
-                            <sort_order>140</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </reserved_status>
-                        <void_status translate="label">
-                            <label>Status: void</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_order_status</source_model>
-                            <sort_order>150</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </void_status>
-                        <declined_status translate="label">
-                            <label>Status: declined</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_order_status</source_model>
-                            <sort_order>160</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </declined_status>
-                        <reversed_status translate="label">
-                            <label>Status: reversed</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_order_status</source_model>
-                            <sort_order>170</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </reversed_status>
-                        <refunded_status translate="label">
-                            <label>Status: refunded</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_order_status</source_model>
-                            <sort_order>180</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </refunded_status>
-                        <partial_refunded_status translate="label">
-                            <label>Status: Partial refunded</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_order_status</source_model>
-                            <sort_order>180</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </partial_refunded_status>
-                        <expired_status translate="label">
-                            <label>Status: expired</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_order_status</source_model>
-                            <sort_order>190</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </expired_status>
-                        <allowspecific translate="label">
-                            <label>Receive payments from applicable countries</label>
-                            <frontend_type>allowspecific</frontend_type>
-                            <sort_order>300</sort_order>
-                            <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </allowspecific>
-                        <specificcountry translate="label">
-                            <label>Receive payments from specific countries</label>
-                            <frontend_type>multiselect</frontend_type>
-                            <sort_order>310</sort_order>
-                            <source_model>adminhtml/system_config_source_country</source_model>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </specificcountry>
-                        <specificgroups translate="label">
-                            <label>Payment for Specific Customer Groups</label>
-                            <frontend_type>multiselect</frontend_type>
-                            <sort_order>311</sort_order>
-                            <source_model>adminhtml/system_config_source_customer_group</source_model>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </specificgroups>
-                        <sort_order translate="label">
-                            <label>Sort order</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>320</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </sort_order>
-                        <debug translate="label">
-                            <label>Debug</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>400</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </debug>
-                    </fields>
-                </msp>
-            </groups>
-        </payment>
-        <!-- end: Main Settings (Payment Methods tab) -->
-        <!-- begin: MSP Gateways -->
-        <msp translate="label" module="msp">
-            <label>MultiSafepay - Gateways - 2.1.2</label>
-            <tab>sales</tab>
+            <label><![CDATA[<div style="display:inline-block;color:#00adee;font-family:Tahoma, Geneva, sans-serif;">Connect</div>]]> Settings</label>
+            <tab>ms</tab>
             <frontend_type>text</frontend_type>
             <sort_order>1000</sort_order>
             <show_in_default>1</show_in_default>
@@ -374,7 +25,7 @@
             <show_in_store>1</show_in_store>
             <groups>
                 <settings translate="label">
-                    <label>Settings</label>
+                    <label>Connect Settings</label>
                     <sort_order>670</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
@@ -533,16 +184,6 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </show_gateway_images>
-                        <!--<show_gateway_title_combi translate="label comment">
-                            <label>Show the gateway image if it exists in front of the title</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>81</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </show_gateway_title_combi>-->
-                        
                         <order_status translate="label">
                             <label>New order status</label>
                             <frontend_type>select</frontend_type>
@@ -651,7 +292,6 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </expired_status>
-
                         <debug translate="label">
                             <label>Debug</label>
                             <frontend_type>select</frontend_type>
@@ -663,6 +303,17 @@
                         </debug>
                     </fields>
                 </settings>
+                </groups>
+            </msp>
+        <msp_gateways>
+            <label><![CDATA[<div style="display:inline-block;color:#00adee;font-family:Tahoma, Geneva, sans-serif;">Connect</div>]]> Gateways</label>
+            <tab>ms</tab>
+            <frontend_type>text</frontend_type>
+            <sort_order>1005</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+            <groups>
                 <msp_ideal translate="label" module="msp">
                     <label>iDEAL</label>
                     <sort_order>680</sort_order>
@@ -679,7 +330,7 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </active>
-						
+                        
                         <bank_select translate='label'>
                             <label>Show iDEAL banklist in checkout</label>
                             <frontend_type>select</frontend_type>
@@ -710,7 +361,6 @@
                             <label>Allowed Currency</label>
                             <frontend_type>multiselect</frontend_type>
                             <source_model>msp/config_sources_order_currency</source_model>
-                            <!--<source_model>msp/config_sources_order_email</source_model>-->
                             <sort_order>14</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -806,13 +456,17 @@
                             <label>Payment for Specific Customer Groups</label>
                             <frontend_type>multiselect</frontend_type>
                             <sort_order>101</sort_order>
-                            <source_model>adminhtml/system_config_source_customer_group</source_model>
+                            <source_model>msp/config_sources_groups</source_model>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                        </specificgroups>			
+                        </specificgroups>
                     </fields>
                 </msp_ideal>
+                
+                
+                
+                
                 <msp_payafter translate="label" module="msp">
                     <label>Pay after Delivery</label>
                     <sort_order>681</sort_order>
@@ -832,7 +486,7 @@
                         <test_api_pad translate="label comment">
                             <label>Account type</label>
                             <frontend_type>select</frontend_type>
-                           
+                            
                             <source_model>msp/config_sources_accounts</source_model>
                             <sort_order>20</sort_order>
                             <show_in_default>1</show_in_default>
@@ -863,6 +517,14 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </secure_code_pad>
+                        <api_key_pad translate="label">
+                            <label>API Key</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>51</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </api_key_pad>
                         <account_id_pad_test translate="label">
                             <label>Account ID (for Test Accounts)</label>
                             <frontend_type>text</frontend_type>
@@ -887,6 +549,14 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </secure_code_pad_test>
+                        <api_key_pad_test translate="label">
+                            <label>API Key (for Test Accounts)</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>59</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </api_key_pad_test>
                         <title translate="label">
                             <label>Title</label>
                             <frontend_type>text</frontend_type>
@@ -929,12 +599,12 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </bno_no_invoice>
-                      
+                        
                         <allowed_currency translate="label comment">
                             <label>Allowed Currency</label>
                             <frontend_type>multiselect</frontend_type>
                             <source_model>msp/config_sources_order_currency</source_model>
-                            <!--<source_model>msp/config_sources_order_email</source_model>-->
+                            
                             <sort_order>122</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -1068,7 +738,7 @@
                             <label>Payment for Specific Customer Groups</label>
                             <frontend_type>multiselect</frontend_type>
                             <sort_order>101</sort_order>
-                            <source_model>adminhtml/system_config_source_customer_group</source_model>
+                            <source_model>msp/config_sources_groups</source_model>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -1094,7 +764,7 @@
                         <test_api_pad translate="label comment">
                             <label>Account type</label>
                             <frontend_type>select</frontend_type>
-                           
+                            
                             <source_model>msp/config_sources_accounts</source_model>
                             <sort_order>20</sort_order>
                             <show_in_default>1</show_in_default>
@@ -1125,6 +795,14 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </secure_code_pad>
+                        <api_key_pad translate="label">
+                            <label>API Key</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>51</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </api_key_pad>
                         <account_id_pad_test translate="label">
                             <label>Account ID (for Test Accounts)</label>
                             <frontend_type>text</frontend_type>
@@ -1149,6 +827,14 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </secure_code_pad_test>
+                        <api_key_pad_test translate="label">
+                            <label>API Key (for Test Accounts)</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>65</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </api_key_pad_test>
                         <title translate="label">
                             <label>Title</label>
                             <frontend_type>text</frontend_type>
@@ -1191,12 +877,11 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </bno_no_invoice>
-                      
+                        
                         <allowed_currency translate="label comment">
                             <label>Allowed Currency</label>
                             <frontend_type>multiselect</frontend_type>
                             <source_model>msp/config_sources_order_currency</source_model>
-                            <!--<source_model>msp/config_sources_order_email</source_model>-->
                             <sort_order>122</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -1330,7 +1015,7 @@
                             <label>Payment for Specific Customer Groups</label>
                             <frontend_type>multiselect</frontend_type>
                             <sort_order>101</sort_order>
-                            <source_model>adminhtml/system_config_source_customer_group</source_model>
+                            <source_model>msp/config_sources_groups</source_model>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -1365,7 +1050,6 @@
                             <label>Allowed Currency</label>
                             <frontend_type>multiselect</frontend_type>
                             <source_model>msp/config_sources_order_currency</source_model>
-                            <!--<source_model>msp/config_sources_order_email</source_model>-->
                             <sort_order>4</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -1462,7 +1146,7 @@
                             <label>Payment for Specific Customer Groups</label>
                             <frontend_type>multiselect</frontend_type>
                             <sort_order>101</sort_order>
-                            <source_model>adminhtml/system_config_source_customer_group</source_model>
+                            <source_model>msp/config_sources_groups</source_model>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -1497,7 +1181,6 @@
                             <label>Allowed Currency</label>
                             <frontend_type>multiselect</frontend_type>
                             <source_model>msp/config_sources_order_currency</source_model>
-                            <!--<source_model>adminhtml/msp_config_source_order_email</source_model>-->
                             <sort_order>4</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -1594,7 +1277,7 @@
                             <label>Payment for Specific Customer Groups</label>
                             <frontend_type>multiselect</frontend_type>
                             <sort_order>101</sort_order>
-                            <source_model>adminhtml/system_config_source_customer_group</source_model>
+                            <source_model>msp/config_sources_groups</source_model>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -1629,7 +1312,6 @@
                             <label>Allowed Currency</label>
                             <frontend_type>multiselect</frontend_type>
                             <source_model>msp/config_sources_order_currency</source_model>
-                            <!--<source_model>msp/config_sources_order_email</source_model>-->
                             <sort_order>4</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -1646,7 +1328,7 @@
                         </allowspecific>
                         <specificcountry translate="label">
                             <label>Receive payments from specific countries</label>
-
+                            
                             <frontend_type>multiselect</frontend_type>
                             <sort_order>14</sort_order>
                             <source_model>adminhtml/system_config_source_country</source_model>
@@ -1727,7 +1409,7 @@
                             <label>Payment for Specific Customer Groups</label>
                             <frontend_type>multiselect</frontend_type>
                             <sort_order>101</sort_order>
-                            <source_model>adminhtml/system_config_source_customer_group</source_model>
+                            <source_model>msp/config_sources_groups</source_model>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -1762,7 +1444,6 @@
                             <label>Allowed Currency</label>
                             <frontend_type>multiselect</frontend_type>
                             <source_model>msp/config_sources_order_currency</source_model>
-                            <!--<source_model>msp/config_sources_order_email</source_model>-->
                             <sort_order>3</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -1859,7 +1540,7 @@
                             <label>Payment for Specific Customer Groups</label>
                             <frontend_type>multiselect</frontend_type>
                             <sort_order>101</sort_order>
-                            <source_model>adminhtml/system_config_source_customer_group</source_model>
+                            <source_model>msp/config_sources_groups</source_model>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -1903,7 +1584,6 @@
                             <label>Allowed Currency</label>
                             <frontend_type>multiselect</frontend_type>
                             <source_model>msp/config_sources_order_currency</source_model>
-                            <!--<source_model>msp/config_sources_order_email</source_model>-->
                             <sort_order>4</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -2000,7 +1680,7 @@
                             <label>Payment for Specific Customer Groups</label>
                             <frontend_type>multiselect</frontend_type>
                             <sort_order>101</sort_order>
-                            <source_model>adminhtml/system_config_source_customer_group</source_model>
+                            <source_model>msp/config_sources_groups</source_model>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -2035,7 +1715,6 @@
                             <label>Allowed Currency</label>
                             <frontend_type>multiselect</frontend_type>
                             <source_model>msp/config_sources_order_currency</source_model>
-                            <!--<source_model>msp/config_sources_order_email</source_model>-->
                             <sort_order>3</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -2132,7 +1811,7 @@
                             <label>Payment for Specific Customer Groups</label>
                             <frontend_type>multiselect</frontend_type>
                             <sort_order>101</sort_order>
-                            <source_model>adminhtml/system_config_source_customer_group</source_model>
+                            <source_model>msp/config_sources_groups</source_model>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -2263,7 +1942,7 @@
                             <label>Payment for Specific Customer Groups</label>
                             <frontend_type>multiselect</frontend_type>
                             <sort_order>101</sort_order>
-                            <source_model>adminhtml/system_config_source_customer_group</source_model>
+                            <source_model>msp/config_sources_groups</source_model>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -2299,7 +1978,6 @@
                             <label>Allowed Currency</label>
                             <frontend_type>multiselect</frontend_type>
                             <source_model>msp/config_sources_order_currency</source_model>
-                            <!--<source_model>msp/config_sources_order_email</source_model>-->
                             <sort_order>3</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -2396,7 +2074,7 @@
                             <label>Payment for Specific Customer Groups</label>
                             <frontend_type>multiselect</frontend_type>
                             <sort_order>101</sort_order>
-                            <source_model>adminhtml/system_config_source_customer_group</source_model>
+                            <source_model>msp/config_sources_groups</source_model>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -2431,7 +2109,6 @@
                             <label>Allowed Currency</label>
                             <frontend_type>multiselect</frontend_type>
                             <source_model>msp/config_sources_order_currency</source_model>
-                            <!--<source_model>msp/config_sources_order_email</source_model>-->
                             <sort_order>3</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -2520,7 +2197,7 @@
                             <label>Payment for Specific Customer Groups</label>
                             <frontend_type>multiselect</frontend_type>
                             <sort_order>101</sort_order>
-                            <source_model>adminhtml/system_config_source_customer_group</source_model>
+                            <source_model>msp/config_sources_groups</source_model>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -2555,7 +2232,6 @@
                             <label>Allowed Currency</label>
                             <frontend_type>multiselect</frontend_type>
                             <source_model>msp/config_sources_order_currency</source_model>
-                            <!--<source_model>msp/config_sources_order_email</source_model>-->
                             <sort_order>3</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -2652,7 +2328,7 @@
                             <label>Payment for Specific Customer Groups</label>
                             <frontend_type>multiselect</frontend_type>
                             <sort_order>101</sort_order>
-                            <source_model>adminhtml/system_config_source_customer_group</source_model>
+                            <source_model>msp/config_sources_groups</source_model>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -2687,7 +2363,6 @@
                             <label>Allowed Currency</label>
                             <frontend_type>multiselect</frontend_type>
                             <source_model>msp/config_sources_order_currency</source_model>
-                            <!--<source_model>msp/config_sources_order_email</source_model>-->
                             <sort_order>3</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -2784,83 +2459,24 @@
                             <label>Payment for Specific Customer Groups</label>
                             <frontend_type>multiselect</frontend_type>
                             <sort_order>101</sort_order>
-                            <source_model>adminhtml/system_config_source_customer_group</source_model>
+                            <source_model>msp/config_sources_groups</source_model>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </specificgroups>
                     </fields>
                 </msp_directdebit>
-                <msp_fastcheckout translate="label" module="msp">
-                    <label>Fast Checkout</label>
-                    <sort_order>780</sort_order>
-                    <show_in_default>1</show_in_default>
-                    <show_in_website>1</show_in_website>
-                    <show_in_store>1</show_in_store>
-                    <fields>
-                        <active translate="label">
-                            <label>Enabled</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>1</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </active>
-                        <title translate="label">
-                            <label>Title</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>2</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </title>
-                        <allowspecific translate="label">
-                            <label>Receive payments from applicable countries</label>
-                            <frontend_type>allowspecific</frontend_type>
-                            <sort_order>13</sort_order>
-                            <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </allowspecific>
-                        <specificcountry translate="label">
-                            <label>Receive payments from specific countries</label>
-                            <frontend_type>multiselect</frontend_type>
-                            <sort_order>14</sort_order>
-                            <source_model>adminhtml/system_config_source_country</source_model>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </specificcountry>
-                        <sort_order translate="label">
-                            <label>Sort order</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>450</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </sort_order>
-                        <instructions translate="label">
-                            <label>Instructions</label>
-                            <frontend_type>textarea</frontend_type>
-                            <sort_order>62</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </instructions>
-                        <specificgroups translate="label">
-                            <label>Payment for Specific Customer Groups</label>
-                            <frontend_type>multiselect</frontend_type>
-                            <sort_order>101</sort_order>
-                            <source_model>adminhtml/system_config_source_customer_group</source_model>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </specificgroups>
-                    </fields>
-                </msp_fastcheckout>
-                <msp_webgift translate="label" module="msp">
+            </groups>
+        </msp_gateways>
+        <msp_giftcards>
+            <label><![CDATA[<div style="display:inline-block;color:#00adee;font-family:Tahoma, Geneva, sans-serif;">Connect</div>]]> GiftCards</label>
+            <tab>ms</tab>
+            <frontend_type>text</frontend_type>
+            <sort_order>1010</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+            <groups>                <msp_webgift translate="label" module="msp">
                     <label>Webshop Giftcard</label>
                     <sort_order>740</sort_order>
                     <show_in_default>1</show_in_default>
@@ -2879,7 +2495,7 @@
                         <test_api_pad translate="label comment">
                             <label>Account type</label>
                             <frontend_type>select</frontend_type>
-                           
+                            
                             <source_model>msp/config_sources_accounts</source_model>
                             <sort_order>20</sort_order>
                             <show_in_default>1</show_in_default>
@@ -2910,6 +2526,14 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </secure_code_pad>
+                        <api_key_pad translate="label">
+                            <label>API Key</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>51</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </api_key_pad>
                         <account_id_pad_test translate="label">
                             <label>Account ID (for Test Accounts)</label>
                             <frontend_type>text</frontend_type>
@@ -2934,6 +2558,14 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </secure_code_pad_test>
+                        <api_key_pad_test translate="label">
+                            <label>API Key (for Test Accounts)</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>59</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </api_key_pad_test>
                         <title translate="label">
                             <label>Title</label>
                             <frontend_type>text</frontend_type>
@@ -2946,7 +2578,6 @@
                             <label>Allowed Currency</label>
                             <frontend_type>multiselect</frontend_type>
                             <source_model>msp/config_sources_order_currency</source_model>
-                            <!--<source_model>msp/config_sources_order_email</source_model>-->
                             <sort_order>3</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -3035,196 +2666,14 @@
                             <label>Payment for Specific Customer Groups</label>
                             <frontend_type>multiselect</frontend_type>
                             <sort_order>101</sort_order>
-                            <source_model>adminhtml/system_config_source_customer_group</source_model>
+                            <source_model>msp/config_sources_groups</source_model>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </specificgroups>
                     </fields>
                 </msp_webgift>
-                <msp_ebon translate="label" module="msp">
-                    <label>E-bon</label>
-                    <sort_order>741</sort_order>
-                    <show_in_default>1</show_in_default>
-                    <show_in_website>1</show_in_website>
-                    <show_in_store>1</show_in_store>
-                    <fields>
-                        <active translate="label">
-                            <label>Enabled</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>1</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </active>
-                        <test_api_pad translate="label comment">
-                            <label>Account type</label>
-                            <frontend_type>select</frontend_type>
-                          
-                            <source_model>msp/config_sources_accounts</source_model>
-                            <sort_order>20</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </test_api_pad>
-                        <account_id_pad translate="label">
-                            <label>Account ID</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>30</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </account_id_pad>
-                        <site_id_pad translate="label">
-                            <label>Site ID</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>40</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </site_id_pad>
-                        <secure_code_pad translate="label">
-                            <label>Site Code</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>50</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </secure_code_pad>
-                        <account_id_pad_test translate="label">
-                            <label>Account ID (for Test Accounts)</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>53</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </account_id_pad_test>
-                        <site_id_pad_test translate="label">
-                            <label>Site ID (for Test Accounts)</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>56</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </site_id_pad_test>
-                        <secure_code_pad_test translate="label">
-                            <label>Site Code (for Test Accounts)</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>58</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </secure_code_pad_test>
-                        <title translate="label">
-                            <label>Title</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>2</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </title>
-                        <allowed_currency translate="label comment">
-                            <label>Allowed Currency</label>
-                            <frontend_type>multiselect</frontend_type>
-                            <source_model>msp/config_sources_order_currency</source_model>
-                            <!--<source_model>msp/config_sources_order_email</source_model>-->
-                            <sort_order>3</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </allowed_currency>
-                        <allowspecific translate="label">
-                            <label>Receive payments from applicable countries</label>
-                            <frontend_type>allowspecific</frontend_type>
-                            <sort_order>13</sort_order>
-                            <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </allowspecific>
-                        <specificcountry translate="label">
-                            <label>Receive payments from specific countries</label>
-                            <frontend_type>multiselect</frontend_type>
-                            <sort_order>14</sort_order>
-                            <source_model>adminhtml/system_config_source_country</source_model>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </specificcountry>
-                        <sort_order translate="label">
-                            <label>Sort order</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>100</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </sort_order>
-                        <instructions translate="label">
-                            <label>Instructions</label>
-                            <frontend_type>textarea</frontend_type>
-                            <sort_order>62</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </instructions>
-                        <fee translate="label">
-                            <label>Enable fee (inc. Tax)</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>70</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </fee>
-                        <fee_amount translate="label">
-                            <label>Payment fee amount</label>
-                            <frontend_type>text</frontend_type>
-                            <comment>Payment fee add like 0:5   this means a fixed fee of 0 euro and 5%</comment>
-                            <sort_order>80</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </fee_amount>
-                        <fee_tax_class>
-                            <label>Tax class for payment fee</label>
-                            <comment>Select which tax class should be used for the payment fee</comment>
-                            <frontend_type>select</frontend_type>
-                            <source_model>msp/config_sources_taxClasses</source_model>
-                            <sort_order>90</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </fee_tax_class>
-                        <fee_incexc translate="label">
-                            <label>Show payment fee incl. tax during checkout</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>81</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </fee_incexc>
-                        <fee_description translate="label">
-                            <label>Payment fee description, visible in order totals</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>100</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </fee_description>
-                        <specificgroups translate="label">
-                            <label>Payment for Specific Customer Groups</label>
-                            <frontend_type>multiselect</frontend_type>
-                            <sort_order>101</sort_order>
-                            <source_model>adminhtml/system_config_source_customer_group</source_model>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </specificgroups>
-                    </fields>
-                </msp_ebon>
-                <msp_lief translate="label" module="msp">
+                <!-- disabled because its special for lief.<msp_lief translate="label" module="msp">
                     <label>Lief Cadeaukaart</label>
                     <sort_order>744</sort_order>
                     <show_in_default>1</show_in_default>
@@ -3273,6 +2722,14 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </secure_code_pad>
+                        <api_key_pad translate="label">
+                            <label>API Key</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>51</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </api_key_pad>
                         <account_id_pad_test translate="label">
                             <label>Account ID (for Test Accounts)</label>
                             <frontend_type>text</frontend_type>
@@ -3297,6 +2754,14 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </secure_code_pad_test>
+                        <api_key_pad_test translate="label">
+                            <label>API Key (for Test Accounts)</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>59</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </api_key_pad_test>
                         <title translate="label">
                             <label>Title</label>
                             <frontend_type>text</frontend_type>
@@ -3309,7 +2774,6 @@
                             <label>Allowed Currency</label>
                             <frontend_type>multiselect</frontend_type>
                             <source_model>msp/config_sources_order_currency</source_model>
-                            <!--<source_model>msp/config_sources_order_email</source_model>-->
                             <sort_order>3</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -3398,13 +2862,13 @@
                             <label>Payment for Specific Customer Groups</label>
                             <frontend_type>multiselect</frontend_type>
                             <sort_order>101</sort_order>
-                            <source_model>adminhtml/system_config_source_customer_group</source_model>
+                            <source_model>msp/config_sources_groups</source_model>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </specificgroups>
                     </fields>
-                </msp_lief>
+                </msp_lief>-->
                 <msp_babygiftcard translate="label" module="msp">
                     <label>Baby giftcard</label>
                     <sort_order>742</sort_order>
@@ -3424,7 +2888,7 @@
                         <test_api_pad translate="label comment">
                             <label>Account type</label>
                             <frontend_type>select</frontend_type>
-                       
+                            
                             <source_model>msp/config_sources_accounts</source_model>
                             <sort_order>20</sort_order>
                             <show_in_default>1</show_in_default>
@@ -3455,6 +2919,14 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </secure_code_pad>
+                        <api_key_pad translate="label">
+                            <label>API Key</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>51</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </api_key_pad>
                         <account_id_pad_test translate="label">
                             <label>Account ID (for Test Accounts)</label>
                             <frontend_type>text</frontend_type>
@@ -3479,6 +2951,14 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </secure_code_pad_test>
+                        <api_key_pad_test translate="label">
+                            <label>API Key (for Test Accounts)</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>59</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </api_key_pad_test>
                         <title translate="label">
                             <label>Title</label>
                             <frontend_type>text</frontend_type>
@@ -3491,7 +2971,6 @@
                             <label>Allowed Currency</label>
                             <frontend_type>multiselect</frontend_type>
                             <source_model>msp/config_sources_order_currency</source_model>
-                            <!--<source_model>msp/config_sources_order_email</source_model>-->
                             <sort_order>3</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -3580,7 +3059,7 @@
                             <label>Payment for Specific Customer Groups</label>
                             <frontend_type>multiselect</frontend_type>
                             <sort_order>101</sort_order>
-                            <source_model>adminhtml/system_config_source_customer_group</source_model>
+                            <source_model>msp/config_sources_groups</source_model>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -3606,7 +3085,7 @@
                         <test_api_pad translate="label comment">
                             <label>Account type</label>
                             <frontend_type>select</frontend_type>
-                          
+                            
                             <source_model>msp/config_sources_accounts</source_model>
                             <sort_order>20</sort_order>
                             <show_in_default>1</show_in_default>
@@ -3637,6 +3116,14 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </secure_code_pad>
+                        <api_key_pad translate="label">
+                            <label>API Key</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>51</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </api_key_pad>
                         <account_id_pad_test translate="label">
                             <label>Account ID (for Test Accounts)</label>
                             <frontend_type>text</frontend_type>
@@ -3661,6 +3148,14 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </secure_code_pad_test>
+                        <api_key_pad_test translate="label">
+                            <label>API Key (for Test Accounts)</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>59</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </api_key_pad_test>
                         <title translate="label">
                             <label>Title</label>
                             <frontend_type>text</frontend_type>
@@ -3673,7 +3168,6 @@
                             <label>Allowed Currency</label>
                             <frontend_type>multiselect</frontend_type>
                             <source_model>msp/config_sources_order_currency</source_model>
-                            <!--<source_model>msp/config_sources_order_email</source_model>-->
                             <sort_order>3</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -3762,7 +3256,7 @@
                             <label>Payment for Specific Customer Groups</label>
                             <frontend_type>multiselect</frontend_type>
                             <sort_order>101</sort_order>
-                            <source_model>adminhtml/system_config_source_customer_group</source_model>
+                            <source_model>msp/config_sources_groups</source_model>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -3788,7 +3282,7 @@
                         <test_api_pad translate="label comment">
                             <label>Account type</label>
                             <frontend_type>select</frontend_type>
-                           
+                            
                             <source_model>msp/config_sources_accounts</source_model>
                             <sort_order>20</sort_order>
                             <show_in_default>1</show_in_default>
@@ -3819,6 +3313,14 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </secure_code_pad>
+                        <api_key_pad translate="label">
+                            <label>API Key</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>51</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </api_key_pad>
                         <account_id_pad_test translate="label">
                             <label>Account ID (for Test Accounts)</label>
                             <frontend_type>text</frontend_type>
@@ -3843,6 +3345,14 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </secure_code_pad_test>
+                        <api_key_pad_test translate="label">
+                            <label>API Key (for Test Accounts)</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>59</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </api_key_pad_test>
                         <title translate="label">
                             <label>Title</label>
                             <frontend_type>text</frontend_type>
@@ -3855,7 +3365,6 @@
                             <label>Allowed Currency</label>
                             <frontend_type>multiselect</frontend_type>
                             <source_model>msp/config_sources_order_currency</source_model>
-                            <!--<source_model>msp/config_sources_order_email</source_model>-->
                             <sort_order>3</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -3944,7 +3453,7 @@
                             <label>Payment for Specific Customer Groups</label>
                             <frontend_type>multiselect</frontend_type>
                             <sort_order>101</sort_order>
-                            <source_model>adminhtml/system_config_source_customer_group</source_model>
+                            <source_model>msp/config_sources_groups</source_model>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -3970,7 +3479,7 @@
                         <test_api_pad translate="label comment">
                             <label>Account type</label>
                             <frontend_type>select</frontend_type>
-                           
+                            
                             <source_model>msp/config_sources_accounts</source_model>
                             <sort_order>20</sort_order>
                             <show_in_default>1</show_in_default>
@@ -4001,6 +3510,14 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </secure_code_pad>
+                        <api_key_pad translate="label">
+                            <label>API Key</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>51</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </api_key_pad>
                         <account_id_pad_test translate="label">
                             <label>Account ID (for Test Accounts)</label>
                             <frontend_type>text</frontend_type>
@@ -4025,6 +3542,14 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </secure_code_pad_test>
+                        <api_key_pad_test translate="label">
+                            <label>API Key (for Test Accounts)</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>59</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </api_key_pad_test>
                         <title translate="label">
                             <label>Title</label>
                             <frontend_type>text</frontend_type>
@@ -4037,7 +3562,6 @@
                             <label>Allowed Currency</label>
                             <frontend_type>multiselect</frontend_type>
                             <source_model>msp/config_sources_order_currency</source_model>
-                            <!--<source_model>msp/config_sources_order_email</source_model>-->
                             <sort_order>3</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -4126,14 +3650,14 @@
                             <label>Payment for Specific Customer Groups</label>
                             <frontend_type>multiselect</frontend_type>
                             <sort_order>101</sort_order>
-                            <source_model>adminhtml/system_config_source_customer_group</source_model>
+                            <source_model>msp/config_sources_groups</source_model>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </specificgroups>
                     </fields>
                 </msp_erotiekbon>
-                <msp_parfumnl translate="label" module="msp">
+               <!-- Disabled because its a individual merchant card <msp_parfumnl translate="label" module="msp">
                     <label>ParfumNL</label>
                     <sort_order>743</sort_order>
                     <show_in_default>1</show_in_default>
@@ -4152,7 +3676,7 @@
                         <test_api_pad translate="label comment">
                             <label>Account type</label>
                             <frontend_type>select</frontend_type>
-                          
+                            
                             <source_model>msp/config_sources_accounts</source_model>
                             <sort_order>20</sort_order>
                             <show_in_default>1</show_in_default>
@@ -4183,6 +3707,14 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </secure_code_pad>
+                        <api_key_pad translate="label">
+                            <label>API Key</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>51</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </api_key_pad>
                         <account_id_pad_test translate="label">
                             <label>Account ID (for Test Accounts)</label>
                             <frontend_type>text</frontend_type>
@@ -4207,6 +3739,14 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </secure_code_pad_test>
+                        <api_key_pad_test translate="label">
+                            <label>API Key (for Test Accounts)</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>59</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </api_key_pad_test>
                         <title translate="label">
                             <label>Title</label>
                             <frontend_type>text</frontend_type>
@@ -4219,7 +3759,6 @@
                             <label>Allowed Currency</label>
                             <frontend_type>multiselect</frontend_type>
                             <source_model>msp/config_sources_order_currency</source_model>
-                            <!--<source_model>msp/config_sources_order_email</source_model>-->
                             <sort_order>3</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -4308,13 +3847,13 @@
                             <label>Payment for Specific Customer Groups</label>
                             <frontend_type>multiselect</frontend_type>
                             <sort_order>101</sort_order>
-                            <source_model>adminhtml/system_config_source_customer_group</source_model>
+                            <source_model>msp/config_sources_groups</source_model>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </specificgroups>
                     </fields>
-                </msp_parfumnl>
+                </msp_parfumnl>-->
                 <msp_parfumcadeaukaart translate="label" module="msp">
                     <label>Parfum Cadeaukaart</label>
                     <sort_order>744</sort_order>
@@ -4334,7 +3873,7 @@
                         <test_api_pad translate="label comment">
                             <label>Account type</label>
                             <frontend_type>select</frontend_type>
-                          
+                            
                             <source_model>msp/config_sources_accounts</source_model>
                             <sort_order>20</sort_order>
                             <show_in_default>1</show_in_default>
@@ -4365,6 +3904,14 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </secure_code_pad>
+                        <api_key_pad translate="label">
+                            <label>API Key</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>51</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </api_key_pad>
                         <account_id_pad_test translate="label">
                             <label>Account ID (for Test Accounts)</label>
                             <frontend_type>text</frontend_type>
@@ -4389,6 +3936,14 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </secure_code_pad_test>
+                        <api_key_pad_test translate="label">
+                            <label>API Key (for Test Accounts)</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>59</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </api_key_pad_test>
                         <title translate="label">
                             <label>Title</label>
                             <frontend_type>text</frontend_type>
@@ -4401,7 +3956,6 @@
                             <label>Allowed Currency</label>
                             <frontend_type>multiselect</frontend_type>
                             <source_model>msp/config_sources_order_currency</source_model>
-                            <!--<source_model>msp/config_sources_order_email</source_model>-->
                             <sort_order>3</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -4490,7 +4044,7 @@
                             <label>Payment for Specific Customer Groups</label>
                             <frontend_type>multiselect</frontend_type>
                             <sort_order>101</sort_order>
-                            <source_model>adminhtml/system_config_source_customer_group</source_model>
+                            <source_model>msp/config_sources_groups</source_model>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -4516,7 +4070,7 @@
                         <test_api_pad translate="label comment">
                             <label>Account type</label>
                             <frontend_type>select</frontend_type>
-                          
+                            
                             <source_model>msp/config_sources_accounts</source_model>
                             <sort_order>20</sort_order>
                             <show_in_default>1</show_in_default>
@@ -4547,6 +4101,14 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </secure_code_pad>
+                        <api_key_pad translate="label">
+                            <label>API Key</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>51</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </api_key_pad>
                         <account_id_pad_test translate="label">
                             <label>Account ID (for Test Accounts)</label>
                             <frontend_type>text</frontend_type>
@@ -4571,6 +4133,14 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </secure_code_pad_test>
+                        <api_key_pad_test translate="label">
+                            <label>API Key (for Test Accounts)</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>59</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </api_key_pad_test>
                         <title translate="label">
                             <label>Title</label>
                             <frontend_type>text</frontend_type>
@@ -4583,7 +4153,6 @@
                             <label>Allowed Currency</label>
                             <frontend_type>multiselect</frontend_type>
                             <source_model>msp/config_sources_order_currency</source_model>
-                            <!--<source_model>msp/config_sources_order_email</source_model>-->
                             <sort_order>3</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -4672,13 +4241,210 @@
                             <label>Payment for Specific Customer Groups</label>
                             <frontend_type>multiselect</frontend_type>
                             <sort_order>101</sort_order>
-                            <source_model>adminhtml/system_config_source_customer_group</source_model>
+                            <source_model>msp/config_sources_groups</source_model>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </specificgroups>
                     </fields>
                 </msp_fashioncheque>
+                <msp_fashiongiftcard translate="label" module="msp">
+                    <label>Fashion Giftcard</label>
+                    <sort_order>744</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <active translate="label">
+                            <label>Enabled</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </active>
+                        <test_api_pad translate="label comment">
+                            <label>Account type</label>
+                            <frontend_type>select</frontend_type>
+                            
+                            <source_model>msp/config_sources_accounts</source_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </test_api_pad>
+                        <account_id_pad translate="label">
+                            <label>Account ID</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </account_id_pad>
+                        <site_id_pad translate="label">
+                            <label>Site ID</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </site_id_pad>
+                        <secure_code_pad translate="label">
+                            <label>Site Code</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </secure_code_pad>
+                        <api_key_pad translate="label">
+                            <label>API Key</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>51</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </api_key_pad>
+                        <account_id_pad_test translate="label">
+                            <label>Account ID (for Test Accounts)</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>53</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </account_id_pad_test>
+                        <site_id_pad_test translate="label">
+                            <label>Site ID (for Test Accounts)</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>56</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </site_id_pad_test>
+                        <secure_code_pad_test translate="label">
+                            <label>Site Code (for Test Accounts)</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>58</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </secure_code_pad_test>
+                        <api_key_pad_test translate="label">
+                            <label>API Key (for Test Accounts)</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>59</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </api_key_pad_test>
+                        <title translate="label">
+                            <label>Title</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>2</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </title>
+                        <allowed_currency translate="label comment">
+                            <label>Allowed Currency</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <source_model>msp/config_sources_order_currency</source_model>
+                            <sort_order>3</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </allowed_currency>
+                        <allowspecific translate="label">
+                            <label>Receive payments from applicable countries</label>
+                            <frontend_type>allowspecific</frontend_type>
+                            <sort_order>13</sort_order>
+                            <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </allowspecific>
+                        <specificcountry translate="label">
+                            <label>Receive payments from specific countries</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <sort_order>14</sort_order>
+                            <source_model>adminhtml/system_config_source_country</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </specificcountry>
+                        <sort_order translate="label">
+                            <label>Sort order</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>100</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </sort_order>
+                        <instructions translate="label">
+                            <label>Instructions</label>
+                            <frontend_type>textarea</frontend_type>
+                            <sort_order>62</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </instructions>
+                        <fee translate="label">
+                            <label>Enable fee (inc. Tax)</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>70</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </fee>
+                        <fee_amount translate="label">
+                            <label>Payment fee amount</label>
+                            <frontend_type>text</frontend_type>
+                            <comment>Payment fee add like 0:5   this means a fixed fee of 0 euro and 5%</comment>
+                            <sort_order>80</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </fee_amount>
+                        <fee_tax_class>
+                            <label>Tax class for payment fee</label>
+                            <comment>Select which tax class should be used for the payment fee</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>msp/config_sources_taxClasses</source_model>
+                            <sort_order>90</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </fee_tax_class>
+                        <fee_incexc translate="label">
+                            <label>Show payment fee incl. tax during checkout</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>81</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </fee_incexc>
+                        <fee_description translate="label">
+                            <label>Payment fee description, visible in order totals</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>100</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </fee_description>
+                        <specificgroups translate="label">
+                            <label>Payment for Specific Customer Groups</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <sort_order>101</sort_order>
+                            <source_model>msp/config_sources_groups</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </specificgroups>
+                    </fields>
+                </msp_fashiongiftcard>
                 <msp_yourgift translate="label" module="msp">
                     <label>Your Gift coupon</label>
                     <sort_order>744</sort_order>
@@ -4698,7 +4464,7 @@
                         <test_api_pad translate="label comment">
                             <label>Account type</label>
                             <frontend_type>select</frontend_type>
-                          
+                            
                             <source_model>msp/config_sources_accounts</source_model>
                             <sort_order>20</sort_order>
                             <show_in_default>1</show_in_default>
@@ -4729,6 +4495,14 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </secure_code_pad>
+                        <api_key_pad translate="label">
+                            <label>API Key</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>51</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </api_key_pad>
                         <account_id_pad_test translate="label">
                             <label>Account ID (for Test Accounts)</label>
                             <frontend_type>text</frontend_type>
@@ -4753,6 +4527,14 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </secure_code_pad_test>
+                        <api_key_pad_test translate="label">
+                            <label>API Key (for Test Accounts)</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>59</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </api_key_pad_test>
                         <title translate="label">
                             <label>Title</label>
                             <frontend_type>text</frontend_type>
@@ -4765,7 +4547,6 @@
                             <label>Allowed Currency</label>
                             <frontend_type>multiselect</frontend_type>
                             <source_model>msp/config_sources_order_currency</source_model>
-                            <!--<source_model>msp/config_sources_order_email</source_model>-->
                             <sort_order>3</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -4854,7 +4635,7 @@
                             <label>Payment for Specific Customer Groups</label>
                             <frontend_type>multiselect</frontend_type>
                             <sort_order>101</sort_order>
-                            <source_model>adminhtml/system_config_source_customer_group</source_model>
+                            <source_model>msp/config_sources_groups</source_model>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -4880,7 +4661,7 @@
                         <test_api_pad translate="label comment">
                             <label>Account type</label>
                             <frontend_type>select</frontend_type>
-                          
+                            
                             <source_model>msp/config_sources_accounts</source_model>
                             <sort_order>20</sort_order>
                             <show_in_default>1</show_in_default>
@@ -4911,6 +4692,14 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </secure_code_pad>
+                        <api_key_pad translate="label">
+                            <label>API Key</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>52</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </api_key_pad>
                         <account_id_pad_test translate="label">
                             <label>Account ID (for Test Accounts)</label>
                             <frontend_type>text</frontend_type>
@@ -4935,6 +4724,14 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </secure_code_pad_test>
+                        <api_key_pad_test translate="label">
+                            <label>API Key (for Test Accounts)</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>59</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </api_key_pad_test>
                         <title translate="label">
                             <label>Title</label>
                             <frontend_type>text</frontend_type>
@@ -4947,7 +4744,6 @@
                             <label>Allowed Currency</label>
                             <frontend_type>multiselect</frontend_type>
                             <source_model>msp/config_sources_order_currency</source_model>
-                            <!--<source_model>msp/config_sources_order_email</source_model>-->
                             <sort_order>3</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -5036,14 +4832,14 @@
                             <label>Payment for Specific Customer Groups</label>
                             <frontend_type>multiselect</frontend_type>
                             <sort_order>101</sort_order>
-                            <source_model>adminhtml/system_config_source_customer_group</source_model>
+                            <source_model>msp/config_sources_groups</source_model>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </specificgroups>
                     </fields>
                 </msp_wijncadeau>
-                <msp_degrotespeelgoedwinkel translate="label" module="msp">
+                <!-- disabled because is individual merchant card<msp_degrotespeelgoedwinkel translate="label" module="msp">
                     <label>De grote speelgoedwinkel coupon</label>
                     <sort_order>744</sort_order>
                     <show_in_default>1</show_in_default>
@@ -5062,7 +4858,7 @@
                         <test_api_pad translate="label comment">
                             <label>Account type</label>
                             <frontend_type>select</frontend_type>
-                          
+                            
                             <source_model>msp/config_sources_accounts</source_model>
                             <sort_order>20</sort_order>
                             <show_in_default>1</show_in_default>
@@ -5093,6 +4889,14 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </secure_code_pad>
+                        <api_key_pad translate="label">
+                            <label>API Key</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>51</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </api_key_pad>
                         <account_id_pad_test translate="label">
                             <label>Account ID (for Test Accounts)</label>
                             <frontend_type>text</frontend_type>
@@ -5117,6 +4921,14 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </secure_code_pad_test>
+                        <api_key_pad_test translate="label">
+                            <label>API Key</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>59</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </api_key_pad_test>
                         <title translate="label">
                             <label>Title</label>
                             <frontend_type>text</frontend_type>
@@ -5129,7 +4941,6 @@
                             <label>Allowed Currency</label>
                             <frontend_type>multiselect</frontend_type>
                             <source_model>msp/config_sources_order_currency</source_model>
-                            <!--<source_model>msp/config_sources_order_email</source_model>-->
                             <sort_order>3</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -5218,22 +5029,811 @@
                             <label>Payment for Specific Customer Groups</label>
                             <frontend_type>multiselect</frontend_type>
                             <sort_order>101</sort_order>
-                            <source_model>adminhtml/system_config_source_customer_group</source_model>
+                            <source_model>msp/config_sources_groups</source_model>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </specificgroups>
                     </fields>
-                </msp_degrotespeelgoedwinkel>
+                </msp_degrotespeelgoedwinkel>-->
+                <msp_podium translate="label" module="msp">
+                    <label>Podium Giftcard</label>
+                    <sort_order>744</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <active translate="label">
+                            <label>Enabled</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </active>
+                        <test_api_pad translate="label comment">
+                            <label>Account type</label>
+                            <frontend_type>select</frontend_type>
+                            
+                            <source_model>msp/config_sources_accounts</source_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </test_api_pad>
+                        <account_id_pad translate="label">
+                            <label>Account ID</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </account_id_pad>
+                        <site_id_pad translate="label">
+                            <label>Site ID</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </site_id_pad>
+                        <secure_code_pad translate="label">
+                            <label>Site Code</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </secure_code_pad>
+                        <api_key_pad translate="label">
+                            <label>API Key</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>51</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </api_key_pad>
+                        <account_id_pad_test translate="label">
+                            <label>Account ID (for Test Accounts)</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>53</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </account_id_pad_test>
+                        <site_id_pad_test translate="label">
+                            <label>Site ID (for Test Accounts)</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>56</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </site_id_pad_test>
+                        <secure_code_pad_test translate="label">
+                            <label>Site Code (for Test Accounts)</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>58</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </secure_code_pad_test>
+                        <api_key_pad_test translate="label">
+                            <label>API Key (for Test Accounts)</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>59</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </api_key_pad_test>
+                        <title translate="label">
+                            <label>Title</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>2</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </title>
+                        <allowed_currency translate="label comment">
+                            <label>Allowed Currency</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <source_model>msp/config_sources_order_currency</source_model>
+                            <sort_order>3</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </allowed_currency>
+                        <allowspecific translate="label">
+                            <label>Receive payments from applicable countries</label>
+                            <frontend_type>allowspecific</frontend_type>
+                            <sort_order>13</sort_order>
+                            <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </allowspecific>
+                        <specificcountry translate="label">
+                            <label>Receive payments from specific countries</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <sort_order>14</sort_order>
+                            <source_model>adminhtml/system_config_source_country</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </specificcountry>
+                        <sort_order translate="label">
+                            <label>Sort order</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>100</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </sort_order>
+                        <instructions translate="label">
+                            <label>Instructions</label>
+                            <frontend_type>textarea</frontend_type>
+                            <sort_order>62</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </instructions>
+                        <fee translate="label">
+                            <label>Enable fee (inc. Tax)</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>70</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </fee>
+                        <fee_amount translate="label">
+                            <label>Payment fee amount</label>
+                            <frontend_type>text</frontend_type>
+                            <comment>Payment fee add like 0:5   this means a fixed fee of 0 euro and 5%</comment>
+                            <sort_order>80</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </fee_amount>
+                        <fee_tax_class>
+                            <label>Tax class for payment fee</label>
+                            <comment>Select which tax class should be used for the payment fee</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>msp/config_sources_taxClasses</source_model>
+                            <sort_order>90</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </fee_tax_class>
+                        <fee_incexc translate="label">
+                            <label>Show payment fee incl. tax during checkout</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>81</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </fee_incexc>
+                        <fee_description translate="label">
+                            <label>Payment fee description, visible in order totals</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>100</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </fee_description>
+                        <specificgroups translate="label">
+                            <label>Payment for Specific Customer Groups</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <sort_order>101</sort_order>
+                            <source_model>msp/config_sources_groups</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </specificgroups>
+                    </fields>
+                </msp_podium>
+                <msp_vvvgiftcard translate="label" module="msp">
+                    <label>VVV Giftcard</label>
+                    <sort_order>744</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <active translate="label">
+                            <label>Enabled</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </active>
+                        <test_api_pad translate="label comment">
+                            <label>Account type</label>
+                            <frontend_type>select</frontend_type>
+                            
+                            <source_model>msp/config_sources_accounts</source_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </test_api_pad>
+                        <account_id_pad translate="label">
+                            <label>Account ID</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </account_id_pad>
+                        <site_id_pad translate="label">
+                            <label>Site ID</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </site_id_pad>
+                        <secure_code_pad translate="label">
+                            <label>Site Code</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </secure_code_pad>
+                        <api_key_pad translate="label">
+                            <label>API Key</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>51</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </api_key_pad>
+                        <account_id_pad_test translate="label">
+                            <label>Account ID (for Test Accounts)</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>53</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </account_id_pad_test>
+                        <site_id_pad_test translate="label">
+                            <label>Site ID (for Test Accounts)</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>56</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </site_id_pad_test>
+                        <secure_code_pad_test translate="label">
+                            <label>Site Code (for Test Accounts)</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>58</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </secure_code_pad_test>
+                        <api_key_pad_test translate="label">
+                            <label>API Key (for Test Accounts)</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>59</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </api_key_pad_test>
+                        <title translate="label">
+                            <label>Title</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>2</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </title>
+                        <allowed_currency translate="label comment">
+                            <label>Allowed Currency</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <source_model>msp/config_sources_order_currency</source_model>
+                            <sort_order>3</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </allowed_currency>
+                        <allowspecific translate="label">
+                            <label>Receive payments from applicable countries</label>
+                            <frontend_type>allowspecific</frontend_type>
+                            <sort_order>13</sort_order>
+                            <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </allowspecific>
+                        <specificcountry translate="label">
+                            <label>Receive payments from specific countries</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <sort_order>14</sort_order>
+                            <source_model>adminhtml/system_config_source_country</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </specificcountry>
+                        <sort_order translate="label">
+                            <label>Sort order</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>100</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </sort_order>
+                        <instructions translate="label">
+                            <label>Instructions</label>
+                            <frontend_type>textarea</frontend_type>
+                            <sort_order>62</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </instructions>
+                        <fee translate="label">
+                            <label>Enable fee (inc. Tax)</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>70</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </fee>
+                        <fee_amount translate="label">
+                            <label>Payment fee amount</label>
+                            <frontend_type>text</frontend_type>
+                            <comment>Payment fee add like 0:5   this means a fixed fee of 0 euro and 5%</comment>
+                            <sort_order>80</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </fee_amount>
+                        <fee_tax_class>
+                            <label>Tax class for payment fee</label>
+                            <comment>Select which tax class should be used for the payment fee</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>msp/config_sources_taxClasses</source_model>
+                            <sort_order>90</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </fee_tax_class>
+                        <fee_incexc translate="label">
+                            <label>Show payment fee incl. tax during checkout</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>81</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </fee_incexc>
+                        <fee_description translate="label">
+                            <label>Payment fee description, visible in order totals</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>100</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </fee_description>
+                        <specificgroups translate="label">
+                            <label>Payment for Specific Customer Groups</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <sort_order>101</sort_order>
+                            <source_model>msp/config_sources_groups</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </specificgroups>
+                    </fields>
+                </msp_vvvgiftcard>
+                <msp_sportenfit translate="label" module="msp">
+                    <label>Sport en Fit Giftcard</label>
+                    <sort_order>744</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <active translate="label">
+                            <label>Enabled</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </active>
+                        <test_api_pad translate="label comment">
+                            <label>Account type</label>
+                            <frontend_type>select</frontend_type>
+                            
+                            <source_model>msp/config_sources_accounts</source_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </test_api_pad>
+                        <account_id_pad translate="label">
+                            <label>Account ID</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </account_id_pad>
+                        <site_id_pad translate="label">
+                            <label>Site ID</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </site_id_pad>
+                        <secure_code_pad translate="label">
+                            <label>Site Code</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </secure_code_pad>
+                        <api_key_pad translate="label">
+                            <label>API Key</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>51</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </api_key_pad>
+                        <account_id_pad_test translate="label">
+                            <label>Account ID (for Test Accounts)</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>53</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </account_id_pad_test>
+                        <site_id_pad_test translate="label">
+                            <label>Site ID (for Test Accounts)</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>56</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </site_id_pad_test>
+                        <secure_code_pad_test translate="label">
+                            <label>Site Code (for Test Accounts)</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>58</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </secure_code_pad_test>
+                        <api_key_pad_test translate="label">
+                            <label>API Key (for Test Accounts)</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>59</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </api_key_pad_test>
+                        <title translate="label">
+                            <label>Title</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>2</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </title>
+                        <allowed_currency translate="label comment">
+                            <label>Allowed Currency</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <source_model>msp/config_sources_order_currency</source_model>
+                            <sort_order>3</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </allowed_currency>
+                        <allowspecific translate="label">
+                            <label>Receive payments from applicable countries</label>
+                            <frontend_type>allowspecific</frontend_type>
+                            <sort_order>13</sort_order>
+                            <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </allowspecific>
+                        <specificcountry translate="label">
+                            <label>Receive payments from specific countries</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <sort_order>14</sort_order>
+                            <source_model>adminhtml/system_config_source_country</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </specificcountry>
+                        <sort_order translate="label">
+                            <label>Sort order</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>100</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </sort_order>
+                        <instructions translate="label">
+                            <label>Instructions</label>
+                            <frontend_type>textarea</frontend_type>
+                            <sort_order>62</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </instructions>
+                        <fee translate="label">
+                            <label>Enable fee (inc. Tax)</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>70</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </fee>
+                        <fee_amount translate="label">
+                            <label>Payment fee amount</label>
+                            <frontend_type>text</frontend_type>
+                            <comment>Payment fee add like 0:5   this means a fixed fee of 0 euro and 5%</comment>
+                            <sort_order>80</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </fee_amount>
+                        <fee_tax_class>
+                            <label>Tax class for payment fee</label>
+                            <comment>Select which tax class should be used for the payment fee</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>msp/config_sources_taxClasses</source_model>
+                            <sort_order>90</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </fee_tax_class>
+                        <fee_incexc translate="label">
+                            <label>Show payment fee incl. tax during checkout</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>81</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </fee_incexc>
+                        <fee_description translate="label">
+                            <label>Payment fee description, visible in order totals</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>100</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </fee_description>
+                        <specificgroups translate="label">
+                            <label>Payment for Specific Customer Groups</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <sort_order>101</sort_order>
+                            <source_model>msp/config_sources_groups</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </specificgroups>
+                    </fields>
+                </msp_sportenfit>
+                <msp_beautyandwellness translate="label" module="msp">
+                    <label>Beauty and Wellness Giftcard</label>
+                    <sort_order>744</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <active translate="label">
+                            <label>Enabled</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </active>
+                        <test_api_pad translate="label comment">
+                            <label>Account type</label>
+                            <frontend_type>select</frontend_type>
+                            
+                            <source_model>msp/config_sources_accounts</source_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </test_api_pad>
+                        <account_id_pad translate="label">
+                            <label>Account ID</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </account_id_pad>
+                        <site_id_pad translate="label">
+                            <label>Site ID</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </site_id_pad>
+                        <secure_code_pad translate="label">
+                            <label>Site Code</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </secure_code_pad>
+                        <api_key_pad translate="label">
+                            <label>API Key</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>51</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </api_key_pad>
+                        <account_id_pad_test translate="label">
+                            <label>Account ID (for Test Accounts)</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>53</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </account_id_pad_test>
+                        <site_id_pad_test translate="label">
+                            <label>Site ID (for Test Accounts)</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>56</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </site_id_pad_test>
+                        <secure_code_pad_test translate="label">
+                            <label>Site Code (for Test Accounts)</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>58</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </secure_code_pad_test>
+                        <api_key_pad_test translate="label">
+                            <label>API Key (for Test Accounts)</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>59</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </api_key_pad_test>
+                        <title translate="label">
+                            <label>Title</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>2</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </title>
+                        <allowed_currency translate="label comment">
+                            <label>Allowed Currency</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <source_model>msp/config_sources_order_currency</source_model>
+                            <sort_order>3</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </allowed_currency>
+                        <allowspecific translate="label">
+                            <label>Receive payments from applicable countries</label>
+                            <frontend_type>allowspecific</frontend_type>
+                            <sort_order>13</sort_order>
+                            <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </allowspecific>
+                        <specificcountry translate="label">
+                            <label>Receive payments from specific countries</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <sort_order>14</sort_order>
+                            <source_model>adminhtml/system_config_source_country</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </specificcountry>
+                        <sort_order translate="label">
+                            <label>Sort order</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>100</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </sort_order>
+                        <instructions translate="label">
+                            <label>Instructions</label>
+                            <frontend_type>textarea</frontend_type>
+                            <sort_order>62</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </instructions>
+                        <fee translate="label">
+                            <label>Enable fee (inc. Tax)</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>70</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </fee>
+                        <fee_amount translate="label">
+                            <label>Payment fee amount</label>
+                            <frontend_type>text</frontend_type>
+                            <comment>Payment fee add like 0:5   this means a fixed fee of 0 euro and 5%</comment>
+                            <sort_order>80</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </fee_amount>
+                        <fee_tax_class>
+                            <label>Tax class for payment fee</label>
+                            <comment>Select which tax class should be used for the payment fee</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>msp/config_sources_taxClasses</source_model>
+                            <sort_order>90</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </fee_tax_class>
+                        <fee_incexc translate="label">
+                            <label>Show payment fee incl. tax during checkout</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>81</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </fee_incexc>
+                        <fee_description translate="label">
+                            <label>Payment fee description, visible in order totals</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>100</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </fee_description>
+                        <specificgroups translate="label">
+                            <label>Payment for Specific Customer Groups</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <sort_order>101</sort_order>
+                            <source_model>msp/config_sources_groups</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </specificgroups>
+                    </fields>
+                </msp_beautyandwellness>
             </groups>
-        </msp>
+        </msp_giftcards>
+
         <!-- end: MSP Gateways -->
         <!-- begin: MSP Fast Checkout -->
         <mspcheckout translate="label" module="msp">
-            <label>MultiSafepay - Fast Checkout - 2.1.2</label>
-            <tab>sales</tab>
+            <label><![CDATA[<div style="display:inline-block;color:#000000;font-family:Tahoma, Geneva, sans-serif;">Fast</div><div style="display:inline-block;color:#ff7e03;font-family:Tahoma, Geneva, sans-serif;">Checkout</div>]]></label>
+            <tab>ms</tab>
             <frontend_type>text</frontend_type>
-            <sort_order>1001</sort_order>
+            <sort_order>1040</sort_order>
             <show_in_default>1</show_in_default>
             <show_in_website>1</show_in_website>
             <show_in_store>1</show_in_store>
@@ -5296,6 +5896,16 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </api_key>
+                        <disable_checkout>
+                            <label>Disable normal checkout</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <comment>When you only offer Fastcheckout you can use this option to disable the normal checkout (hides the buttons to go to the checkout)</comment>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </disable_checkout>
                         <allow_fcofeed translate="label comment">
                             <label>Allow FastCheckout Product Feed</label>
                             <comment>With this option enabled, FastCheckout can request your productfeed if configured at FastCheckout</comment>
@@ -5656,280 +6266,6 @@
                         </account>
                     </fields>
                 </checkout_google_analytics>
-                <!--<checkout_shipping_pickup translate="label">-->
-                <!--<label>Shipping - Pickup</label>-->
-                <!--<frontend_type>text</frontend_type>-->
-                <!--<sort_order>34</sort_order>-->
-                <!--<show_in_default>1</show_in_default>-->
-                <!--<show_in_website>1</show_in_website>-->
-                <!--<show_in_store>0</show_in_store>-->
-                <!--<fields>-->
-                <!--<active>-->
-                <!--<label>Enable Pickup</label>-->
-                <!--<frontend_type>select</frontend_type>-->
-                <!--<source_model>adminhtml/system_config_source_yesno</source_model>-->
-                <!--<sort_order>10</sort_order>-->
-                <!--<show_in_default>1</show_in_default>-->
-                <!--<show_in_website>1</show_in_website>-->
-                <!--<show_in_store>0</show_in_store>-->
-                <!--</active>-->
-                <!--<title>-->
-                <!--<label>Pickup Title</label>-->
-                <!--<frontend_type>text</frontend_type>-->
-                <!--<sort_order>20</sort_order>-->
-                <!--<show_in_default>1</show_in_default>-->
-                <!--<show_in_website>1</show_in_website>-->
-                <!--<show_in_store>0</show_in_store>-->
-                <!--</title>-->
-                <!--<price>-->
-                <!--<label>Pickup Price</label>-->
-                <!--<frontend_type>text</frontend_type>-->
-                <!--<sort_order>30</sort_order>-->
-                <!--<show_in_default>1</show_in_default>-->
-                <!--<show_in_website>1</show_in_website>-->
-                <!--<show_in_store>0</show_in_store>-->
-                <!--</price>-->
-                <!--</fields>-->
-                <!--</checkout_shipping_pickup>-->
-                <!--<checkout_shipping_tablerate>-->
-                <!--<label>Shipping - Table Rates</label>-->
-                <!--<frontend_type>text</frontend_type>-->
-                <!--<sort_order>35</sort_order>-->
-                <!--<show_in_default>1</show_in_default>-->
-                <!--<show_in_website>1</show_in_website>-->
-                <!--<show_in_store>0</show_in_store>-->
-                <!--<fields>-->
-                <!--<active translate="label">-->
-                <!--<label>Enable Table Rates</label>-->
-                <!--<frontend_type>select</frontend_type>-->
-                <!--<source_model>adminhtml/system_config_source_yesno</source_model>-->
-                <!--<comment>This will enable the Table Rates method configured at Shipping Methods -> Table Rates</comment>-->
-                <!--<sort_order>10</sort_order>-->
-                <!--<show_in_default>1</show_in_default>-->
-                <!--<show_in_website>1</show_in_website>-->
-                <!--<show_in_store>0</show_in_store>-->
-                <!--</active>-->
-                <!--</fields>-->
-                <!--</checkout_shipping_tablerate>-->
-                <!--<checkout_shipping_flatrate translate="label">-->
-                <!--<label>Shipping - Flat Rate</label>-->
-                <!--<frontend_type>text</frontend_type>-->
-                <!--<sort_order>36</sort_order>-->
-                <!--<show_in_default>1</show_in_default>-->
-                <!--<show_in_website>1</show_in_website>-->
-                <!--<show_in_store>0</show_in_store>-->
-                <!--<fields>-->
-                <!--<active translate="label">-->
-                <!--<label>Enable Flat Rate</label>-->
-                <!--<frontend_type>select</frontend_type>-->
-                <!--<source_model>adminhtml/system_config_source_yesno</source_model>-->
-                <!--<sort_order>10</sort_order>-->
-                <!--<show_in_default>1</show_in_default>-->
-                <!--<show_in_website>1</show_in_website>-->
-                <!--<show_in_store>0</show_in_store>-->
-                <!--</active>-->
-                <!--<title_1 translate="label">-->
-                <!--<label>Rate 1 Title</label>-->
-                <!--<frontend_type>text</frontend_type>-->
-                <!--<sort_order>20</sort_order>-->
-                <!--<show_in_default>1</show_in_default>-->
-                <!--<show_in_website>1</show_in_website>-->
-                <!--<show_in_store>0</show_in_store>-->
-                <!--</title_1>-->
-                <!--<price_1 translate="label">-->
-                <!--<label>Rate 1 Amount</label>-->
-                <!--<frontend_type>text</frontend_type>-->
-                <!--<sort_order>22</sort_order>-->
-                <!--<show_in_default>1</show_in_default>-->
-                <!--<show_in_website>1</show_in_website>-->
-                <!--<show_in_store>0</show_in_store>-->
-                <!--</price_1>-->
-                <!--<sallowspecific_1 translate="label">-->
-                <!--<label>Rate 1 Ship To Applicable Countries</label>-->
-                <!--<frontend_type>select</frontend_type>-->
-                <!--<sort_order>24</sort_order>-->
-                <!--<source_model>adminhtml/system_config_source_shipping_allspecificcountries</source_model>-->
-                <!--<frontend_model>googlecheckout/adminhtml_shipping_applicable_countries</frontend_model>-->
-                <!--<show_in_default>1</show_in_default>-->
-                <!--<show_in_website>1</show_in_website>-->
-                <!--<show_in_store>0</show_in_store>-->
-                <!--<can_be_empty>1</can_be_empty>-->
-                <!--</sallowspecific_1>-->
-                <!--<specificcountry_1 translate="label">-->
-                <!--<label>Rate 1 Ship to Specific Countries</label>-->
-                <!--<frontend_type>multiselect</frontend_type>-->
-                <!--<sort_order>26</sort_order>-->
-                <!--<source_model>adminhtml/system_config_source_country</source_model>-->
-                <!--<show_in_default>1</show_in_default>-->
-                <!--<show_in_website>1</show_in_website>-->
-                <!--<show_in_store>0</show_in_store>-->
-                <!--<can_be_empty>1</can_be_empty>-->
-                <!--</specificcountry_1>-->
-                <!--<title_2 translate="label">-->
-                <!--<label>Rate 2 Title</label>-->
-                <!--<frontend_type>text</frontend_type>-->
-                <!--<sort_order>30</sort_order>-->
-                <!--<show_in_default>1</show_in_default>-->
-                <!--<show_in_website>1</show_in_website>-->
-                <!--<show_in_store>0</show_in_store>-->
-                <!--</title_2>-->
-                <!--<price_2 translate="label">-->
-                <!--<label>Rate 2 Amount</label>-->
-                <!--<frontend_type>text</frontend_type>-->
-                <!--<sort_order>32</sort_order>-->
-                <!--<show_in_default>1</show_in_default>-->
-                <!--<show_in_website>1</show_in_website>-->
-                <!--<show_in_store>0</show_in_store>-->
-                <!--</price_2>-->
-                <!--<sallowspecific_2 translate="label">-->
-                <!--<label>Rate 2 Ship To Applicable Countries</label>-->
-                <!--<frontend_type>select</frontend_type>-->
-                <!--<sort_order>34</sort_order>-->
-                <!--<source_model>adminhtml/system_config_source_shipping_allspecificcountries</source_model>-->
-                <!--<frontend_model>googlecheckout/adminhtml_shipping_applicable_countries</frontend_model>-->
-                <!--<show_in_default>1</show_in_default>-->
-                <!--<show_in_website>1</show_in_website>-->
-                <!--<show_in_store>0</show_in_store>-->
-                <!--<can_be_empty>1</can_be_empty>-->
-                <!--</sallowspecific_2>-->
-                <!--<specificcountry_2 translate="label">-->
-                <!--<label>Rate 2 Ship to Specific Countries</label>-->
-                <!--<frontend_type>multiselect</frontend_type>-->
-                <!--<sort_order>36</sort_order>-->
-                <!--<source_model>adminhtml/system_config_source_country</source_model>-->
-                <!--<show_in_default>1</show_in_default>-->
-                <!--<show_in_website>1</show_in_website>-->
-                <!--<show_in_store>0</show_in_store>-->
-                <!--<can_be_empty>1</can_be_empty>-->
-                <!--</specificcountry_2>-->
-                <!--<title_3 translate="label">-->
-                <!--<label>Rate 3 Title</label>-->
-                <!--<frontend_type>text</frontend_type>-->
-                <!--<sort_order>40</sort_order>-->
-                <!--<show_in_default>1</show_in_default>-->
-                <!--<show_in_website>1</show_in_website>-->
-                <!--<show_in_store>0</show_in_store>-->
-                <!--</title_3>-->
-                <!--<price_3 translate="label">-->
-                <!--<label>Rate 3 Amount</label>-->
-                <!--<frontend_type>text</frontend_type>-->
-                <!--<sort_order>42</sort_order>-->
-                <!--<show_in_default>1</show_in_default>-->
-                <!--<show_in_website>1</show_in_website>-->
-                <!--<show_in_store>0</show_in_store>-->
-                <!--</price_3>-->
-                <!--<sallowspecific_3 translate="label">-->
-                <!--<label>Rate 3 Ship To Applicable Countries</label>-->
-                <!--<frontend_type>select</frontend_type>-->
-                <!--<sort_order>44</sort_order>-->
-                <!--<source_model>adminhtml/system_config_source_shipping_allspecificcountries</source_model>-->
-                <!--<frontend_model>googlecheckout/adminhtml_shipping_applicable_countries</frontend_model>-->
-                <!--<show_in_default>1</show_in_default>-->
-                <!--<show_in_website>1</show_in_website>-->
-                <!--<show_in_store>0</show_in_store>-->
-                <!--<can_be_empty>1</can_be_empty>-->
-                <!--</sallowspecific_3>-->
-                <!--<specificcountry_3 translate="label">-->
-                <!--<label>Rate 3 Ship to Specific Countries</label>-->
-                <!--<frontend_type>multiselect</frontend_type>-->
-                <!--<sort_order>46</sort_order>-->
-                <!--<source_model>adminhtml/system_config_source_country</source_model>-->
-                <!--<show_in_default>1</show_in_default>-->
-                <!--<show_in_website>1</show_in_website>-->
-                <!--<show_in_store>0</show_in_store>-->
-                <!--<can_be_empty>1</can_be_empty>-->
-                <!--</specificcountry_3>-->
-                <!--</fields>-->
-                <!--</checkout_shipping_flatrate>-->
-                <!--<freeshipping translate="label">-->
-                <!--<label>Shipping - Free Shipping</label>-->
-                <!--<frontend_type>text</frontend_type>-->
-                <!--<sort_order>40</sort_order>-->
-                <!--<show_in_default>1</show_in_default>-->
-                <!--<show_in_website>1</show_in_website>-->
-                <!--<show_in_store>1</show_in_store>-->
-                <!--<fields>-->
-                <!--<active translate="label">-->
-                <!--<label>Enabled</label>-->
-                <!--<frontend_type>select</frontend_type>-->
-                <!--<source_model>adminhtml/system_config_source_yesno</source_model>-->
-                <!--<sort_order>1</sort_order>-->
-                <!--<show_in_default>1</show_in_default>-->
-                <!--<show_in_website>1</show_in_website>-->
-                <!--<show_in_store>0</show_in_store>-->
-                <!--</active>-->
-                <!--<free_shipping_subtotal translate="label">-->
-                <!--<label>Minimum Order Amount</label>-->
-                <!--<frontend_type>text</frontend_type>-->
-                <!--<validate>validate-number validate-zero-or-greater</validate>-->
-                <!--<sort_order>4</sort_order>-->
-                <!--<show_in_default>1</show_in_default>-->
-                <!--<show_in_website>1</show_in_website>-->
-                <!--<show_in_store>0</show_in_store>-->
-                <!--</free_shipping_subtotal>-->
-                <!--<name translate="label">-->
-                <!--<label>Method Name</label>-->
-                <!--<frontend_type>text</frontend_type>-->
-                <!--<sort_order>3</sort_order>-->
-                <!--<show_in_default>1</show_in_default>-->
-                <!--<show_in_website>1</show_in_website>-->
-                <!--<show_in_store>1</show_in_store>-->
-                <!--</name>-->
-                <!--<sort_order translate="label">-->
-                <!--<label>Sort Order</label>-->
-                <!--<frontend_type>text</frontend_type>-->
-                <!--<sort_order>100</sort_order>-->
-                <!--<show_in_default>1</show_in_default>-->
-                <!--<show_in_website>1</show_in_website>-->
-                <!--<show_in_store>0</show_in_store>-->
-                <!--</sort_order>-->
-                <!--<title translate="label">-->
-                <!--<label>Title</label>-->
-                <!--<frontend_type>text</frontend_type>-->
-                <!--<sort_order>2</sort_order>-->
-                <!--<show_in_default>1</show_in_default>-->
-                <!--<show_in_website>1</show_in_website>-->
-                <!--<show_in_store>1</show_in_store>-->
-                <!--</title>-->
-                <!--<sallowspecific translate="label">-->
-                <!--<label>Ship to Applicable Countries</label>-->
-                <!--<frontend_type>select</frontend_type>-->
-                <!--<sort_order>90</sort_order>-->
-                <!--<frontend_class>shipping-applicable-country</frontend_class>-->
-                <!--<source_model>adminhtml/system_config_source_shipping_allspecificcountries</source_model>-->
-                <!--<show_in_default>1</show_in_default>-->
-                <!--<show_in_website>1</show_in_website>-->
-                <!--<show_in_store>0</show_in_store>-->
-                <!--</sallowspecific>-->
-                <!--<specificcountry translate="label">-->
-                <!--<label>Ship to Specific Countries</label>-->
-                <!--<frontend_type>multiselect</frontend_type>-->
-                <!--<sort_order>91</sort_order>-->
-                <!--<source_model>adminhtml/system_config_source_country</source_model>-->
-                <!--<show_in_default>1</show_in_default>-->
-                <!--<show_in_website>1</show_in_website>-->
-                <!--<show_in_store>0</show_in_store>-->
-                <!--<can_be_empty>1</can_be_empty>-->
-                <!--</specificcountry>-->
-                <!--<showmethod translate="label">-->
-                <!--<label>Show Method if Not Applicable</label>-->
-                <!--<frontend_type>select</frontend_type>-->
-                <!--<sort_order>92</sort_order>-->
-                <!--<source_model>adminhtml/system_config_source_yesno</source_model>-->
-                <!--<show_in_default>1</show_in_default>-->
-                <!--<show_in_website>1</show_in_website>-->
-                <!--<show_in_store>0</show_in_store>-->
-                <!--</showmethod>-->
-                <!--<specificerrmsg translate="label">-->
-                <!--<label>Displayed Error Message</label>-->
-                <!--<frontend_type>textarea</frontend_type>-->
-                <!--<sort_order>80</sort_order>-->
-                <!--<show_in_default>1</show_in_default>-->
-                <!--<show_in_website>1</show_in_website>-->
-                <!--<show_in_store>1</show_in_store>-->
-                <!--</specificerrmsg>-->
-                <!--</fields>-->
-                <!--</freeshipping>-->
             </groups>
         </mspcheckout>
         <!-- end: MSP Fast Checkout -->

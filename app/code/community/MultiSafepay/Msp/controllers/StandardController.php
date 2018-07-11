@@ -92,18 +92,27 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
      * Return after transaction
      */
     public function returnAction() {
-        //$this->notificationAction(true);
-        // Fix for emptying cart after success
-        // $this->getOnepage()->getQuote()->setIsActive(false);
-        // $this->getOnepage()->getQuote()->save();
+       $transactionId = $this->getRequest()->getQuery('transactionid');
 
+        /** @var $session Mage_Checkout_Model_Session */
         $session = Mage::getSingleton("checkout/session");
         $session->unsQuoteId();
         $session->getQuote()->setIsActive(false)->save();
 
+        // set some vars for the success page
+        $session->setLastSuccessQuoteId($transactionId);
+        $session->setLastQuoteId($transactionId);
+
+        /** @var $order Mage_Sales_Model_Order */
+        //$order = Mage::getSingleton('sales/order')->loadByAttribute('ext_order_id', $transactionId);
+        $order = Mage::getModel('sales/order')->loadByIncrementId($transactionId);
+        $session->setLastOrderId($order->getId());
+        $session->setLastRealOrderId($order->getIncrementId());
+        
         // End fix
-        $this->_redirect("checkout/onepage/success?utm_nooverride=1", array("_secure" => true));
+        $this->_redirect("checkout/onepage/success/", array("_secure" => true));
     }
+
 
     /**
      * @return Mage_Checkout_Model_Type_Onepage

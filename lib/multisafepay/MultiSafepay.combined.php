@@ -43,6 +43,7 @@ class MultiSafepay {
         'user_agent' => '',
         'referrer' => '',
         'bankaccount' => '',
+        'gender'    => '',
         'birthday' => ''
     );
     // customer-delivery data
@@ -83,6 +84,7 @@ class MultiSafepay {
         'birthday' => '',
         'phone' => '',
         'email' => '',
+        'gender' => '',
         'issuer' => ''
     );
     var $plugin = array(
@@ -890,6 +892,7 @@ class MultiSafepay {
 				<user_agent>' . $this->xmlEscape($this->customer['user_agent']) . '</user_agent>
 				<birthday>' . $this->xmlEscape($this->customer['birthday']) . '</birthday>
 				<bankaccount>' . $this->xmlEscape($this->customer['bankaccount']) . '</bankaccount>
+                <gender>' . $this->xmlEscape($this->customer['gender']) . '</gender>
 			</customer>
 			<customer-delivery>
 				<firstname>' . $this->xmlEscape($this->delivery['firstname']) . '</firstname>
@@ -912,6 +915,7 @@ class MultiSafepay {
 				<referrer>' . $this->xmlEscape($this->gatewayinfo['referrer']) . '</referrer>
 				<user_agent>' . $this->xmlEscape($this->gatewayinfo['user_agent']) . '</user_agent>
 				<birthday>' . $this->xmlEscape($this->gatewayinfo['birthday']) . '</birthday>
+                <gender>' . $this->xmlEscape($this->gatewayinfo['gender']) . '</gender>
 				<bankaccount>' . $this->xmlEscape($this->gatewayinfo['bankaccount']) . '</bankaccount>
 				<phone>' . $this->xmlEscape($this->gatewayinfo['phone']) . '</phone>
 				<email>' . $this->xmlEscape($this->gatewayinfo['email']) . '</email>
@@ -1183,15 +1187,10 @@ class MultiSafepay {
      * Returns the string escaped for use in XML documents
      */
 
-    function xmlEscape($str) {
-        $ts = array("/[�-�]/", "/�/", "/�/", "/[�-�]/", "/[�-�]/", "/�/", "/�/", "/[�-��]/", "/�/", "/[�-�]/", "/[�-�]/", "/[�-�]/", "/�/", "/�/", "/[�-�]/", "/[�-�]/", "/�/", "/�/", "/[�-��]/", "/�/", "/[�-�]/", "/[�-�]/");
-        $tn = array("A", "AE", "C", "E", "I", "D", "N", "O", "X", "U", "Y", "a", "ae", "c", "e", "i", "d", "n", "o", "x", "u", "y");
-
-        $str = preg_replace($ts, $tn, $str);
-        $str = mb_convert_encoding($str, 'UTF-8');
-        //$str = htmlspecialchars($string, ENT_QUOTES);
-        return htmlspecialchars($str, ENT_COMPAT, "UTF-8");
-    }
+    function xmlEscape($str) 
+   {
+   return htmlspecialchars($str, ENT_COMPAT, "UTF-8");
+   }
 
     /*
      * Returns the string with all XML escaping removed
@@ -3219,15 +3218,10 @@ class MspItem {
      * @param double $numeric_weight the weight of the item
      * 
      */
-    function xmlEscape($str) {
-        $ts = array("/[�-�]/", "/�/", "/�/", "/[�-�]/", "/[�-�]/", "/�/", "/�/", "/[�-��]/", "/�/", "/[�-�]/", "/[�-�]/", "/[�-�]/", "/�/", "/�/", "/[�-�]/", "/[�-�]/", "/�/", "/�/", "/[�-��]/", "/�/", "/[�-�]/", "/[�-�]/");
-        $tn = array("A", "AE", "C", "E", "I", "D", "N", "O", "X", "U", "Y", "a", "ae", "c", "e", "i", "d", "n", "o", "x", "u", "y");
-
-        $str = preg_replace($ts, $tn, $str);
-        $str = mb_convert_encoding($str, 'UTF-8');
-        //$str = htmlspecialchars($string, ENT_QUOTES);
-        return htmlspecialchars($str, ENT_COMPAT, "UTF-8");
-    }
+    function xmlEscape($str) 
+   {
+   return htmlspecialchars($str, ENT_COMPAT, "UTF-8");
+   }
 
     /*
      * Returns the string with all XML escaping removed

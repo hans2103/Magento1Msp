@@ -11,7 +11,7 @@ class MultiSafepay_Msp_Block_IdealIssuers extends Mage_Payment_Block_Form {
      * Construct
      */
     protected function _construct() {
-        $gateway_select = Mage::getStoreConfig("msp/msp_ideal/bank_select");
+        $gateway_select = Mage::getStoreConfig("msp_gateways/msp_ideal/bank_select");
         if ($gateway_select) {
             parent::_construct();
             $this->setTemplate('msp/idealissuers.phtml');

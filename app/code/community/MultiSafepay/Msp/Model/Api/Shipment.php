@@ -94,7 +94,7 @@ class MultiSafepay_Msp_Model_Api_Shipment extends MultiSafepay {
             $logData = $data;
         }
 
-        Mage::log($logData, null, 'msp_pdashipping');
+        Mage::log($logData, null, 'msp_pad_shipping');
     }
 
 }

@@ -25,6 +25,7 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
     protected $_canRefund = true;
     protected $_canRefundInvoicePartial = true;
     public $payment;
+    public $_configCode= 'msp';
 
     const MSP_GENERAL_CODE = 'msp';
     const MSP_FASTCHECKOUT_CODE = 'mspcheckout';
@@ -47,6 +48,10 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
         'msp_webgift',
         'msp_ebon',
         'msp_babygiftcard',
+        'msp_podium',
+        'msp_vvvgiftcard',
+        'msp_sportenfit',
+        'msp_beautyandwellness',
         'msp_boekenbon',
         'msp_erotiekbon',
         'msp_parfumnl',
@@ -63,9 +68,51 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
         'msp_lief',
         'msp_gezondheidsbon',
         'msp_fashioncheque',
+        'msp_fashiongiftcard',
+    );
+    
+    public $giftcards = array(
+        'msp_webgift',
+        'msp_ebon',
+        'msp_babygiftcard',
+        'msp_boekenbon',
+        'msp_erotiekbon',
+        'msp_parfumnl',
+        'msp_parfumcadeaukaart',
+        'msp_degrotespeelgoedwinkel',
+        'msp_yourgift',
+        'msp_wijncadeau',
+        'msp_lief',
+        'msp_gezondheidsbon',
+        'msp_fashioncheque',
+        'msp_fashiongiftcard',
+        'msp_podium',
+        'msp_vvvgiftcard',
+        'msp_sportenfit',
+        'msp_beautyandwellness',
+    );
+
+    
+    public $gateways = array(
+        'msp_ideal',
+        'msp_payafter',
+        'msp_klarna',
+        'msp_mistercash',
+        'msp_visa',
+        'msp_mastercard',
+        'msp_banktransfer',
+        'msp_maestro',
+        'msp_paypal',
+        'msp_giropay',
+        'msp_multisafepay',
+        'msp_directebanking',
+        'msp_directdebit',
+        'msp_amex',
+     
     );
 
     public function __construct() {
+	   
         if ($this->_code == 'msp') {
             $currencies = explode(',', $this->getConfigData('allowed_currency'));
             $isAllowConvert = $this->getConfigData('allow_convert_currency');
@@ -80,9 +127,20 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
                 }
             }
         } else {
-            $currencies = explode(',', Mage::getStoreConfig('msp/' . $this->_code . '/allowed_currency'));
-            $isAllowConvert = Mage::getStoreConfigFlag('msp/settings/allow_convert_currency');
-
+	       
+	        if(in_array($this->_code, $this->gateways)){
+		        $this->_configCode = 'msp_gateways';
+		        $this->_module = 'msp_gateways';
+            	$currencies = explode(',', Mage::getStoreConfig('msp_gateways/' . $this->_code . '/allowed_currency'));
+				$isAllowConvert = Mage::getStoreConfigFlag('msp/settings/allow_convert_currency');
+			}elseif(in_array($this->_code, $this->giftcards)){   
+				$this->_configCode = 'msp_giftcards';  
+				$this->_module = 'msp_giftcards';       	
+				$currencies = explode(',', Mage::getStoreConfig('msp_giftcards/' . $this->_code . '/allowed_currency'));
+				$isAllowConvert = Mage::getStoreConfigFlag('msp/settings/allow_convert_currency');
+			}
+			
+   	
             if ($isAllowConvert) {
                 $this->_canUseCheckout = true;
             } else {
@@ -93,22 +151,21 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
                 }
             }
         }
-        if (Mage::getSingleton('customer/session')->isLoggedIn()) {
-            $customer = Mage::getSingleton('customer/session');
-            $data = $customer->getCustomer();
-
-            $group_id = $data->getGroupId();
-            $specificgroups = explode(",", $this->getConfigData('specificgroups'));
-            $selectedgroup = trim($this->getConfigData('specificgroups'));
-
-            if (!in_array($group_id, $specificgroups) && $selectedgroup !== "") {
-                $this->_canUseCheckout = false;
-            }
-        } else {
-            if (trim($this->getConfigData('specificgroups')) !== "") {
-                $this->_canUseCheckout = false;
-            }
-        }
+        
+        
+ 	 
+ 	    $group_id = 0; // If not logged in, customer group id is 0
+        if (Mage::getSingleton('customer/session')->isLoggedIn()) { // If logged in, set customer group id
+			$group_id = Mage::getSingleton('customer/session')->getCustomer()->getGroupId();
+		}
+		$option = trim(Mage::getStoreConfig($this->_configCode.'/' . $this->_code . '/specificgroups'));
+		$specificgroups = explode(",", $option);
+		// If customer group is not in available groups and config option is not empty, disable this gateway
+		if (!in_array($group_id, $specificgroups) && $option !== "") {
+			$this->_canUseCheckout = false;
+		}
+		
+		  
     }
 
     // For 1.3.2.4
@@ -119,7 +176,8 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
 
     public function setSortOrder($order) {
         // Magento tries to set the order from payment/, instead of our msp/
-        $this->sort_order = $this->getConfigData('sort_order');
+
+        $this->sort_order = Mage::getStoreConfig($this->_configCode.'/' . $this->_code . '/sort_order'); 
     }
 
     /**
@@ -175,6 +233,8 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
 
         // merge
         $config = array_merge($configSettings, $configGateway);
+
+
 
         // payment
         $payment->setConfigObject($config);
@@ -308,12 +368,6 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
 
     public function refund(Varien_Object $payment, $amount) {
         $order = $payment->getOrder();
-
-
-
-
-
-
         $payment = $order->getPayment()->getMethodInstance();
 
         switch ($payment->getCode()) {
@@ -353,6 +407,23 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
         if (!in_array($payment->getCode(), $this->availablePaymentMethodCodes)) {
             Mage::getSingleton('adminhtml/session')->addNotice(Mage::helper('msp')->__('Refund has not been send to MultiSafepay. Looks like a non MultiSafepay payment method was selected'));
             return $this;
+        }
+
+
+        //get account data from correct gateway settings for pad klarna and coupons.
+        if (isset($config['test_api_pad'])) {
+            if ($config['test_api_pad'] == 'test') {
+                $config['test_api'] = 'test';
+                $config['account_id'] = $config['account_id_pad_test'];
+                $config['site_id'] = $config['site_id_pad_test'];
+                $config['site_code'] = $config['secure_code_pad_test'];
+                $config['api_key'] = $config['api_key_pad_test'];
+            } else {
+                $config['account_id'] = $config['account_id_pad'];
+                $config['site_id'] = $config['site_id_pad'];
+                $config['site_code'] = $config['secure_code_pad'];
+                $config['api_key'] = $config['api_key_pad'];
+            }
         }
 
         // build request

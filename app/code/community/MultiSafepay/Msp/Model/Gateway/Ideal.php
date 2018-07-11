@@ -14,7 +14,7 @@ class MultiSafepay_Msp_Model_Gateway_Ideal extends MultiSafepay_Msp_Model_Gatewa
 
     public function assignData($data) {
         parent::assignData($data);
-        $session = Mage::getSingleton('core/session');
+        $session = Mage::getSingleton('checkout/session');
         $session->setData('payment_additional', $data);
         return $this;
     }

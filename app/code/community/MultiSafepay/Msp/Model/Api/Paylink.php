@@ -68,6 +68,11 @@ class MultiSafepay_Msp_Model_Api_Paylink {
         'msp_lief',
         'msp_gezondheidsbon',
         'msp_fashioncheque',
+        'msp_fashiongiftcard',
+        'msp_podium',
+        'msp_vvvgiftcard',
+        'msp_sportenfit',
+        'msp_beautyandwellness',
     );
 
     /**
@@ -83,7 +88,7 @@ class MultiSafepay_Msp_Model_Api_Paylink {
 
         $payment = $order->getPayment()->getMethodInstance();
         $pm_code = $payment->getCode();
-        $storename = Mage::app()->getStore()->getName();
+         $storename = strtok($order->getStoreName(), "\n");//Mage::app()->getStore()->getName();
         $billing = $order->getBillingAddress();
         $shipping = $order->getShippingAddress();
 

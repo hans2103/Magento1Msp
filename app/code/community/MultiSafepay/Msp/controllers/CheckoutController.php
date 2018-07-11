@@ -43,7 +43,8 @@ class MultiSafepay_Msp_CheckoutController extends Mage_Core_Controller_Front_Act
         $oldQuote = $session->getQuote();
         $oldQuote->setIsActive(false)->save();
         $session->replaceQuote($storeQuote);
-        Mage::getModel('checkout/cart')->init()->save();
+        Mage::getModel('checkout/cart')->init();
+        Mage::getModel('checkout/cart')->save();
 
         // checkout
         $checkoutLink = $checkout->startCheckout();
@@ -99,7 +100,7 @@ class MultiSafepay_Msp_CheckoutController extends Mage_Core_Controller_Front_Act
         if ($config["redirect_to_account"]) {
             $this->_redirect("customer/account?utm_nooverride=1", array("_secure" => true));
         } else {
-            $this->_redirect("checkout/onepage/success?utm_nooverride=1", array("_secure" => true));
+            $this->_redirect("checkout/onepage/success/", array("_secure" => true));
         }
     }
 

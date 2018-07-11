@@ -43,6 +43,11 @@ class MultiSafepay_Msp_Model_Observer_Order extends MultiSafepay_Msp_Model_Obser
         'msp_paypal',
         'msp_gezondheidsbon',
         'msp_fashioncheque',
+        'msp_fashiongiftcard',
+        'msp_podium',
+        'msp_vvvgiftcard',
+        'msp_sportenfit',
+        'msp_beautyandwellness',
     );
 
     public function sales_order_place_after(Varien_Event_Observer $observer) {
