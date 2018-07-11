@@ -1113,8 +1113,9 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object
         $payment_data = $session->getData('payment_additional');
 
         if (is_object($payment_data)) {
-            if (!empty($payment_data->msp_ideal_bank)) {
-                $ideal_issuer = $payment_data->msp_ideal_bank;
+            $iss = $payment_data->msp_ideal_bank;
+            if (!empty($iss)) {
+                $ideal_issuer = $iss;
             } elseif ($this->_gateway == "CREDITCARD") {
                 $api->transaction['gateway'] = $payment_data->msp_creditcard_cc;
             }
