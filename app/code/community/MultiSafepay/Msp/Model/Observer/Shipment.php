@@ -9,6 +9,7 @@ class MultiSafepay_Msp_Model_Observer_Shipment extends MultiSafepay_Msp_Model_Ob
 
     public $availablePaymentMethodCodes = array(
         'msp_payafter',
+        'msp_einvoice',
         'msp_klarna',
     );
 

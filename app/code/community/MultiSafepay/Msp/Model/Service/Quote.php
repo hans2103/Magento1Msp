@@ -11,7 +11,9 @@ class MultiSafepay_Msp_Model_Service_Quote extends Mage_Sales_Model_Service_Quot
         'msp',
         //'mspcheckout', 
         'msp_ideal',
+        'msp_dotpay',
         'msp_payafter',
+        'msp_einvoice',
         'msp_mistercash',
         'msp_visa',
         'msp_mastercard',
@@ -59,6 +61,7 @@ class MultiSafepay_Msp_Model_Service_Quote extends Mage_Sales_Model_Service_Quot
             if (Mage::getStoreConfig('payment/msp/keep_cart', $this->_quote->getStoreId()) ||
                     Mage::getStoreConfig('msp/settings/keep_cart', $this->_quote->getStoreId()) ||
                     $this->_quote->getPayment()->getMethod() == 'msp_payafter' ||
+                    $this->_quote->getPayment()->getMethod() == 'msp_einvoice' ||
                     $this->_quote->getPayment()->getMethod() == 'msp_klarna') {
 
                 $this->_quote->setIsActive(true)->save();

@@ -45,7 +45,9 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
     );
     public $gateways = array(
         'msp_ideal',
+        'msp_dotpay',
         'msp_payafter',
+        'msp_einvoice',
         'msp_klarna',
         'msp_mistercash',
         'msp_visa',
@@ -259,8 +261,11 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
 
         $currentCurrencyCode = Mage::app()->getStore()->getCurrentCurrencyCode();
         $baseCurrencyCode = Mage::app()->getBaseCurrencyCode();
-
-        if ($canUseCurrentCurrency) {
+        
+		if($order->getGlobalCurrencyCode() == 'EUR' && Mage::getStoreConfigFlag('msp/settings/allow_convert_currency')){
+			$amount = $order_base_grand_total;
+            $currencyCode = 'EUR';
+		}elseif ($canUseCurrentCurrency) {
             $amount = $checked_amount_current;
             $currencyCode = $currentCurrencyCode;
         } elseif ($isAllowConvert) {
@@ -351,6 +356,14 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
         }
 
 
+        if (isset($_GET['phonenumber'])) {
+            $this->api->gatewayinfo['phone'] = $_GET['phonenumber'];
+            $this->api->customer['phone'] = $_GET['phonenumber'];
+        } else {
+            $this->api->gatewayinfo['phone'] = ''; //not available
+        }
+        
+        
         if (isset($_GET['accountnumber'])) {
             $this->api->gatewayinfo['bankaccount'] = $_GET['accountnumber'];
             $this->api->customer['bankaccount'] = $_GET['accountnumber'];
@@ -372,7 +385,11 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
             $this->api->gatewayinfo['birthday'] = ''; //not available
         }
 
-        if ($this->api->gatewayinfo['bankaccount'] != '' && $this->api->customer['birthday'] != '') {
+        if (($this->_gateway == "PAYAFTER" || $this->_gateway =="KLARNA") && $this->api->gatewayinfo['bankaccount'] != '' && $this->api->customer['birthday'] != '') {
+            $this->api->transaction['special'] = true;
+        }
+        
+        if ($this->_gateway == "EINVOICE") {
             $this->api->transaction['special'] = true;
         }
 
@@ -883,13 +900,6 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
           } */
 
         $gateway_data = $quote->getPayment()->getData();
-        if ($gateway_data['method'] === 'msp_directebanking' ) {
-			$gateway = 'DIRECTBANK';
-		}else{
-        $gateway = strtoupper(str_replace("msp_", '', $gateway_data['method']));
-		}	
-        //$gateway = strtoupper(str_replace("msp_", '', $gateway_data['method']));
-
 
         if (in_array($gateway_data['method'], $this->gateways)) {
             $this->_configCode = 'msp_gateways';
@@ -909,7 +919,10 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
 
         $canUseCurrentCurrency = in_array(Mage::app()->getStore()->getCurrentCurrencyCode(), $currencies);
 
-        if ($canUseCurrentCurrency) {
+        if($order->getGlobalCurrencyCode() == 'EUR' && Mage::getStoreConfigFlag('msp/settings/allow_convert_currency')){
+			$amount = $order_base_grand_total;
+            $currencyCode = 'EUR';
+		}elseif ($canUseCurrentCurrency) {
             $amount = $checked_amount_current;
             $currencyCode = Mage::app()->getStore()->getCurrentCurrencyCode();
         } elseif ($isAllowConvert) {
@@ -1015,10 +1028,6 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
             $api->delivery['phone'] = $shipping->getTelephone();
         }
 
-        if ($gateway == "DIRECTEBANKING") {
-            $gateway = 'DIRECTBANK';
-        }
-
 
         $api->transaction['id'] = $orderId;
         $api->transaction['amount'] = $amount;
@@ -1028,15 +1037,13 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
         $api->transaction['var3'] = Mage::app()->getStore()->getStoreId();
         $api->transaction['description'] = Mage::helper("msp")->__("Order") . ' #' . $orderId . Mage::helper("msp")->__("@") . $storename;
         $api->transaction['items'] = $items;
-        $api->transaction['gateway'] = $gateway;
+        $api->transaction['gateway'] = $this->_gateway;
         $api->transaction['daysactive'] = $this->getConfigData("daysactive");
         if ($api->transaction['gateway'] == '') {
             $api->transaction['gateway'] = $this->_gateway;
         }
 
-        if ($this->_gateway == 'BANKTRANS') {
-            $api->transaction['gateway'] = 'BANKTRANS';
-        }
+   
 
 
         $ideal_issuer = "";
@@ -1162,7 +1169,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
         }
 
         // get the status
-        if ($payment_method_code == 'msp_payafter' || $payment_method_code == 'msp_klarna') {
+        if ($payment_method_code == 'msp_payafter' || $payment_method_code == 'msp_klarna' || $payment_method_code == 'msp_einvoice') {
             $api = $this->getPayAfterApi($orderId, $order);
         } elseif ($payment_method_code == 'msp_ebon' ||
                 $payment_method_code == 'msp_webgift' ||

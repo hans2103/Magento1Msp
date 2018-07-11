@@ -31,13 +31,16 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
     const MSP_FASTCHECKOUT_CODE = 'mspcheckout';
     const MSP_GENERAL_PAD_CODE = 'msp_payafter';
     const MSP_GENERAL_KLARNA_CODE = 'msp_klarna';
+    const MSP_GENERAL_EINVOICE_CODE = 'msp_einvoice';
     const MSP_GATEWAYS_CODE_PREFIX = 'msp_';
 
     public $availablePaymentMethodCodes = array(
         'msp',
         'mspcheckout',
         'msp_ideal',
+        'msp_dotpay',
         'msp_payafter',
+        'msp_einvoice',
         'msp_klarna',
         'msp_mistercash',
         'msp_visa',
@@ -94,7 +97,9 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
     );
     public $gateways = array(
         'msp_ideal',
+        'msp_dotpay',
         'msp_payafter',
+        'msp_einvoice',
         'msp_klarna',
         'msp_mistercash',
         'msp_visa',
@@ -388,10 +393,13 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
 
             // MSP - Gateways (Pay After Delivery)
             case self::MSP_GENERAL_PAD_CODE:
-                $settingsPathPrefix = 'msp/' . self::MSP_GENERAL_PAD_CODE;
+                $settingsPathPrefix = 'msp_gateways/' . self::MSP_GENERAL_PAD_CODE;
                 break;
             case self::MSP_GENERAL_KLARNA_CODE:
-                $settingsPathPrefix = 'msp/' . self::MSP_GENERAL_KLARNA_CODE;
+                $settingsPathPrefix = 'msp_gateways/' . self::MSP_GENERAL_KLARNA_CODE;
+                break;
+            case self::MSP_GENERAL_EINVOICE_CODE:
+                $settingsPathPrefix = 'msp_gateways/' . self::MSP_GENERAL_EINVOICE_CODE;
                 break;
 
             // MSP - Gateways
@@ -399,10 +407,11 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
                 $settingsPathPrefix = 'msp/settings';
                 break;
         }
+
         $config = Mage::getStoreConfig($settingsPathPrefix, $order->getStoreId());
 
         // use refund by Credit Memo is enabled
-        $pathCreditMemoIsEnabled = (($payment->getCode() == self::MSP_GENERAL_PAD_CODE || $payment->getCode() == self::MSP_GENERAL_KLARNA_CODE)) ? 'msp/settings' : $settingsPathPrefix;
+        $pathCreditMemoIsEnabled = (($payment->getCode() == self::MSP_GENERAL_PAD_CODE || $payment->getCode() == self::MSP_GENERAL_KLARNA_CODE || $payment->getCode() == self::MSP_GENERAL_EINVOICE_CODE)) ? 'msp/settings' : $settingsPathPrefix;
         if (!Mage::getStoreConfigFlag($pathCreditMemoIsEnabled . '/use_refund_credit_memo', $order->getStoreId())) {
             Mage::getSingleton('adminhtml/session')->addNotice(Mage::helper('msp')->__('Refund has not been send to MultiSafepay. You need to refund manually at MultiSafepay. Please check if the creditmemo option is configured within the MultiSafepay payment methods configuration!'));
             return $this;
@@ -421,15 +430,16 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
                 $config['test_api'] = 'test';
                 $config['account_id'] = $config['account_id_pad_test'];
                 $config['site_id'] = $config['site_id_pad_test'];
-                $config['site_code'] = $config['secure_code_pad_test'];
+                $config['secure_code'] = $config['secure_code_pad_test'];
                 $config['api_key'] = $config['api_key_pad_test'];
             } else {
                 $config['account_id'] = $config['account_id_pad'];
                 $config['site_id'] = $config['site_id_pad'];
-                $config['site_code'] = $config['secure_code_pad'];
+                $config['secure_code'] = $config['secure_code_pad'];
                 $config['api_key'] = $config['api_key_pad'];
             }
         }
+        
 
         // build request
         $mapi = new MultiSafepay();
@@ -442,6 +452,7 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
         $mapi->transaction['amount'] = $amount * 100; //$order->getGrandTotal() * 100;
         $mapi->transaction['currency'] = Mage::app()->getStore()->getCurrentCurrencyCode();
         $mapi->signature = sha1($config['site_id'] . $config['secure_code'] . $mapi->transaction['id']);
+
 
         $response = $mapi->refundTransaction();
 

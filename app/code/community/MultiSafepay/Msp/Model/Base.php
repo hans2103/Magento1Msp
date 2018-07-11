@@ -27,14 +27,16 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
     
     public $methodMap = array(
         'IDEAL' =>'msp_ideal',
+        'DOTPAY' =>'msp_dotpay',
         'PAYAFTER'=>'msp_payafter',
+        'EINVOICE'=>'msp_einvoice',
         'KLARNA'=>'msp_klarna',
         'MISTERCASH'=>'msp_mistercash',
         'VISA'=> 'msp_visa',
         'MASTERCARD'=>'msp_mastercard',
-        'msp_banktransfer',
+        'BANKTRANS'=>'msp_banktransfer',
         'MAESTRO'=>'msp_maestro',
-        'MAESTRO'=>'msp_paypal',
+        'PAYPAL'=>'msp_paypal',
         'AMEX'=>'msp_amex',
         'WEBGIFT'=>'msp_webgift',
         'EBON'=>'msp_ebon',
@@ -262,7 +264,6 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
         $quote = Mage::getModel('sales/quote')->load($quoteid);
 
 
-
         if (!empty($details['shipping']['type'])) {
             $qAddress = $order->getShippingAddress();
             $qAddress->setTaxAmount($details['total-tax']['total']);
@@ -294,9 +295,9 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
                 $order->setShippingMethod(null);
             }
 
-            $order->setGrandTotal($details['order-total']['total']);
-            $order->setBaseGrandTotal($details['order-total']['total']);
-            $order->setTotalPaid($details['order-total']['total']);
+            $order->setGrandTotal($details['order-total']['total']+$details['shipping']['cost']);
+            $order->setBaseGrandTotal($details['order-total']['total']+$details['shipping']['cost']);
+            $order->setTotalPaid($details['order-total']['total']+$details['shipping']['cost']);
             $order->save();
         }
         
@@ -308,15 +309,25 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
         $newState = null;
         $newStatus = true; // makes Magento use the default status belonging to state
         $statusMessage = '';
-		$this->_paid = $details['transaction']['amount']/100;
+		//$this->_paid = $details['transaction']['amount']/100;
 
         //If the order already has in invoice than it was paid for using another method? So if our transaction expires we shouldn't update it to cancelled because it was already invoiced.
         if ($order->hasInvoices() && $mspStatus == 'expired') {
             return true;
         }
         
-        if(($usedMethod == 'PAYAFTER' || $usedMethod == 'KLARNA') && ($mspStatus == 'cancelled' || $mspStatus == 'void')){
+        if(($usedMethod == 'PAYAFTER' || $usedMethod == 'KLARNA' || $usedMethod == 'EINVOICE') && ($mspStatus == 'cancelled' || $mspStatus == 'void')){
             return true;
+        }
+        
+        $payment_method_quote = $quote->getPayment();
+        $payment = $order->getPayment();
+        
+        if($usedMethod != $payment->getMethod()){
+	        $payment->setMethod($usedMethod);
+			$payment->save();
+			$payment_method_quote->setMethod($usedMethod);
+			$payment_method_quote->save();
         }
 
         switch ($mspStatus) {
@@ -331,6 +342,7 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
                     $newStatus = $statusInitialized;
                     $statusMessage = Mage::helper("msp")->__("Transaction started, waiting for payment");
                 }
+
                 break;
             case "completed":
                 $complete = true;
@@ -346,19 +358,12 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
                     $transaction->setAdditionalInformation(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS, $this->transdetails);
                     $transaction->save();
                 }
-
                 
-                if($usedMethod != $payment->Method){
-	                $payment->setMethod($usedMethod);
-					$payment->save();
-                }
-                
-                
-                if(round($order->getGrandTotal(),2) != $this->_paid && $mspDetails['ewallet']['fastcheckout'] !='YES'){
+                /*if(round($order->getGrandTotal(),2) != $this->_paid && $mspDetails['ewallet']['fastcheckout'] !='YES' && !Mage::getStoreConfigFlag('msp/settings/allow_convert_currency')){
 	            	$newState = Mage_Sales_Model_Order::STATE_PAYMENT_REVIEW;
 					$newStatus = Mage_Sales_Model_Order::STATE_PAYMENT_REVIEW;
 					$statusMessage = Mage::helper("msp")->__("Payment received for an amount that is not equal to the order total amount. Please verify the paid amount!");
-                }
+                }*/
 
                 break;
             case "uncleared":
@@ -507,7 +512,7 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
                 $is_already_invoiced = false;
                 
 
-                if ($complete && $autocreateInvoice && $this->_paid == round($order->getBaseGrandTotal(), 2)) {
+                if ($complete && $autocreateInvoice){// && $this->_paid == round($order->getBaseGrandTotal(), 2) && !Mage::getStoreConfigFlag('msp/settings/allow_convert_currency')) {
                     $payment = $order->getPayment();
                     $payment->setTransactionId($mspDetails['ewallet']['id']);
                     $transaction = $payment->addTransaction('capture', null, false, $statusMessage);
@@ -525,8 +530,13 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
                     $transaction->setIsClosed(1);
                     $transaction->setAdditionalInformation(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS, $transdetails);
                     $transaction->save();
-                    $payment->setAmount($this->_paid);
-                    $order->setTotalPaid($this->_paid);
+                    /*if(!Mage::getStoreConfigFlag('msp/settings/allow_convert_currency')){
+                        $payment->setAmount($this->_paid);
+                        $order->setTotalPaid($this->_paid);
+                    }else{
+                        $payment->setAmount($order->getGrandTotal());
+                        $order->setTotalPaid($order->getGrandTotal());
+                    }*/
                 }
             }
 
@@ -668,10 +678,9 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
                 $order->addStatusHistoryComment('Automatically invoiced by MultiSafepay invoicer.', false);
                 $transactionSave = Mage::getModel('core/resource_transaction')->addObject($invoice)->addObject($invoice->getOrder());
                 $transactionSave->save();
+				
+				$payment = $order->getPayment();
 
-
-
-                $payment = $order->getPayment();
                 $transaction = $payment->getTransaction($this->mspDetails['ewallet']['id']);
                 if (is_object($transaction)) {
                     $transaction->setAdditionalInformation(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS, $this->transdetails);
@@ -702,11 +711,11 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
                 $gateway = $order->getPayment()->getMethodInstance()->_gateway;
 
 
-                if ($mail_invoice && $gateway != 'PAYAFTER' && $gateway != 'KLARNA') {
+                if ($mail_invoice && $gateway != 'PAYAFTER' && $gateway != 'KLARNA' && $gateway != 'EINVOICE') {
                     $invoice->setEmailSent(true);
                     $invoice->sendEmail();
                     $invoice->save();
-                } elseif (($gateway == 'PAYAFTER' || $gateway == 'KLARNA') && $send_bno_invoice && $mail_invoice) {
+                } elseif (($gateway == 'PAYAFTER' || $gateway == 'KLARNA' || $gateway == 'EINVOICE') && $send_bno_invoice && $mail_invoice) {
                     $invoice->setEmailSent(true);
                     $invoice->sendEmail();
                     $invoice->save();

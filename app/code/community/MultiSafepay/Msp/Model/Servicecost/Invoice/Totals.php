@@ -8,11 +8,14 @@ class MultiSafepay_Msp_Model_Servicecost_Invoice_Totals extends Mage_Sales_Model
         $invoice->setBaseServicecost($order->getBaseServicecost());
         $invoice->setServicecostTax($order->getServicecostTax());
         $invoice->setBaseServicecostTax($order->getBaseServicecostTax());
+        $invoice->setBaseTaxAmount($order->getBaseTaxAmount()+$order->getBaseServicecostTax());
+        $invoice->setTaxAmount($order->getTaxAmount()+$order->getBaseServicecostTax());
+        
 
-        $invoice->setBaseGrandTotal($invoice->getBaseGrandTotal() + $invoice->getServicecost() - $invoice->getServicecostTax());
-        $invoice->setGrandTotal($invoice->getGrandTotal() + $invoice->getServicecost() - $invoice->getServicecostTax());
-        $invoice->setSubtotalInclTax($invoice->getSubtotalInclTax() - $invoice->getServicecostTax());
-        $invoice->setBaseSubtotalInclTax($invoice->getBaseSubtotalInclTax() - $invoice->getServicecostTax());
+        $invoice->setBaseGrandTotal($order->getBaseGrandTotal()+$order->getBaseServicecostTax());
+        $invoice->setGrandTotal($order->getGrandTotal()+$order->getBaseServicecostTax());
+        $invoice->setSubtotalInclTax($order->getSubtotalInclTax());
+        $invoice->setBaseSubtotalInclTax($order->getBaseSubtotalInclTax());
         $invoice->setServicecostPdf($order->getServicecostPdf());
 
 

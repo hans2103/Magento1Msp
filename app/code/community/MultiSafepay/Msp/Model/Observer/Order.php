@@ -10,6 +10,7 @@ class MultiSafepay_Msp_Model_Observer_Order extends MultiSafepay_Msp_Model_Obser
     const MSP_GENERAL_CODE = 'msp';
     const MSP_FASTCHECKOUT_CODE = 'mspcheckout';
     const MSP_GENERAL_PAD_CODE = 'msp_payafter';
+    const MSP_GENERAL_EINVOICE_CODE = 'msp_einvoice';
     const MSP_GENERAL_KLARNA_CODE = 'msp_klarna';
     const MSP_GATEWAYS_CODE_PREFIX = 'msp_';
 
@@ -17,7 +18,9 @@ class MultiSafepay_Msp_Model_Observer_Order extends MultiSafepay_Msp_Model_Obser
         'msp',
         //'mspcheckout', dont allow fco
         'msp_ideal',
+        'msp_dotpay',
         //'msp_payafter', for now we dont allow payafter manual transaction requests
+        //'msp_einvoice', for now we dont allow payafter manual transaction requests
         'msp_mistercash',
         'msp_visa',
         'msp_mastercard',
@@ -89,6 +92,9 @@ class MultiSafepay_Msp_Model_Observer_Order extends MultiSafepay_Msp_Model_Obser
             case self::MSP_GENERAL_KLARNA_CODE:
                 $settingsPathPrefix = 'msp/' . self::MSP_GENERAL_KLARNA_CODE;
                 break;
+            case self::MSP_GENERAL_EINVOICE_CODE:
+                $settingsPathPrefix = 'msp/' . self::MSP_GENERAL_EINVOICE_CODE;
+                break;
             // MSP - Gateways
             default:
                 $settingsPathPrefix = 'msp/settings';
@@ -109,13 +115,14 @@ class MultiSafepay_Msp_Model_Observer_Order extends MultiSafepay_Msp_Model_Obser
         $config = Mage::getStoreConfig($settingsPathPrefix, $order->getStoreId());
 
         $api = Mage::getModel('msp/api_paylink');
-
+		$configMain = Mage::getStoreConfig('msp/settings', $order->getStoreId());
         if (!$api->isPaymentLinkCreated($order)) {
-            if ($payment->getCode() == self::MSP_GENERAL_PAD_CODE || $payment->getCode() == self::MSP_GENERAL_KLARNA_CODE) {
-                $configMain = Mage::getStoreConfig('msp/settings', $order->getStoreId());
+            if ($payment->getCode() == self::MSP_GENERAL_PAD_CODE || $payment->getCode() == self::MSP_GENERAL_KLARNA_CODE || $payment->getCode() == self::MSP_GENERAL_EINVOICE_CODE) {
+              
+           
                 $api->test = ($config['test_api_pad'] == 'test');
                 $suffix = '';
-
+				
                 if ($api->test) {
                     $suffix = '_test';
                 }
@@ -135,7 +142,7 @@ class MultiSafepay_Msp_Model_Observer_Order extends MultiSafepay_Msp_Model_Obser
                 $api->transaction['id'] = $configMain['daysactive'];
                 $api->debug = $config['debug'];
             }
-
+			$api->transaction['gateway_reset'] = $configMain['gateway_reset'];
             if ($payment->getCode() == self::MSP_FASTCHECKOUT_CODE) {
                 $api->transaction['id'] = $order->getQuoteId();
             } else {
@@ -148,6 +155,7 @@ class MultiSafepay_Msp_Model_Observer_Order extends MultiSafepay_Msp_Model_Obser
 
 
             $api->transaction['currency'] = $currencyCode;
+            
 
 
             $response = $api->getPaymentLink($order);

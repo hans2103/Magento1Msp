@@ -92,6 +92,7 @@ class MultiSafepay_Msp_Helper_Data extends Mage_Core_Helper_Abstract {
         if (Mage::getStoreConfig('payment/msp/keep_cart', $storeId) ||
                 Mage::getStoreConfig('msp/settings/keep_cart', $storeId) ||
                 $gatewayMethod == 'msp_payafter' ||
+                $gatewayMethod == 'msp_einvoice' ||
                 $gatewayMethod == 'msp_klarna') {
 
             $needRestore = true;
