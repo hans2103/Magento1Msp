@@ -213,25 +213,26 @@ class Mage_Msp_Model_Payment extends Varien_Object
 
 		// build request
 		$api  = $this->getApi();
-		$api->merchant['notification_url'] = $this->_notification_url . "?type=initial";
-		$api->merchant['cancel_url']       = $this->_cancel_url;
-		$api->merchant['redirect_url']     = ($this->getConfigData('use_redirect')) ? $this->_return_url : '';
+		$this->api->test                    = 	($this->getConfigData("test_api") == 'test');
+		$api->merchant['notification_url'] 	= 	$this->_notification_url . "?type=initial";
+		$api->merchant['cancel_url']       	= 	$this->_cancel_url;
+		$api->merchant['redirect_url']     	= 	($this->getConfigData('use_redirect')) ? $this->_return_url : '';
 
 		$api->parseCustomerAddress($billing->getStreet(1));
-		$api->customer['locale']           = Mage::app()->getLocale()->getDefaultLocale();
-		$api->customer['firstname']        = $billing->getFirstname();
-		$api->customer['lastname']         = $billing->getLastname();
-		$api->customer['address2']         = $billing->getStreet(2);
-		$api->customer['zipcode']          = $billing->getPostcode();
-		$api->customer['city']             = $billing->getCity();
-		$api->customer['state']            = $billing->getState();
-		$api->customer['country']          = $billing->getCountry();
-		$api->customer['phone']            = $billing->getTelephone();
-		$api->customer['email']            = $this->getOrder()->getCustomerEmail();
+		$api->customer['locale']           	=	Mage::app()->getLocale()->getDefaultLocale();
+		$api->customer['firstname']        	= 	$billing->getFirstname();
+		$api->customer['lastname']         	= 	$billing->getLastname();
+		$api->customer['address2']         	= 	$billing->getStreet(2);
+		$api->customer['zipcode']          	= 	$billing->getPostcode();
+		$api->customer['city']             	= 	$billing->getCity();
+		$api->customer['state']            	= 	$billing->getState();
+		$api->customer['country']          	= 	$billing->getCountry();
+		$api->customer['phone']            	= 	$billing->getTelephone();
+		$api->customer['email']            	= 	$this->getOrder()->getCustomerEmail();
 	
-		$api->transaction['id']            = $orderId;
-		$api->transaction['amount']        = $amount;
-		$api->transaction['currency']      = "EUR";
+		$api->transaction['id']            	= 	$orderId;
+		$api->transaction['amount']        	=	$amount;
+		$api->transaction['currency']      	= 	"EUR";
 		if($conversion)
 		{
 			$api->transaction['description']   = 'Order #' . $orderId . ' at ' . $storename . '. Original price: ' . round($this->getOrder()->getBaseGrandTotal(), 2) . ' ' . $this->getOrder()->getBaseCurrencyCode();
@@ -240,9 +241,9 @@ class Mage_Msp_Model_Payment extends Varien_Object
 		{
 			$api->transaction['description']   = 'Order #' . $orderId . ' at ' . $storename;
 		}
-		$api->transaction['items']         = $items;
-		$api->transaction['gateway']       = $this->_gateway;
-		$api->transaction['issuer']        = $this->_issuer;
+		$api->transaction['items']         = 	$items;
+		$api->transaction['gateway']       = 	$this->_gateway;
+		$api->transaction['issuer']        = 	$this->_issuer;
 		
 		
 		if($this->_gateway == 'IDEAL' && isset($_SESSION['bankid'])){

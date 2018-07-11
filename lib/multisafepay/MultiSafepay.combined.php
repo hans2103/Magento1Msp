@@ -39,6 +39,10 @@ class MultiSafepay {
     'country'          => '',
     'phone'            => '',
     'email'            => '', // advised
+	'accountid'			=>'',
+	'accountholdername' =>'',
+	'accountholdercity'	=> '',
+	'accountholdercountry'	=> ''
   );
   
   // customer-delivery data
@@ -137,6 +141,39 @@ class MultiSafepay {
     $this->payment_url = $this->xmlUnescape($rootNode['gatewayinfo']['redirecturl']['VALUE']);
     return $this->payment_url;
   }
+  
+  
+    function startDirectBankTransfer(){
+    $this->checkSettings();
+
+    $this->setIp();
+    $this->createSignature();
+    
+    // create request
+    $this->request_xml = $this->createDirectBankTransferTransactionRequest();
+
+    // post request and get reply
+    $this->api_url   = $this->getApiUrl();
+    $this->reply_xml = $this->xmlPost($this->api_url, $this->request_xml);
+    
+    // communication error
+    if (!$this->reply_xml)
+      return false;
+    
+    // parse xml
+    $rootNode = $this->parseXmlResponse($this->reply_xml);
+    if (!$rootNode)
+      return false;
+    
+    // return payment url
+	
+	//print_r($rootNode);exit;
+    $this->payment_url = $this->xmlUnescape($rootNode['gatewayinfo']['redirecturl']['VALUE']);
+    return $this->payment_url;
+  }
+  
+  
+  
   
   /*
    * Check the settings before using them
@@ -594,6 +631,84 @@ function createDirectXMLTransactionRequest(){
 		
 		return $request;
 	}
+	
+	
+	function createDirectBankTransferTransactionRequest(){
+		$issuer = "";
+		if (!empty($this->issuer)){
+			$issuer =' issuer="'.$this->xmlEscape($this->issuer).'"';
+		}
+	    $request = '<?xml version="1.0" encoding="UTF-8"?>
+		<directtransaction ua="' . $this->plugin_name . ' ' . $this->version . '">
+			<transaction>
+				<id>' .               $this->xmlEscape($this->transaction['id']) . '</id>
+				<currency>' .         $this->xmlEscape($this->transaction['currency']) . '</currency>
+				<amount>' .           $this->xmlEscape($this->transaction['amount']) . '</amount>
+				<description>' .      $this->xmlEscape($this->transaction['description']) . '</description>
+				<var1>' .             $this->xmlEscape($this->transaction['var1']) . '</var1>
+				<var2>' .             $this->xmlEscape($this->transaction['var2']) . '</var2>
+				<var3>' .             $this->xmlEscape($this->transaction['var3']) . '</var3>
+				<items>' .            $this->xmlEscape($this->transaction['items']) . '</items>
+				<manual>' .           $this->xmlEscape($this->transaction['manual']) . '</manual>
+				<daysactive>' .       $this->xmlEscape($this->transaction['daysactive']) . '</daysactive>
+				<gateway'.$issuer.'>'.$this->xmlEscape($this->transaction['gateway']) . '</gateway>
+			</transaction>
+		  <merchant>
+			<account>' .          $this->xmlEscape($this->merchant['account_id']) . '</account>
+			<site_id>' .          $this->xmlEscape($this->merchant['site_id']) . '</site_id>
+			<site_secure_code>' . $this->xmlEscape($this->merchant['site_code']) . '</site_secure_code>
+			<notification_url>' . $this->xmlEscape($this->merchant['notification_url']) . '</notification_url>
+			<cancel_url>' .       $this->xmlEscape($this->merchant['cancel_url']) . '</cancel_url>
+			<redirect_url>' .     $this->xmlEscape($this->merchant['redirect_url']) . '</redirect_url>
+			<close_window>' .     $this->xmlEscape($this->merchant['close_window']) . '</close_window>
+		  </merchant>
+		  <customer>
+			<locale>' .           $this->xmlEscape($this->customer['locale']) . '</locale>
+			<ipaddress>' .        $this->xmlEscape($this->customer['ipaddress']) . '</ipaddress>
+			<forwardedip>' .      $this->xmlEscape($this->customer['forwardedip']) . '</forwardedip>
+			<firstname>' .        $this->xmlEscape($this->customer['firstname']) . '</firstname>
+			<lastname>' .         $this->xmlEscape($this->customer['lastname']) . '</lastname>
+			<address1>' .         $this->xmlEscape($this->customer['address1']) . '</address1>
+			<address2>' .         $this->xmlEscape($this->customer['address2']) . '</address2>
+			<housenumber>' .      $this->xmlEscape($this->customer['housenumber']) . '</housenumber>
+			<zipcode>' .          $this->xmlEscape($this->customer['zipcode']) . '</zipcode>
+			<city>' .             $this->xmlEscape($this->customer['city']) . '</city>
+			<state>' .            $this->xmlEscape($this->customer['state']) . '</state>
+			<country>' .          $this->xmlEscape($this->customer['country']) . '</country>
+			<phone>' .            $this->xmlEscape($this->customer['phone']) . '</phone>
+			<email>' .            $this->xmlEscape($this->customer['email']) . '</email>
+		  </customer>
+				<customer-delivery>
+					<firstname>' .        $this->xmlEscape($this->delivery['firstname']) . '</firstname>
+					<lastname>' .         $this->xmlEscape($this->delivery['lastname']) . '</lastname>
+					<address1>' .         $this->xmlEscape($this->delivery['address1']) . '</address1>
+					<address2>' .         $this->xmlEscape($this->delivery['address2']) . '</address2>
+					<housenumber>' .      $this->xmlEscape($this->delivery['housenumber']) . '</housenumber>
+					<zipcode>' .          $this->xmlEscape($this->delivery['zipcode']) . '</zipcode>
+					<city>' .             $this->xmlEscape($this->delivery['city']) . '</city>
+					<state>' .            $this->xmlEscape($this->delivery['state']) . '</state>
+					<country>' .          $this->xmlEscape($this->delivery['country']) . '</country>
+					<phone>' .            $this->xmlEscape($this->delivery['phone']) . '</phone>
+					<email>' .            $this->xmlEscape($this->delivery['email']) . '</email>
+				</customer-delivery>
+				<gatewayinfo>
+					<accountid>' .        		$this->xmlEscape($this->customer['accountid']) . '</accountid>
+					<accountholdername>' .      $this->xmlEscape($this->customer['accountholdername']) . '</accountholdername>
+					<accountholdercity>' .      $this->xmlEscape($this->customer['accountholdercity']) . '</accountholdercity>
+					<accountholdercountry>' .   $this->xmlEscape($this->customer['accountholdercountry']) . '</accountholdercountry>
+				</gatewayinfo>
+		  <signature>' .          $this->xmlEscape($this->signature) . '</signature>
+		</directtransaction>';
+		
+		return $request;
+	}
+	
+	
+	
+	
+	
+	
+	
 
   /*
    * Create the checkout request xml
@@ -937,7 +1052,6 @@ function createDirectXMLTransactionRequest(){
     // issue request
     if ($curl_available) {
       $ch = curl_init($url);
-
       curl_setopt($ch, CURLOPT_POST,           true);
       curl_setopt($ch, CURLOPT_HTTPHEADER,     $header);
       curl_setopt($ch, CURLOPT_POSTFIELDS,     $request_xml);

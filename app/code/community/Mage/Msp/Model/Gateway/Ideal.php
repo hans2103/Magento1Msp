@@ -13,7 +13,6 @@ class Mage_Msp_Model_Gateway_Ideal extends Mage_Msp_Model_Gateway_Abstract
 		if ( !($data instanceof Varien_Object) ) {
 			$data = new Varien_Object($data);
 		}
-			//Mage::register('bank_id', 'wasdfasdfatf');
 			foreach($data as $key => $value)
 			{
 				if($key == '_data'){
@@ -26,16 +25,15 @@ class Mage_Msp_Model_Gateway_Ideal extends Mage_Msp_Model_Gateway_Abstract
 					}
 				}
 			}
-			if(strlen(Mage::registry('bank_id')) == 0)
+			/*if(strlen(Mage::registry('bank_id')) == 0)
 			{
 				Mage::register('bank_id', $bank_id );
-			}
+			}*/
 	
 			$_SESSION['bankid'] = $bank_id;
 			
 		return $this;
 	}
-
 	
 	public function getOrderPlaceRedirectUrl() 
 	{

@@ -262,6 +262,12 @@ class Mage_Msp_Model_Base extends Varien_Object
 		*	ENDING UNDO CANCEL CODE
 		*/
 		
+		if($order->getState() == Mage_Sales_Model_Order::STATE_PROCESSING){
+			$is_already_invoiced = true;
+		}else{
+			$is_already_invoiced = false;
+		}
+		
 		
 		
 		
@@ -277,7 +283,7 @@ class Mage_Msp_Model_Base extends Varien_Object
 
 
 			// create an invoice when the payment is completed
-			if ($complete && $autocreateInvoice)
+			if ($complete && $autocreateInvoice && !$is_already_invoiced)
 			{
 				$this->createInvoice($order);
 			}
@@ -428,7 +434,6 @@ class Mage_Msp_Model_Base extends Varien_Object
 	function isCancellationFinal($order, $mspStatus)
 	{
 		$history = $order->getAllStatusHistory();
-		
 		
 		foreach($history as $status)
 		{
