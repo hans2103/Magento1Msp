@@ -4,13 +4,12 @@
  *
  * @category MultiSafepay
  * @package  MultiSafepay_Msp
- * @license  http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 -->
 <config>
     <modules>
         <MultiSafepay_Msp>
-            <version>2.0.2</version>
+            <version>2.1.0</version>
         </MultiSafepay_Msp>
     </modules>
     <global>
@@ -24,49 +23,59 @@
                 <deprecatedNode>msp_mysql4</deprecatedNode>
                 <entities />
             </msp_resource>
-<sales>
+            <sales>
                 <rewrite>
                     <service_quote>MultiSafepay_Msp_Model_Service_Quote</service_quote>
                 </rewrite>
             </sales>
         </models>
-	<sales>
-             <quote>
-                    <totals>
-                        <servicecost>
-                            <class>MultiSafepay_Msp_Model_Servicecost_Quote_Address_Total_Servicecost</class>
-                            <after>subtotal,discount,shipping,tax</after>
-				<before>grand_total</before>
-                        </servicecost>
-                    </totals>
-                </quote>
-		<order_invoice>
-				<totals>
-					<servicecost>
-						<class>MultiSafepay_Msp_Model_Servicecost_Invoice_Totals</class>
-						<after>subtotal,discount,shipping,tax</after>
-						<before>grand_total</before>
-					</servicecost>
-				</totals>
-			</order_invoice>
-		 <order_creditmemo>
+        <sales>
+            <quote>
+                <totals>
+                    <servicecost>
+                        <class>MultiSafepay_Msp_Model_Servicecost_Quote_Address_Total_Servicecost</class>
+                        <after>subtotal,discount,shipping,tax</after>
+                        <before>grand_total</before>
+                    </servicecost>
+                </totals>
+            </quote>
+            <order_invoice>
+                <totals>
+                    <servicecost>
+                        <class>MultiSafepay_Msp_Model_Servicecost_Invoice_Totals</class>
+                        <after>subtotal,discount,shipping,tax</after>
+                        <before>grand_total</before>
+                    </servicecost>
+                </totals>
+            </order_invoice>
+            <order_creditmemo>
                 <totals>
                     <servicecost>
                         <class>MultiSafepay_Msp_Model_Servicecost_Creditmemo_Total</class>
                     </servicecost>
                 </totals>
             </order_creditmemo>
-          </sales>
-            <fieldsets>
-                <sales_convert_quote>
-                    <servicecost><to_order>*</to_order></servicecost>
-			<base_servicecost><to_order>*</to_order></base_servicecost>
-                    <servicecost_tax><to_order>*</to_order></servicecost_tax>
- 			<base_servicecost_tax><to_order>*</to_order></base_servicecost_tax>
-			<servicecost_pdf><to_order>*</to_order></servicecost_pdf>
-                </sales_convert_quote>
-            </fieldsets>
-<pdf>
+        </sales>
+        <fieldsets>
+            <sales_convert_quote>
+                <servicecost>
+                    <to_order>*</to_order>
+                </servicecost>
+                <base_servicecost>
+                    <to_order>*</to_order>
+                </base_servicecost>
+                <servicecost_tax>
+                    <to_order>*</to_order>
+                </servicecost_tax>
+                <base_servicecost_tax>
+                    <to_order>*</to_order>
+                </base_servicecost_tax>
+                <servicecost_pdf>
+                    <to_order>*</to_order>
+                </servicecost_pdf>
+            </sales_convert_quote>
+        </fieldsets>
+        <pdf>
             <totals>
                 <servicecost translate="title">
                     <title>MultiSafepay Fee</title>
@@ -103,20 +112,19 @@
             <msp>
                 <class>MultiSafepay_Msp_Block</class>
             </msp>
-		<adminhtml>
-		<rewrite>
-			<sales_order_totals>MultiSafepay_Msp_Block_Adminhtml_Servicecost_Totals_Order</sales_order_totals>
-			<sales_order_invoice_totals>MultiSafepay_Msp_Block_Adminhtml_Servicecost_Totals_Invoice</sales_order_invoice_totals>
-			<sales_order_creditmemo_totals>MultiSafepay_Msp_Block_Adminhtml_Servicecost_Totals_Creditmemo</sales_order_creditmemo_totals>
-		</rewrite>
-	</adminhtml>
-	<sales>
-				<rewrite>
-					<order_totals>MultiSafepay_Msp_Block_Servicecost_Order_Totals</order_totals>
-					<order_invoice_totals>MultiSafepay_Msp_Block_Servicecost_Order_Totals</order_invoice_totals>
-				</rewrite>
-			</sales>
-
+            <adminhtml>
+                <rewrite>
+                    <sales_order_totals>MultiSafepay_Msp_Block_Adminhtml_Servicecost_Totals_Order</sales_order_totals>
+                    <sales_order_invoice_totals>MultiSafepay_Msp_Block_Adminhtml_Servicecost_Totals_Invoice</sales_order_invoice_totals>
+                    <sales_order_creditmemo_totals>MultiSafepay_Msp_Block_Adminhtml_Servicecost_Totals_Creditmemo</sales_order_creditmemo_totals>
+                </rewrite>
+            </adminhtml>
+            <sales>
+                <rewrite>
+                    <order_totals>MultiSafepay_Msp_Block_Servicecost_Order_Totals</order_totals>
+                    <order_invoice_totals>MultiSafepay_Msp_Block_Servicecost_Order_Totals</order_invoice_totals>
+                </rewrite>
+            </sales>
             <checkout>
                 <rewrite>
                     <onepage_payment_methods>MultiSafepay_Msp_Block_Checkout_Onepage_Payment_Methods</onepage_payment_methods>
@@ -129,16 +137,7 @@
                 <class>MultiSafepay_Msp_Helper</class>
             </msp>
         </helpers>
-<events>
-  <sales_order_creditmemo_save_after>
-                <observers>
-                    <msp_creditmemo_save_after>
-                        <type>singleton</type>
-                        <class>msp/observer_creditmemo</class>
-                        <method>sales_order_creditmemo_save_after</method>
-                    </msp_creditmemo_save_after>
-                </observers>
-            </sales_order_creditmemo_save_after>
+        <events>
             <sales_order_shipment_save_after>
                 <observers>
                     <msp_shipment_save_after>
@@ -148,9 +147,7 @@
                     </msp_shipment_save_after>
                 </observers>
             </sales_order_shipment_save_after>
-
-
-		<sales_order_invoice_save_after>
+            <sales_order_invoice_save_after>
                 <observers>
                     <sales_order_invoice_save_after>
                         <class>msp/servicecost_observer</class>
@@ -159,19 +156,26 @@
                 </observers>
             </sales_order_invoice_save_after>
             <sales_order_creditmemo_save_after>
-               <observers>
-                   <sales_order_creditmemo_save_after>
-                       <class>msp/servicecost_observer</class>
-                       <method>creditmemoSaveAfter</method>
-                   </sales_order_creditmemo_save_after>
-               </observers>
-           </sales_order_creditmemo_save_after>
-
-
-
-</events>
+                <observers>
+                    <sales_order_creditmemo_save_after>
+                        <class>msp/servicecost_observer</class>
+                        <method>creditmemoSaveAfter</method>
+                    </sales_order_creditmemo_save_after>
+                </observers>
+            </sales_order_creditmemo_save_after>
+        </events>
     </global>
     <adminhtml>
+        <events>
+            <sales_order_place_after>
+                <observers>
+                    <sales_order_save_after>
+                        <class>msp/observer_order</class>
+                        <method>sales_order_place_after</method>
+                    </sales_order_save_after>
+                </observers>
+            </sales_order_place_after>
+        </events>
         <translate>
             <modules>
                 <MultiSafepay_Msp>
@@ -210,6 +214,12 @@
         </layout>
     </frontend>
     <default>
+        <!--Sorting of the payment fee. by default 31 is after the shipping cost-->
+        <sales>
+            <totals_sort>
+                <servicecost>31</servicecost>
+            </totals_sort>
+        </sales>
         <!-- begin: Main Settings ('Payment Methods' tab) -->
         <payment>
             <msp>
@@ -221,12 +231,14 @@
                 <order_status>pending</order_status>
                 <complete_status>processing</complete_status>
                 <initialized_status>pending</initialized_status>
+                <initialized_banktransfer_status>pending</initialized_banktransfer_status>
                 <uncleared_status>pending</uncleared_status>
                 <reserved_status>pending</reserved_status>
                 <void_status>canceled</void_status>
                 <declined_status>canceled</declined_status>
                 <reversed_status>canceled</reversed_status>
                 <refunded_status>canceled</refunded_status>
+                <partial_refunded_status>canceled</partial_refunded_status>
                 <expired_status>canceled</expired_status>
                 <autocreate_invoice>0</autocreate_invoice>
                 <mail_invoice>0</mail_invoice>
@@ -250,11 +262,11 @@
                 <model>msp/gateway_payafter</model>
                 <title>MSP Betaal na Ontvangst</title>
             </msp_payafter>
-				<msp_amex>
-				<active>1</active>
-				<model>msp/gateway_amex</model>
-				<title>MSP American Express</title>
-			</msp_amex>
+            <msp_amex>
+                <active>1</active>
+                <model>msp/gateway_amex</model>
+                <title>MSP American Express</title>
+            </msp_amex>
             <msp_mistercash>
                 <active>1</active>
                 <model>msp/gateway_mistercash</model>
@@ -295,7 +307,7 @@
                 <model>msp/gateway_ebon</model>
                 <title>MSP E-bon</title>
             </msp_ebon>
-			 <msp_lief>
+            <msp_lief>
                 <active>1</active>
                 <model>msp/gateway_lief</model>
                 <title>MSP Lief</title>
@@ -305,7 +317,7 @@
                 <model>msp/gateway_babygiftcard</model>
                 <title>MSP Baby giftcard</title>
             </msp_babygiftcard>
-			 <msp_gezondheidsbon>
+            <msp_gezondheidsbon>
                 <active>1</active>
                 <model>msp/gateway_gezondheidsbon</model>
                 <title>MSP Gezondheidsbon</title>
@@ -330,11 +342,16 @@
                 <model>msp/gateway_parfumcadeaukaart</model>
                 <title>MSP Parfum cadeaukaart</title>
             </msp_parfumcadeaukaart>
-			 <msp_fashioncheque>
+            <msp_fashioncheque>
                 <active>1</active>
                 <model>msp/gateway_fashioncheque</model>
-                <title>MSP Fahion Cheque</title>
+                <title>MSP Fashion Cheque</title>
             </msp_fashioncheque>
+            <msp_yourgift>
+                <active>1</active>
+                <model>msp/gateway_yourgift</model>
+                <title>MSP Your Giftcard</title>
+            </msp_yourgift>
             <msp_degrotespeelgoedwinkel>
                 <active>1</active>
                 <model>msp/gateway_degrotespeelgoedwinkel</model>
@@ -374,12 +391,14 @@
                 <order_status>pending</order_status>
                 <complete_status>processing</complete_status>
                 <initialized_status>pending</initialized_status>
+                <initialized_banktransfer_status>pending</initialized_banktransfer_status>
                 <uncleared_status>pending</uncleared_status>
                 <reserved_status>pending</reserved_status>
                 <void_status>canceled</void_status>
                 <declined_status>canceled</declined_status>
                 <reversed_status>canceled</reversed_status>
                 <refunded_status>canceled</refunded_status>
+                <partial_refunded_status>canceled</partial_refunded_status>
                 <expired_status>canceled</expired_status>
                 <autocreate_invoice>0</autocreate_invoice>
                 <mail_invoice>0</mail_invoice>
@@ -404,13 +423,13 @@
                 <max_order_total>300</max_order_total>
                 <send_request_after_shipping>0</send_request_after_shipping>
             </msp_payafter>
-			<msp_amex translate="title" module="msp">
-				<active>0</active>
-				<model>msp/gateway_amex</model>
-				<title>American Express</title>
-				<allowed_currency>EUR</allowed_currency>
-				<lang>nl</lang>
-			</msp_amex>
+            <msp_amex translate="title" module="msp">
+                <active>0</active>
+                <model>msp/gateway_amex</model>
+                <title>American Express</title>
+                <allowed_currency>EUR</allowed_currency>
+                <lang>nl</lang>
+            </msp_amex>
             <msp_mistercash translate="title" module="msp">
                 <active>0</active>
                 <model>msp/gateway_mistercash</model>
@@ -467,7 +486,7 @@
                 <allowed_currency>EUR</allowed_currency>
                 <lang>nl</lang>
             </msp_ebon>
-			  <msp_lief translate="title" module="msp">
+            <msp_lief translate="title" module="msp">
                 <active>0</active>
                 <model>msp/gateway_lief</model>
                 <title>Lief</title>
@@ -481,7 +500,7 @@
                 <allowed_currency>EUR</allowed_currency>
                 <lang>nl</lang>
             </msp_babygiftcard>
-			<msp_gezondheidsbon translate="title" module="msp">
+            <msp_gezondheidsbon translate="title" module="msp">
                 <active>0</active>
                 <model>msp/gateway_gezondheidsbon</model>
                 <title>Gezondheidsbon</title>
@@ -516,13 +535,20 @@
                 <allowed_currency>EUR</allowed_currency>
                 <lang>nl</lang>
             </msp_parfumcadeaukaart>
-			<msp_fashioncheque translate="title" module="msp">
+            <msp_fashioncheque translate="title" module="msp">
                 <active>0</active>
                 <model>msp/gateway_fashioncheque</model>
                 <title>Fashion Cheque</title>
                 <allowed_currency>EUR</allowed_currency>
                 <lang>nl</lang>
             </msp_fashioncheque>
+            <msp_yourgift translate="title" module="msp">
+                <active>0</active>
+                <model>msp/gateway_yourgift</model>
+                <title>Your Gift card</title>
+                <allowed_currency>EUR</allowed_currency>
+                <lang>nl</lang>
+            </msp_yourgift>
             <msp_degrotespeelgoedwinkel translate="title" module="msp">
                 <active>0</active>
                 <model>msp/gateway_degrotespeelgoedwinkel</model>
@@ -573,12 +599,14 @@
                 <order_status>pending</order_status>
                 <complete_status>processing</complete_status>
                 <initialized_status>pending</initialized_status>
+                <initialized_banktransfer_status>pending</initialized_banktransfer_status>
                 <uncleared_status>pending</uncleared_status>
                 <reserved_status>pending</reserved_status>
                 <void_status>canceled</void_status>
                 <declined_status>canceled</declined_status>
                 <reversed_status>canceled</reversed_status>
                 <refunded_status>canceled</refunded_status>
+                <partial_refunded_status>canceled</partial_refunded_status>
                 <expired_status>canceled</expired_status>
                 <autocreate_invoice>0</autocreate_invoice>
                 <mail_invoice>0</mail_invoice>
@@ -586,6 +614,8 @@
                 <redirect_to_account>0</redirect_to_account>
                 <auto_login_fco_user>0</auto_login_fco_user>
                 <test_api>live</test_api>
+                <api_key>add api key here</api_key>
+                <allow_fcofeed>0</allow_fcofeed>
                 <use_refund_credit_memo>0</use_refund_credit_memo>
             </settings>
             <freeshipping>

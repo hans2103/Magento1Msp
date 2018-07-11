@@ -16,7 +16,6 @@ app/design/frontend/base/default/template/msp/link.phtml            app/design/f
 app/design/frontend/base/default/template/msp/default.phtml            app/design/frontend/base/default/template/msp/default.phtml
 app/design/frontend/base/default/template/msp/idealissuers.phtml            app/design/frontend/base/default/template/msp/idealissuers.phtml
 app/design/frontend/base/default/template/msp/linkText.phtml            app/design/frontend/base/default/template/msp/linkText.phtml
-app/design/frontend/base/default/template/msp/gateways.phtml            app/design/frontend/base/default/template/msp/gateways.phtml
 app/design/frontend/base/default/template/msp/bno.phtml            app/design/frontend/base/default/template/msp/bno.phtml
 app/design/frontend/base/default/template/msp/agreements.phtml            app/design/frontend/base/default/template/msp/agreements.phtml
 app/design/adminhtml/default/default/template/msp/idealissuers.phtml            app/design/adminhtml/default/default/template/msp/idealissuers.phtml

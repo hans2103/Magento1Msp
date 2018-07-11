@@ -4,18 +4,17 @@
  *
  * @category MultiSafepay
  * @package  MultiSafepay_Msp
- * @license  http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 -->
 <layout version="0.1.0">
-    <checkout_onepage_paymentmethod>
+    <!--<checkout_onepage_paymentmethod>
         <remove name="right"/>
         <remove name="left"/>
         <remove name="root"/>
         <block type="msp/checkout_onepage_payment_methods" name="msp_payment_method" output="toHtml" template="msp/default.phtml">
             <action method="setMethodFormTemplate"><method>purchaseorder</method><template>payment/form/purchaseorder.phtml</template></action>
         </block>
-    </checkout_onepage_paymentmethod>
+    </checkout_onepage_paymentmethod>-->
 
     <checkout_cart_index>
         <reference name="checkout.cart.top_methods">

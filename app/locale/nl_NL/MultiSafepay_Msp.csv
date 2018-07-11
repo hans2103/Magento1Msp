@@ -102,8 +102,18 @@
 "Newsletter", "Nieuwsbrief"
 "Comment", "Commentaar"
 "Type account", "Type account"
-
-
+"@"," @ "
+"Order", "Order"
+"You are not allowed to request the product feed!", "U heeft geen toegang tot de productfeed!"
+"Send invoice ID to MultiSafepay", "Stuur factuurnummer naar MultiSafepay"
+"Pay after Delivery", "Betaal Na Ontvangst"
+"Payment fee add like 0:5   this means a fixed fee of 0 euro and 5%", "Toeslag dient u te configureren als 0:5 waarbij 0 de vast toeslag is en 5 een percentage"
+"Payment for Specific Customer Groups", "Klant group die deze betaalmethode mag gebruiken"
+"You can add multiple addresses separated by ;. Feature enabled only when \'Type account\' set \'Live account\'", "U kunt meerder adressen opnemen, gescheiden door een ;. Deze optie is alleen actief bij de live omgeving."
+"Order status will be set to shipped at MultiSafepay", "De status bij MultiSafepay zal op verzonden worden gezet."
+"Enable direct banktransfer (no MultiSafepay page)", "Activeer een directe bankoverschrijving (Geen MultiSafepay pagina)"
+"Allow FastCheckout Product Feed", "Sta het ophalen van de producten feed voor FastCheckout toe"
+"With this option enabled, FastCheckout can request your productfeed if configured at FastCheckout", "Met deze optie aan kan FastCheckout the producten feed ophalen."
 
 
 

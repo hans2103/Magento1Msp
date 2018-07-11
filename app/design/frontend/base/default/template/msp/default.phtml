@@ -3,35 +3,34 @@
  *
  * @category MultiSafepay
  * @package  MultiSafepay_Msp
- * @license  http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 ?>
 <?php /** @var $this MultiSafepay_Msp_Block_Checkout_Onepage_Payment_Methods */ ?>
 <?php
-    $methods   = $this->getMethods();
-    $oneMethod = count($methods) <= 1;
+$methods = $this->getMethods();
+$oneMethod = count($methods) <= 1;
 ?>
 <?php if (empty($methods)): ?>
     <dt>
-        <?php //echo $this->__('No Payment Methods') ?>
+    <?php //echo $this->__('No Payment Methods') ?>
     </dt>
 <?php else: ?>
     <?php foreach ($methods as $_method): ?>
         <?php $_code = $_method->getCode() ?>
         <dt>
-            <?php if (!$oneMethod): ?>
-                <input id="p_method_<?php echo $_code ?>" value="<?php echo $_code ?>" type="radio" name="payment[method]" title="<?php echo $this->htmlEscape($_method->getTitle()) ?>" onclick="payment.switchMethod('<?php echo $_code ?>')"<?php if($this->getSelectedMethodCode()==$_code): ?> checked="checked"<?php endif; ?> class="radio" />
-            <?php else: ?>
-                <span class="no-display"><input id="p_method_<?php echo $_code ?>" value="<?php echo $_code ?>" type="radio" name="payment[method]" checked="checked" class="radio" /></span>
-                <?php $oneMethod = $_code ?>
-            <?php endif ?>
-            <label for="p_method_<?php echo $_code ?>"><?php echo $this->getMethodTitle($_method) ?> <?php echo $this->getMethodLabelAfterHtml($_method) ?></label>
+        <?php if (!$oneMethod): ?>
+            <input id="p_method_<?php echo $_code ?>" value="<?php echo $_code ?>" type="radio" name="payment[method]" title="<?php echo $this->htmlEscape($_method->getTitle()) ?>" onclick="payment.switchMethod('<?php echo $_code ?>')"<?php if ($this->getSelectedMethodCode() == $_code): ?> checked="checked"<?php endif; ?> class="radio" />
+        <?php else: ?>
+            <span class="no-display"><input id="p_method_<?php echo $_code ?>" value="<?php echo $_code ?>" type="radio" name="payment[method]" checked="checked" class="radio" /></span>
+            <?php $oneMethod = $_code ?>
+        <?php endif ?>
+        <label for="p_method_<?php echo $_code ?>"><?php echo $this->getMethodTitle($_method) ?> <?php echo $this->getMethodLabelAfterHtml($_method) ?></label>
         </dt>
 
         <?php if ($_code == 'msp_fastcheckout') { ?>
             <dd>
                 <a class="msp_checkout_link" href="<?php echo Mage::getUrl("msp/checkout/redirect") ?>">
-                    <img src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA).'msp'.DS.'button.png' ?>" style="margin-left: -0px;"/>
+                    <img src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA) . 'msp' . DS . 'button.png' ?>" style="margin-left: -0px;"/>
                 </a>
                 <script type="text/javascript">
                     element1 = document.getElementById('p_method_msp_fastcheckout');
@@ -39,7 +38,7 @@
                 </script>
             </dd>
         <?php } elseif ($_code != 'msp_ideal' && $_code != 'msp') { ?>
-            <?php if ($instruction = Mage::getStoreConfig('msp/'.$_code.'/instructions')) { ?>
+            <?php if ($instruction = Mage::getStoreConfig('msp/' . $_code . '/instructions')) { ?>
                 <dd>
                     <ul  class="form-list" id="payment_form_<?php echo $_code ?>" style="display: none;">
                         <li>
@@ -52,7 +51,7 @@
                     <?php echo $html; ?>
                 </dd>
             <?php } ?>
-        <?php } elseif ($_code == 'msp_ideal' && Mage::getStoreConfig('msp/'.$_code.'/bank_select')) { ?>
+        <?php } elseif ($_code == 'msp_ideal' && Mage::getStoreConfig('msp/' . $_code . '/bank_select')) { ?>
             <dd>
                 <ul class="5 form-list" id="payment_form_<?php echo $_code ?>" style="display: none;">
                     <li>
@@ -70,7 +69,7 @@
             <dd>
                 <ul class="form-list" id="payment_form_<?php echo $_code ?>" style="display: none;">
                     <li>
-                        <?php if ($_code=='msp_banktransfer') { ?>
+                        <?php if ($_code == 'msp_banktransfer') { ?>
                             <input name='payment[accountid]'            value=""   id="accountid"/>            <label for="accountid"            style="width:200px!important;">Rekeningnummer:</label><br />
                             <input name='payment[accountholdername]'    value=""   id="accountholdername"/>    <label for="accountholdername"    style="width:200px!important;">Naam rekeninghouder:</label><br />
                             <input name='payment[accountholdercity]'    value=""   id="accountholdercity"/>    <label for="accountholdercity"    style="width:200px!important;">Plaats Bank:</label><br />
@@ -84,7 +83,7 @@
             <?php if ($_code == 'msp') { ?>
                 <?php $instruction = Mage::getStoreConfig('payment/msp/instructions') ?>
             <?php } else { ?>
-                <?php $instruction = Mage::getStoreConfig('msp/'.$_code.'/instructions') ?>
+                <?php $instruction = Mage::getStoreConfig('msp/' . $_code . '/instructions') ?>
             <?php } ?>
             <?php if ($instruction): ?>
                 <dd>
@@ -103,10 +102,10 @@
 
 <script type="text/javascript">
 //<![CDATA[
-    <?php echo $this->getChildChildHtml('scripts') ?>
+<?php echo $this->getChildChildHtml('scripts') ?>
     payment.init();
-    <?php if (is_string($oneMethod)): ?>
-    payment.switchMethod('<?php echo $oneMethod ?>');
-    <?php endif ?>
+<?php if (is_string($oneMethod)): ?>
+        payment.switchMethod('<?php echo $oneMethod ?>');
+<?php endif ?>
 //]]>
 </script>

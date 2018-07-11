@@ -1,19 +1,16 @@
 <?php
+
 /**
  *
  * @category MultiSafepay
  * @package  MultiSafepay_Msp
- * @license  http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
-
-class MultiSafepay_Msp_Model_Config_Sources_Order_Email
-{
+class MultiSafepay_Msp_Model_Config_Sources_Order_Email {
 
     /**
      * @return array
      */
-    public function toOptionArray()
-    {
+    public function toOptionArray() {
         return array(
             array(
                 "value" => "after_confirmation",

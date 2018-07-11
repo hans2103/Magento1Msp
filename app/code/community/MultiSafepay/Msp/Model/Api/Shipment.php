@@ -1,20 +1,18 @@
 <?php
+
 /**
  *
  * @category MultiSafepay
  * @package  MultiSafepay_Msp
- * @license  http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
+require_once(Mage::getBaseDir('lib') . DS . 'multisafepay' . DS . 'MultiSafepay.combined.php');
 
-require_once(Mage::getBaseDir('lib').DS.'multisafepay'.DS.'MultiSafepay.combined.php');
+class MultiSafepay_Msp_Model_Api_Shipment extends MultiSafepay {
 
-class MultiSafepay_Msp_Model_Api_Shipment extends MultiSafepay
-{
     /**
      * Send update transaction
      */
-    function updateTransaction()
-    {
+    function updateTransaction() {
         $this->checkSettings();
 
         // generate request
@@ -51,28 +49,27 @@ class MultiSafepay_Msp_Model_Api_Shipment extends MultiSafepay
     /**
      * Create the update transaction request xml
      */
-    function createUpdateTransactionRequest()
-    {
+    function createUpdateTransactionRequest() {
         $request = '<?xml version="1.0" encoding="UTF-8"?>
     <updatetransaction>
         <merchant>
-            <account>' .          $this->xmlEscape($this->merchant['account_id'])    . '</account>
-            <site_id>' .          $this->xmlEscape($this->merchant['site_id'])       . '</site_id>
-            <site_secure_code>' . $this->xmlEscape($this->merchant['site_code'])     . '</site_secure_code>
+            <account>' . $this->xmlEscape($this->merchant['account_id']) . '</account>
+            <site_id>' . $this->xmlEscape($this->merchant['site_id']) . '</site_id>
+            <site_secure_code>' . $this->xmlEscape($this->merchant['site_code']) . '</site_secure_code>
         </merchant>
         <transaction>
-            <id>' .               $this->xmlEscape($this->transaction['id'])         . '</id>
-            <invoiceid>' .        $this->xmlEscape($this->transaction['invoice_id']) . '</invoiceid>
-            <shipdate>' .         $this->xmlEscape($this->transaction['shipdate'])   . '</shipdate>';
+            <id>' . $this->xmlEscape($this->transaction['id']) . '</id>
+            <invoiceid>' . $this->xmlEscape($this->transaction['invoice_id']) . '</invoiceid>
+            <shipdate>' . $this->xmlEscape($this->transaction['shipdate']) . '</shipdate>';
 
         if ($this->xmlEscape($this->transaction['shipper_trace_code'])) {
             $request .= '
-            <tracktracecode>' .   $this->xmlEscape($this->transaction['shipper_trace_code'])   . '</tracktracecode>';
+            <tracktracecode>' . $this->xmlEscape($this->transaction['shipper_trace_code']) . '</tracktracecode>';
         }
 
         if ($this->xmlEscape($this->transaction['carrier'])) {
             $request .= '
-            <carrier>' .          $this->xmlEscape($this->transaction['carrier'])   . '</carrier>';
+            <carrier>' . $this->xmlEscape($this->transaction['carrier']) . '</carrier>';
         }
 
         $request .= '
@@ -82,8 +79,7 @@ class MultiSafepay_Msp_Model_Api_Shipment extends MultiSafepay
         return $request;
     }
 
-    public function log()
-    {
+    public function log() {
         $argv = func_get_args();
         $data = array_shift($argv);
 

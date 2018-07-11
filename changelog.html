@@ -8,6 +8,86 @@
 	<div id="container" style="width:900px; margin-left:100">
 
 		<div id="version" style="background-color:#E0E0E0 ;">
+			<b>Release Notes - Magento 2.1.0 (Mar 19, 2015)</b>
+		</div>
+		<p>
+			<b>New features</b>
+			<hr size=1 color="#E0E0E0";>
+			<ul>
+				<li>Coupons now use their own gateway settings so that multiple MultiSafepay accounts can be used to support multiple MultiSafepay coupons</li>
+				<li>Add a refund transaction to the Magento transactions order overview on refund or partial refund</li>
+				<li>Support for partial refunds</li>
+				<li>Special status for initialized banktransfer transactions</li>
+				<li>Added support for fixed fee and/or percentage fee for each gateway</li>
+				<li>Show PAD rejection notice within the store when transaction is rejected</li>
+				<li>Added enable/disable config value for FCO product feed</li>
+				<li>Feed action. Feed can be requested at /msp/standard/feed/ </li>
+				<li>Enable/disable config option check is now added. Check is also added for api key to check if the given key matches the configured key</li>
+				<li>Order now using translation files</li>
+				<li>Added updateInvoice function. Send Magento invoice ID to MultiSafepay, this will be added to the accountantexport</li>
+				<li>Added daysactive to connect</li>
+				<li>When creating an order we now use the selected payment method for the manual transaction request</li>
+				<li>Payment link added to a manually created order by an admin. When an admin creates an order manually, we will create a transaction request for it and add the payment link to the order. The merchant now doesn't need to login to the Ewallet and manually create a payment link for the order</li>
+			</ul>
+			<br/>			
+
+			
+			<b>Improvements</b>
+			<hr size=1 color="#E0E0E0";>
+			<ul>
+				<li>If there is an invoice, the order can't be cancelled anymore</li>
+				<li>Added more language files</li>
+				<li>Better support for Keep Cart alive, so it is compatible with onestepcheckout</li>
+				<li>Added check for - phonenumber for BNO trans. Compatiblity with some onestepcheckout modules that add - when phonenumer is empty or not available as custom field</li>
+				<li>Check if payment is object, if not, default to standard gateway model This will solve the 1016 error message</li>
+				<li>Manual payment link process has changed. Updated the observer. The payment link is now only added when the order is beeing created from the magento backoffice and no longer on every save action within the Magento backend</li>
+				<li>If title isn't added then fallback tot main gateway title</li>
+				<li>Updated upgrade script</li>
+				<li>Updated bno.phtml for better layout in OneStepCheckout</li>
+				<li>Better support for gateway images. Works with default, onestepcheckout.com and apptha checkout</li>
+				<li>Removed disable option for text titles</li>
+				<li>Disabled check for active table rates config. This was old code from when this was configured within the FCO configuration</li>
+				<li>Transaction errors for normal transaction request now also result in a closed order</li>
+				<li>Added extra check for enabled fee for the payment method</li>
+				<li>After transaction error with DIRECT PAD transactions we will close the order because replacing using another payment method will create a new order</li>
+				<li>When status is refunded just return ok and exit. The magento plugin can process partial refunds so we should ignore refunded status because this can update the order wrong with partial refunds. Status updates are done by creating the credit memo</li>
+				<li>Added fallback for refund status for when new base.php is used with older releases</li>
+				<li>Added transaction details to the transaction record that is created when creating an invoice automatically</li>
+				<li>Added default config to the pugin that sets the fee after the shipping cost in the totals overviews</li>
+				<li>Rewrite of the refund API integration. The implementation was wrong and causing every MSP refunded to be processed online. This supposed to be a choice by order to refund online. Merchants can now refund online when it's enabled within the configuration and by going to the invoice, click credit memo and then refund. Then can choose to refund, or refund offline where the refund offline won't submit the refund to MultiSafepay</li>
+
+			</ul>
+			<br/>			
+
+			<b>Changes</b>
+			<hr size=1 color="#E0E0E0";>
+			<ul>
+				<li>Removed fijncadeau references</li>
+			</ul>
+			<br/>			
+			
+			<b>Fixes</b>
+			<hr size=1 color="#E0E0E0";>
+			<ul>
+				<li>Fixed bug for coupon settings</li>
+				<li>Fixed bug for ordering same article with different options results in an error 1027</li>
+				<li>Pay After Delivery option for sending invoice e-mail. When enabled resulted in NOT sending and vice-versa</li>
+				<li>Fixed bug Maintransaction ID errors when auto redirect is enabled with direct ideal</li>
+				<li>Reset fee before trying to set it. Solves issue with some installations not reseting, resulting in fee from other selected payment method</li>
+				<li>Added extra setQuote to solve issues reported by one mechant where Magento didn't add the quote correctly to the order. To solve this bug with Magento, we set the quote manually within the order</li>
+				<li>Fixed bug with payment details to be added to the transaction record. Payment details are now stored again within the transaction record</li>
+				<li>Fixed bug with unpaid invoices when completed</li>
+				<li>Fixed issue to treat orderstatus canceled or cancelled (American vs English) the same correct way</li>
+				<li>Fixed bug that caused product from a manually created order to be in the cart for the customer that the order was created for when the customer returns to the store and logs in</li>
+				<li>Fixed bug with paid status</li>
+				<li>When creating an invoice, Magento gets the totalpaid value and add it to the total invoiced value. When we don't create an invoice automatically, we set the totalpaid to inform the merchatn that the order was paid. This resulted in a double totalPaid value bacause magento added the invoiced total to the totalPaid when manually creating the invoice. This is now changed so that we reset the Total Paid in this situation just before the invoice is created and Magento updates the totalPaid again</li>
+			</ul>
+			
+		</p>
+		<br/>
+		<br/>
+
+		<div id="version" style="background-color:#E0E0E0 ;">
 			<b>Release Notes - Magento 2.0.2 (Oct 10, 2014)</b>
 		</div>
 		<p>
