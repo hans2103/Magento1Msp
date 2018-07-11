@@ -205,12 +205,16 @@ class Mage_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
 			$api->delivery['country']          = $shipping->getCountry();
 			$api->delivery['phone']            = $shipping->getTelephone();
 		}
-
+		$api->customer['referrer']			=	$_SERVER['HTTP_REFERER'];
+		$api->customer['user_agent']		=	$_SERVER['HTTP_USER_AGENT'];
+		$api->customer['ipaddress']			= 	$_SERVER['REMOTE_ADDR'];
 		$this->getItems();
 		$this->getShipping();
 		$this->getTaxes();
 		$this->getCustomFieldsFromFile();
     
+	
+	
 		if ($this->getSectionConfigData('checkout_google_analytics/active')) 
 		{
 			$api->ganalytics['account'] = $this->getSectionConfigData('checkout_google_analytics/account');

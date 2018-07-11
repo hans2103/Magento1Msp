@@ -19,7 +19,7 @@ class Mage_Msp_CheckoutController extends Mage_Core_Controller_Front_Action
 		{
 			$this->getResponse()->setRedirect(Mage::getUrl('checkout/cart'));
 		}
-    
+		
 		// create new quote
 		$storeQuote = Mage::getModel('sales/quote')->setStoreId(Mage::app()->getStore()->getId());
 		$storeQuote->merge($session->getQuote());

@@ -6,7 +6,7 @@ abstract class Mage_Msp_Model_Gateway_Abstract extends Mage_Payment_Model_Method
 	protected $_settings = "msp"; // config root for settings (always msp for now)
 	protected $_code;             // payment method code
 	protected $_model;            // payment model
-	protected $_gateway;          // msp 'gateway'
+	public $_gateway;          // msp 'gateway'
 	protected $_idealissuer;	  // ideal issuer
 	protected $_params;
 	protected $_loadSettingsConfig = true; // load 'settings' before payment config
@@ -92,6 +92,17 @@ abstract class Mage_Msp_Model_Gateway_Abstract extends Mage_Payment_Model_Method
 	}
 	
 	/**
+	* Start fco xml transaction transaction
+	*/
+	function startPayAfterTransaction()
+	{
+		// pass store (from this getLastOrderId) to the getPayment?
+		$payment = $this->getPayment();
+		return $payment->startPayAfterTransaction();
+	}
+	
+	
+	/**
 	* Start a transaction
 	*/
 	function startTransaction()
@@ -106,6 +117,7 @@ abstract class Mage_Msp_Model_Gateway_Abstract extends Mage_Payment_Model_Method
 	*/
 	function notification($id)
 	{
+		
 		// pass store (from this id) to the getPayment
 		$order = Mage::getSingleton('sales/order')->loadByIncrementId($id);
 		$storeId = $order->getStore();
@@ -114,6 +126,7 @@ abstract class Mage_Msp_Model_Gateway_Abstract extends Mage_Payment_Model_Method
 	}
 	
 	public function getIdealIssuersHTML(){
+		$storeId = $this->getStore();
 		$configSettings = array();
 		if ($this->_loadSettingsConfig)
 		{
