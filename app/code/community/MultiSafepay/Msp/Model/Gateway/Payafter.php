@@ -40,6 +40,8 @@ class MultiSafepay_Msp_Model_Gateway_PayAfter extends MultiSafepay_Msp_Model_Gat
         'msp_klarna',
         'msp_mistercash',
         'msp_visa',
+        'msp_eps',
+        'msp_ferbuy',
         'msp_mastercard',
         'msp_banktransfer',
         'msp_maestro',
@@ -91,7 +93,19 @@ class MultiSafepay_Msp_Model_Gateway_PayAfter extends MultiSafepay_Msp_Model_Gat
             }
         }
 
-        $this->_canUseCheckout = $availableByIP && $availableByCurrency;
+        $isavailablebygroup= true;
+        $group_id = 0; // If not logged in, customer group id is 0
+        if (Mage::getSingleton('customer/session')->isLoggedIn()) { // If logged in, set customer group id
+            $group_id = Mage::getSingleton('customer/session')->getCustomer()->getGroupId();
+        }
+        $option = trim(Mage::getStoreConfig($this->_configCode . '/' . $this->_code . '/specificgroups'));
+        $specificgroups = explode(",", $option);
+        // If customer group is not in available groups and config option is not empty, disable this gateway
+        if (!in_array($group_id, $specificgroups) && $option !== "") {
+            $isavailablebygroup = false;
+        }
+
+        $this->_canUseCheckout = $availableByIP && $availableByCurrency && $isavailablebygroup;
     }
 
     public function getOrderPlaceRedirectUrl() {

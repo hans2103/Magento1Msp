@@ -7,6 +7,15 @@
   padding-top: 12px;
 }
 
+#msp_gateways_msp_creditcard-head{
+  background-image: url("../../images/msp/nl/msp_creditcard.png");
+  background-position-x: 0px;
+  background-repeat: no-repeat;
+  padding-left: 60px;
+  min-height: 30px;
+  padding-top: 12px;
+}
+
 #msp_gateways_msp_dotpay-head{
   background-image: url("../../images/msp/nl/msp_dotpay.png");
   background-position-x: 0px;
@@ -63,6 +72,22 @@
 
 #msp_gateways_msp_visa-head{
   background-image: url("../../images/msp/nl/msp_visa.png");
+  background-position-x: 0px;
+  background-repeat: no-repeat;
+  padding-left: 60px;
+  min-height: 30px;
+  padding-top: 12px;
+}
+#msp_gateways_msp_eps-head{
+  background-image: url("../../images/msp/nl/msp_eps.png");
+  background-position-x: 0px;
+  background-repeat: no-repeat;
+  padding-left: 60px;
+  min-height: 30px;
+  padding-top: 12px;
+}
+#msp_gateways_msp_ferbuy-head{
+  background-image: url("../../images/msp/nl/msp_ferbuy.png");
   background-position-x: 0px;
   background-repeat: no-repeat;
   padding-left: 60px;

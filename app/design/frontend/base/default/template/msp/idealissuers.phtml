@@ -22,28 +22,27 @@
     
     ?>
    <label style="padding:0;" class="required">Selecteer uw bank: <em>*</em></label>
-	<br/>
+	<br/><br />
 	<?php foreach ($_banks as $bank) { ?>
-		<label>
-          
+		
+          <span>
           <?php 
           $fileWithPath = 'msp' . DS . 'ideallogos' . DS . $bank['code']['VALUE'] . '.' . 'gif';
             $iconFileDir = Mage::getBaseDir(Mage_Core_Model_Store::URL_TYPE_MEDIA) . DS . $fileWithPath;
             if (file_exists($iconFileDir)) {
                 $iconFileUrl = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA) . $fileWithPath;
               ?>
-            <input type="radio" name="payment[<?php echo $_code ?>_bank]" value="<?php echo $bank['code']['VALUE']; ?>">
-			<span style="display:block;float:left;width:45px;"><img src="<?php echo $iconFileUrl;?>" style="width:20px;"></span>&nbsp;<?php echo $bank['description']['VALUE']; ?>
+            <input type="radio" name="payment[<?php echo $_code ?>_bank]"  class="validate-one-required-by-name" value="<?php echo $bank['code']['VALUE']; ?>">
+			<span style="display:inline-block;"><img src="<?php echo $iconFileUrl;?>" ></span>&nbsp;<?php echo $bank['description']['VALUE']; ?>
             <?php }else{
                 ?>
-                <input type="radio" name="payment[<?php echo $_code ?>_bank]" value="<?php echo $bank['code']['VALUE']; ?>">
+                <input type="radio" name="payment[<?php echo $_code ?>_bank]" class="validate-one-required-by-name" value="<?php echo $bank['code']['VALUE']; ?>">
                 <?php echo $bank['description']['VALUE']; ?>
             <?php 
                 
             }
           ?>
-		</label>
-		<br/>
+          </span><br/ >
 	<?php } ?>
 	
   </li>

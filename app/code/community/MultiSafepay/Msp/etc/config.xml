@@ -9,7 +9,7 @@
 <config>
   <modules>
     <MultiSafepay_Msp>
-      <version>2.2.9</version>
+      <version>2.3.1</version>
     </MultiSafepay_Msp>
   </modules>
   <global>
@@ -275,6 +275,21 @@
         <model>msp/gateway_ideal</model>
         <title>MSP iDEAL</title>
       </msp_ideal>
+      <msp_creditcard>
+        <active>1</active>
+        <model>msp/gateway_creditcard</model>
+        <title>MSP Creditcard</title>
+      </msp_creditcard>
+      <msp_eps>
+        <active>1</active>
+        <model>msp/gateway_eps</model>
+        <title>MSP Eps</title>
+      </msp_eps>
+      <msp_ferbuy>
+        <active>1</active>
+        <model>msp/gateway_ferbuy</model>
+        <title>MSP Ferbuy</title>
+      </msp_ferbuy>
       <msp_payafter>
         <active>1</active>
         <model>msp/gateway_payafter</model>
@@ -486,6 +501,27 @@
         <allowed_currency>EUR</allowed_currency>
         <lang>nl</lang>
       </msp_ideal>
+      <msp_creditcard translate="title" module="msp">
+        <active>0</active>
+        <model>msp/gateway_creditcard</model>
+        <title>Creditcard</title>
+        <allowed_currency>EUR</allowed_currency>
+        <lang>nl</lang>
+      </msp_creditcard>
+      <msp_eps translate="title" module="msp">
+        <active>0</active>
+        <model>msp/gateway_eps</model>
+        <title>Eps</title>
+        <allowed_currency>EUR</allowed_currency>
+        <lang>nl</lang>
+      </msp_eps>
+      <msp_ferbuy translate="title" module="msp">
+        <active>0</active>
+        <model>msp/gateway_ferbuy</model>
+        <title>Ferbuy</title>
+        <allowed_currency>EUR</allowed_currency>
+        <lang>nl</lang>
+      </msp_ferbuy>
       <msp_payafter translate="title" module="msp">
         <active>0</active>
         <model>msp/gateway_payafter</model>

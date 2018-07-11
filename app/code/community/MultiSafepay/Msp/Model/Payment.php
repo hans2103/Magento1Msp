@@ -45,12 +45,15 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
     );
     public $gateways = array(
         'msp_ideal',
+        'msp_creditcard',
         'msp_dotpay',
         'msp_payafter',
         'msp_einvoice',
         'msp_klarna',
         'msp_mistercash',
         'msp_visa',
+        'msp_eps',
+        'msp_ferbuy',
         'msp_mastercard',
         'msp_banktransfer',
         'msp_maestro',
@@ -378,9 +381,10 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
             $this->api->gatewayinfo['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
         }
 
-        if (isset($_GET['birthday'])) {
-            $this->api->gatewayinfo['birthday'] = $_GET['birthday'];
-            $this->api->customer['birthday'] = $_GET['birthday'];
+         if (isset($_GET['birthday'])) {
+	        $birthday = str_replace('/', '-', $_GET['birthday']);
+            $this->api->gatewayinfo['birthday'] = $birthday;
+            $this->api->customer['birthday'] = $birthday;
         } else {
             $this->api->gatewayinfo['birthday'] = ''; //not available
         }
@@ -859,7 +863,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
 
                 // create item
                 $c_item = new MspItem($itemName, $item->getDescription(), $quantity, $price, 'KG', $item->getWeight());
-                $c_item->SetMerchantItemId($item->getSku());
+                $c_item->SetMerchantItemId($item->getId());
                 $c_item->SetTaxTableSelector($taxClass);
                 $this->api->cart->AddItem($c_item);
             }
@@ -1052,9 +1056,15 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
         $session = Mage::getSingleton('checkout/session');
         $payment_data = $session->getData('payment_additional');
 
+		$iss=$payment_data->msp_ideal_bank;
+		$cc= $payment_data->msp_creditcard_cc;
 
         if (is_object($payment_data)) {
-            $ideal_issuer = $payment_data->msp_ideal_bank;
+	        if(!empty($iss)){
+            	$ideal_issuer = $payment_data->msp_ideal_bank;
+            }elseif(!empty($cc)){
+	            $api->transaction['gateway'] = $payment_data->msp_creditcard_cc;
+            }
         }
 
 

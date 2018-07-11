@@ -18,11 +18,14 @@ class MultiSafepay_Msp_Model_Observer_Order extends MultiSafepay_Msp_Model_Obser
         'msp',
         //'mspcheckout', dont allow fco
         'msp_ideal',
+        'msp_creditcard',
         'msp_dotpay',
         //'msp_payafter', for now we dont allow payafter manual transaction requests
         //'msp_einvoice', for now we dont allow payafter manual transaction requests
         'msp_mistercash',
         'msp_visa',
+        'msp_eps',
+        'msp_ferbuy',
         'msp_mastercard',
         'msp_banktransfer',
         'msp_maestro',
@@ -118,8 +121,16 @@ class MultiSafepay_Msp_Model_Observer_Order extends MultiSafepay_Msp_Model_Obser
 
         $api = Mage::getModel('msp/api_paylink');
         $configMain = Mage::getStoreConfig('msp/settings', $order->getStoreId());
+        
+        if(!$config['paylink_create']){
+	        return $this;
+        }
+        
         if (!$api->isPaymentLinkCreated($order)) {
             if ($payment->getCode() == self::MSP_GENERAL_PAD_CODE || $payment->getCode() == self::MSP_GENERAL_KLARNA_CODE || $payment->getCode() == self::MSP_GENERAL_EINVOICE_CODE) {
+
+			
+
 
 
                 $api->test = ($config['test_api_pad'] == 'test');

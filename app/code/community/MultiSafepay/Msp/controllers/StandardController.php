@@ -345,19 +345,66 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
                 }
 
                 $product_data = array();
-                $product_data['ProductID'] = $productId;
-                $product_data['ProductName'] = $product->getName();
-                $product_data['SKUnumber'] = $product->getSku();
-                $product_data['PrimaryCategory'] = $maincat;
-                $product_data['SecondaryCategory'] = $subcats;
-                $product_data['ProductURL'] = $product->getProductUrl();
-                $product_data['ProductImageURL'] = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA) . 'catalog/product' . $product->getImage();
-                $product_data['ShortProductDescription'] = substr(iconv("UTF-8", "UTF-8//IGNORE", $product->getDescription()), 0, 150) . "...";
-                $product_data['LongProductDescription'] = substr(iconv("UTF-8", "UTF-8//IGNORE", $product->getDescription()), 0, 2000);
-                $product_data['SalePrice'] = round($product->getFinalPrice(), 4);
-                $product_data['RetailPrice'] = round($product->getPrice(), 4);
-                $product_data['UniversalProductCode'] = $product->getData('upc'); //need variable
-                $product_data['Currency'] = Mage::app()->getStore()->getCurrentCurrencyCode();
+	            $product_data['ProductID'] = $productId;
+	            $product_data['ProductName'] = $product->getName();
+	            $product_data['SKUnumber'] = $product->getSku();
+	            $product_data['Created'] = $product->getCreatedAt();
+	            $product_data['Updated'] = $product->getUpdatedAt();
+	            
+	            if($product->getTypeId() == Mage_Catalog_Model_Product_Type::TYPE_VIRTUAL){
+		            $product_data['Downloadable'] = true;
+	            }else{
+		            $product_data['Downloadable'] = false;
+	            }
+	            
+	            if($product->getFtin()){
+		            $product_data['FTIN'] = $product->getFtin();
+		            $product_data['UniqueIdentifier'] = true;
+	            }else{
+		            $product_data['UniqueIdentifier'] = false;
+	            }
+	            
+	            $product_data['MPN'] = $product->getMpn();
+	            $product_data['Brand'] = $product->getBrand();
+	            $product_data['Weight'] = $product->getWeight();
+	            $product_data['PrimaryCategory'] = $maincat;
+	            $product_data['SecondaryCategory'] = $subcats;
+	            $product_data['ProductURL'] = $product->getProductUrl();
+	            $product_data['ProductImageURLs']= array();
+	            
+	            $mainimage = new stdclass();
+	            $mainimage->url = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA) . 'catalog/product' . $product->getImage();
+	            $mainimage->main = true;
+	            $product_data['ProductImageURLs'][]= $mainimage;
+	            
+	            
+	            foreach ($product->getMediaGalleryImages() as $image) {
+		            $subimage = new stdclass();
+		            $subimage->url = $image->getUrl();
+					$subimage->main = false;
+					$product_data['ProductImageURLs'][] = $subimage;
+				}		
+	            
+	            //$product_data['ProductImageURL'] = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA) . 'catalog/product' . $product->getImage();
+	            $product_data['ShortProductDescription'] = substr(iconv("UTF-8", "UTF-8//IGNORE", $product->getDescription()), 0, 150) . "...";
+	            $product_data['LongProductDescription'] = substr(iconv("UTF-8", "UTF-8//IGNORE", $product->getDescription()), 0, 2000);
+	            $product_data['SalePrice'] = round($product->getFinalPrice(), 4);
+	            $product_data['RetailPrice'] = round($product->getPrice(), 4);
+	            //$product_data['UniversalProductCode'] = $product->getData('upc'); //need variable
+	            $product_data['Currency'] = Mage::app()->getStore()->getCurrentCurrencyCode();
+	            $product_data['TaxId'] = $product->getTaxClassId();
+	            
+	             $stockItem = Mage::getModel('cataloginventory/stock_item')->loadByProduct($productId);
+				 
+				 
+				$product_data['Stock'] = $stockItem->getQty();
+	            
+	            $meta_data = new stdclass();
+	            $meta_data->title = $product->getMetaTitle();
+	            $meta_data->keyword =  $product->getMetaKeyword();
+	            $meta_data->description= $product->getMetaDescription();
+	            
+	            $product_data['Metadata'] =$meta_data;
 
                 foreach ($product->getOptions() as $value) {
                     if (is_object($value)) {
@@ -400,20 +447,69 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
                 }
             }
 
+
+
             $product_data = array();
             $product_data['ProductID'] = $product_id;
             $product_data['ProductName'] = $product->getName();
             $product_data['SKUnumber'] = $product->getSku();
+            $product_data['Created'] = $product->getCreatedAt();
+            $product_data['Updated'] = $product->getUpdatedAt();
+            
+            if($product->getTypeId() == Mage_Catalog_Model_Product_Type::TYPE_VIRTUAL){
+	            $product_data['Downloadable'] = true;
+            }else{
+	            $product_data['Downloadable'] = false;
+            }
+            
+            if($product->getFtin()){
+	            $product_data['FTIN'] = $product->getFtin();
+	            $product_data['UniqueIdentifier'] = true;
+            }else{
+	            $product_data['UniqueIdentifier'] = false;
+            }
+            
+            $product_data['MPN'] = $product->getMpn();
+            $product_data['Brand'] = $product->getBrand();
+            $product_data['Weight'] = $product->getWeight();
             $product_data['PrimaryCategory'] = $maincat;
             $product_data['SecondaryCategory'] = $subcats;
             $product_data['ProductURL'] = $product->getProductUrl();
-            $product_data['ProductImageURL'] = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA) . 'catalog/product' . $product->getImage();
+            $product_data['ProductImageURLs']= array();
+            
+            $mainimage = new stdclass();
+            $mainimage->url = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA) . 'catalog/product' . $product->getImage();
+            $mainimage->main = true;
+            $product_data['ProductImageURLs'][]= $mainimage;
+            
+            
+            foreach ($product->getMediaGalleryImages() as $image) {
+	            $subimage = new stdclass();
+	            $subimage->url = $image->getUrl();
+				$subimage->main = false;
+				$product_data['ProductImageURLs'][] = $subimage;
+			}		
+            
+            //$product_data['ProductImageURL'] = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA) . 'catalog/product' . $product->getImage();
             $product_data['ShortProductDescription'] = substr(iconv("UTF-8", "UTF-8//IGNORE", $product->getDescription()), 0, 150) . "...";
             $product_data['LongProductDescription'] = substr(iconv("UTF-8", "UTF-8//IGNORE", $product->getDescription()), 0, 2000);
             $product_data['SalePrice'] = round($product->getFinalPrice(), 4);
             $product_data['RetailPrice'] = round($product->getPrice(), 4);
-            $product_data['UniversalProductCode'] = $product->getData('upc'); //need variable
+            //$product_data['UniversalProductCode'] = $product->getData('upc'); //need variable
             $product_data['Currency'] = Mage::app()->getStore()->getCurrentCurrencyCode();
+            $product_data['TaxId'] = $product->getTaxClassId();
+            
+             $stockItem = Mage::getModel('cataloginventory/stock_item')->loadByProduct($product_id);
+			 
+			 
+			$product_data['Stock'] = $stockItem->getQty();
+            
+            $meta_data = new stdclass();
+            $meta_data->title = $product->getMetaTitle();
+            $meta_data->keyword =  $product->getMetaKeyword();
+            $meta_data->description= $product->getMetaDescription();
+            
+            $product_data['Metadata'] =$meta_data;
 
             foreach ($product->getOptions() as $value) {
                 if (is_object($value)) {
@@ -454,10 +550,10 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
         $tree = Mage::getResourceModel('catalog/category_tree');
         $nodes = $tree->loadNode($parent)->loadChildren($recursionLevel)->getChildren();
         $tree->addCollectionData(null, false, $parent);
-        $categoryTreeData = new stdClass();
-        $categoryTreeData->categories = array();
+        $categoryTreeData = array();
+        //$categoryTreeData->categories = array();
         foreach ($nodes as $node) {
-            $categoryTreeData->categories[] = $this->getNodeChildrenData($node);
+            $categoryTreeData[] = $this->getNodeChildrenData($node);
         }
         return json_encode($categoryTreeData);
     }
@@ -502,27 +598,250 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
      */
     public function getTaxFeed() {
         $taxRules = Mage::getModel('tax/sales_order_tax')->getCollection();
-        $taxes = array();
 
+        $alternate=  array();
         foreach ($taxRules as $taxRule) {
-            print_r($taxRule);
-            exit;
-
             $tax_rule = new stdclass();
             $tax_rule->id = $taxRule->getTaxId();
+            $code = $taxRule->getCode();
+            $rate = $test = Mage::getModel('tax/calculation_rate')->loadByCode($code);
             $tax_rule->name = $taxRule->getTitle();
-            $tax_rule->rate = $taxRule->getPercent();
-            $taxes[] = $tax_rule;
+            $rule = array();
+            $rule[$rate->getTaxCountryId()]=$taxRule->getPercent();
+            $tax_rule->rules = $rule;
+            $alternate[] = $tax_rule;    
         }
-        return json_encode($taxes);
+        return json_encode($alternate);
     }
 
     /*
      * 	Function that generates a JSON Shipping feed.
      */
     public function getShippingFeed() {
-        return 'Shipping feed in json needs to be returned';
+	    //all method
+	    $shippingMethods= array();
+        $carriers = Mage::getStoreConfig('carriers', Mage::app()->getStore()->getId());
+        //$oldcarrierlist= print_r($this->handleShippingRatesNotification());
+        
+        //print_r($carriers);
+  
+		foreach ($carriers as $carrierCode => $carrierConfig) {
+			if($carrierConfig['active']){
+				if(isset($carrierConfig['price'])){				
+					$method= new stdclass();
+					$method->id = $carrierCode;
+					$method->name =  $carrierConfig['name'];
+					//$method->taxid= null;
+					$method->price = $carrierConfig['price'];
+					$method->sort_order = $carrierConfig['sort_order'];
+					$areas = explode(',', $carrierConfig['specificcountry']);
+					$method->allowed_areas = array();
+					foreach($areas as $area){
+						$method->allowed_areas[] =$area;
+					}
+					$shippingMethods[] = $method;
+				}
+			}
+		}	
+		return json_encode($shippingMethods);
     }
+    
+    
+    /*
+     * 	Function that generates a JSON store info feed.
+     */
+    public function getStoresFeed() {
+	    $stores = array();
+	    $languages=array();
+		$storeCollection=Mage::getModel('core/store')->getCollection();
+		//foreach($storeCollection as $store)
+		//{
+			$store = Mage::app()->getStore();
+			$store_data= new stdclass();
+			 
+			//get languages
+			//$languages[] = Mage::getStoreConfig('general/locale/code', $store->getId());
+			
+			
+			//get allowed countries
+			$allowed = explode(",", Mage::getStoreConfig('general/country/allow'),$store->getId());	 
+			$countries = array();
+		
+			foreach($allowed as $key => $value){
+				$countriesdata = explode(",", $value);
+				foreach($countriesdata as $index => $val){
+					$countries[] = $val;
+				}
+			}
+			
+			$store_data->allowed_countries =  $countries;
+			
+			//get metadata per languages
+			$metadata[Mage::getStoreConfig('general/locale/code', $store->getId())]['title'] = Mage::getStoreConfig('design/head/default_title', $store->getId());
+			
+			$keywords = explode(",", Mage::getStoreConfig('design/head/default_keywords', $store->getId()));
+			$keywordsdata = array();
+			foreach($keywords as $key =>$value){
+				$keywordsdata[]=trim($value);
+			}
+			
+			$metadata[Mage::getStoreConfig('general/locale/code', $store->getId())]['keywords'] = $keywordsdata;
+			$metadata[Mage::getStoreConfig('general/locale/code', $store->getId())]['description'] = Mage::getStoreConfig('design/head/default_description', $store->getId());  
+			
+			$metadata[Mage::getStoreConfig('general/locale/code', $store->getId())]['usps'] = array(
+				"shipping" => array("Order before 20:00 delivery tomorrow", "Optional, same day delivery", "We deliver till 22:00"),
+				"global"=> array("24 hour helpdesk", "Try first, pay later")
+			);
+			
+			
+			$store_data->languages = $metadata;
+			
+			$store_data->stock_updates = true;
+			$store_data->including_tax = false;
+			$store_data->require_shipping = true;
+			$store_data->base_url = $store->getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK);
+			$store_data->order_push_url=$store->getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK).'msp/standard/notification/';
+			$store_data->coc='12345678';
+			$store_data->email='webmaster@example.com';
+			$store_data->contact_phone='0208500500';
+			$store_data->address='raanspoor';
+			$store_data->housenumber='39';
+			$store_data->zipcode ='1033 SC';
+			$store_data->city = 'Amsterdam';
+			$store_data->country='NL';
+			$store_data->vat_nr= "NL123456789B01";
+			$store_data->coc='12345678';
+			$store_data->terms_and_conditions = $store->getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK);
+			$store_data->faq =  $store->getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK);
+			$store_data->open= "08:00";
+			$store_data->closed='23:00';
+			
+			$store_data->days= array("sunday"=>false,"monday"=>true, "tuesday"=>true, "wednesday"=>true, "thursday"=>true,"friday"=>true, "saturday"=>true);
+			$store_data->social=array(
+				"facebook"=>$store->getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK),
+				"twitter"=>$store->getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK),
+				"linkedin"=>$store->getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK)
+			);
+			
+			
+			
+			
+			
+			
+			//add store data to feed structure
+			$stores = $store_data;
+			
+		//}
+		
+		return json_encode($stores);	    
+    }
+    
+    
+    
+    
+    /*
+     * 	Function that generates a JSON Languages feed.
+     */
+    public function getLanguagesFeed() {
+	    $languages=array();
+		$storeCollection=Mage::getModel('core/store')->getCollection();
+		foreach($storeCollection as $store)
+		{
+			$languages[] =Mage::getStoreConfig('general/locale/code', $store->getId());
+		}
+		
+		return json_encode($languages);	    
+    }
+    
+    /*
+     * 	Function that generates a JSON countries feed.
+     */
+    public function getCountriesFeed() {
+		$allowed = explode(",", Mage::getStoreConfig('general/country/allow'),$store->getId());	 
+		$countries = array();
+		
+		foreach($allowed as $key => $value){
+			$countries[] = $value;
+		}  
+			   
+	   	return json_encode($countries);	    
+    }
+    
+    /*
+     * 	Function that generates a JSON Languages feed.
+     */
+    public function getMetadataFeed() {
+	    $metadata=array();
+		$storeCollection=Mage::getModel('core/store')->getCollection();
+		
+		foreach($storeCollection as $store)
+		{
+			$metadata[Mage::getStoreConfig('general/locale/code', $store->getId())]['title'] = Mage::getStoreConfig('design/head/default_title', $store->getId());
+			
+			$keywords = explode(",", Mage::getStoreConfig('design/head/default_keywords', $store->getId()));
+			$keywordsdata = array();
+			foreach($keywords as $key =>$value){
+				$keywordsdata[]=trim($value);
+			}
+			
+			$metadata[Mage::getStoreConfig('general/locale/code', $store->getId())]['keywords'] = $keywordsdata;
+			$metadata[Mage::getStoreConfig('general/locale/code', $store->getId())]['description'] = Mage::getStoreConfig('design/head/default_description', $store->getId());
+		}
+		
+		return json_encode($metadata);	    
+    }
+    
+    
+    
+    
+    public function handleShippingRatesNotification() {
+        $transactionId = $this->getRequest()->getQuery('transactionid');
+        $countryCode = $this->getRequest()->getQuery('countrycode');
+        $zipCode = $this->getRequest()->getQuery('zipcode');
+        $settings = array(
+            'currency' => $this->getRequest()->getQuery('currency'),
+            'country' => $this->getRequest()->getQuery('countrycode'),
+            'weight' => $this->getRequest()->getQuery('weight'),
+            'amount' => $this->getRequest()->getQuery('amount'),
+            'size' => $this->getRequest()->getQuery('size'),
+        );
+
+        return $this->getShippingRatesFiltered($transactionId, $countryCode, $zipCode, $settings);
+    }
+    
+      
+
+    public function getShippingRatesFiltered($transactionId, $countryCode, $zipCode, $settings) {
+        $output = array();
+
+        /** @var $quote Mage_Sales_Model_Quote */
+        $quote = Mage::getModel('sales/quote')->load($transactionId);
+
+        /** @var $shippingAddress Mage_Sales_Model_Quote_Address */
+        $shippingAddress = $quote->getShippingAddress();
+        $shippingAddress->setCountryId($countryCode);
+        $shippingAddress->setPostcode($zipCode);
+        $shippingAddress->setCollectShippingRates(true);
+
+        $rates = $shippingAddress->collectShippingRates()->getGroupedAllShippingRates();
+
+
+        foreach ($rates as $carrier) {
+            foreach ($carrier as $rate) {
+                $shipping = array();
+                $shipping['id'] = $rate->getCode();
+                $shipping['name'] = $rate->getCarrierTitle() . ' - ' . $rate->getMethodTitle();
+                $shipping['cost'] = number_format($rate->getPrice(), 2, '.', '');
+                $shipping['currency'] = $quote->getQuoteCurrencyCode();
+
+                $output[] = $shipping;
+            }
+        }
+
+        return $output;
+    }
+    
+    
 
     /*
      * This function will generate the product feed, used for FastCheckout shopping
@@ -565,11 +884,25 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
                 case "shipping":
                     $json = $this->getShippingFeed();
                     break;
+                case "languages":
+                    $json = "Deprecated"; //$this->getLanguagesFeed();
+                    break;
+                case "countries":
+                    $json = "Deprecated"; // $this->getCountriesFeed();
+                    break;
+                case "metadata":
+                    $json = "Deprecated"; //$this->getMetadataFeed();
+                    break;
+                case "stores":
+                    $json = $this->getStoresFeed();
+                    break;  
             }
 
-            $this->getResponse()->setHeader('Content-type', 'application/json', true);
-            echo $json;
-            exit;
+           $this->getResponse()->clearHeaders()->setHeader('Content-type','application/json',true);
+           $this->getResponse()->setHeader('X-Feed-Version','1.0',true);
+           $this->getResponse()->setHeader('Connection','close',true);
+		   $this->getResponse()->setBody($json);            
+  
         } else {
             echo Mage::helper("msp")->__("You are not allowed to request the product feed!");
             exit;
