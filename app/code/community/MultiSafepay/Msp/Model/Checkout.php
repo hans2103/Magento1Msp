@@ -352,8 +352,14 @@ class MultiSafepay_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
             $base->unlock();
             exit();
         }
+        
+        if($api->details['ewallet']['id'] == ''){
+            return true;
+        }else{
+            $this->_createOrder($quoteId);
+        }
 
-        $this->_createOrder($quoteId);
+        
 
         $base->log("Quote ID: $quoteId");
         // get the order

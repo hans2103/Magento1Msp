@@ -10,6 +10,7 @@ class MultiSafepay_Msp_Model_Servicecost_Quote_Address_Total_Servicecost extends
         'mspcheckout',
         'msp_ideal',
         'msp_payafter',
+        'msp_klarna',
         'msp_mistercash',
         'msp_visa',
         'msp_mastercard',
@@ -30,6 +31,12 @@ class MultiSafepay_Msp_Model_Servicecost_Quote_Address_Total_Servicecost extends
         'msp_directebanking',
         'msp_directdebit',
         'msp_fastcheckout',
+        'msp_yourgift',
+        'msp_wijncadeau',
+        'msp_lief',
+        'msp_gezondheidsbon',
+        'msp_fashioncheque',
+        
     );
 
     public function __construct() {

@@ -195,6 +195,12 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
         $order = $this->getOrder();
         $quote = Mage::getModel('sales/quote')->load($order->getQuoteId());
 
+
+
+        $gateway_data = $quote->getPayment()->getData();
+        $gateway = strtoupper(str_replace("msp_", '', $gateway_data['method']));
+
+
         $quote_base_grand_total = $quote->getBaseGrandTotal();
         $order_base_grand_total = $order->getBaseGrandTotal();
 
@@ -210,7 +216,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
 
         // currency check
         $isAllowConvert = Mage::getStoreConfigFlag('msp/settings/allow_convert_currency');
-        $currencies = explode(',', Mage::getStoreConfig('msp/' . $order->getPayment()->getMethodInstance()->getCode() . '/allowed_currency'));
+        $currencies = explode(',', Mage::getStoreConfig('msp/' . strtolower($gateway_data['method']) . '/allowed_currency'));
         $canUseCurrentCurrency = in_array(Mage::app()->getStore()->getCurrentCurrencyCode(), $currencies);
 
         $currentCurrencyCode = Mage::app()->getStore()->getCurrentCurrencyCode();
@@ -242,7 +248,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
         }
         $items .= "</ul>\n";
 
-        $isTestMode = $this->_isTestPayAfterDelivery();
+        $isTestMode = $this->_isTestPayAfterDelivery($order->getPayment()->getMethodInstance()->getCode());
 
         $suffix = '';
         if ($isTestMode) {
@@ -351,12 +357,12 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
         }
 
 
-        $taxClass = Mage::getStoreConfig('msp/msp_payafter/fee_tax_class');
+        $taxClass = Mage::getStoreConfig('msp/msp_' . strtolower($this->_gateway) . '/fee_tax_class');
 
         if ($taxClass == 0) {
             $this->_rate = 1;
         }
-        
+
         $taxCalculationModel = Mage::getSingleton('tax/calculation');
         $request = $taxCalculationModel->getRateRequest(
                 $quote->getShippingAddress(), $quote->getBillingAddress(), $quote->getCustomerTaxClassId(), Mage::app()->getStore()->getId()
@@ -385,42 +391,39 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
           $fee = number_format($fee, 4, '.', ''); */
 
         $total_fee = 0;
-        $fee = Mage::getStoreConfig('msp/msp_payafter/fee_amount');
+        $fee = Mage::getStoreConfig('msp/msp_' . strtolower($this->_gateway) . '/fee_amount');
         $fee_array = explode(':', $fee);
 
         //fee is not configured
-        if ($fee_array[0] == '') {
-            return;
-        }
+        if ($fee_array[0] != '') {
+            $fixed_fee = str_replace(',', '.', $fee_array[0]);
 
-        $fixed_fee = str_replace(',', '.', $fee_array[0]);
-
-        //check for configured percentage value
-        if (!empty($fee_array[1])) {
-            $fee_array[1] = str_replace(',', '.', $fee_array[1]);
-            $serviceCostPercentage = str_replace('%', '', $fee_array[1]);
-            //if the service cost is added, then first remove it before calcualting the fee
-            if ($quote->getBaseServicecost()) {
-                $fee_percentage = ($quote->getBaseGrandTotal() - $quote->getBaseServicecost()) * ($serviceCostPercentage / 100);
-            } else {
-                $fee_percentage = $quote->getBaseGrandTotal() * ($serviceCostPercentage / 100);
+            //check for configured percentage value
+            if (!empty($fee_array[1])) {
+                $fee_array[1] = str_replace(',', '.', $fee_array[1]);
+                $serviceCostPercentage = str_replace('%', '', $fee_array[1]);
+                //if the service cost is added, then first remove it before calcualting the fee
+                if ($quote->getBaseServicecost()) {
+                    $fee_percentage = ($quote->getBaseGrandTotal() - $quote->getBaseServicecost()) * ($serviceCostPercentage / 100);
+                } else {
+                    $fee_percentage = $quote->getBaseGrandTotal() * ($serviceCostPercentage / 100);
+                }
+                $total_fee += $fee_percentage;
             }
-            $total_fee += $fee_percentage;
+            $total_fee += $fixed_fee;
+            $fee = $total_fee;
+            $tax = ($fee / $bigRate) * $rate;
+            $fee = $fee - $tax;
+
+
+            //add pay after delivery fee if enabled
+            if (Mage::getStoreConfig('msp/msp_' . strtolower($this->_gateway) . '/fee')) {
+                $c_item = new MspItem('Fee', 'Fee', 1, $fee, 'KG', 0); // Todo adjust the amount to cents, and round it up.
+                $c_item->SetMerchantItemId('Fee');
+                $c_item->SetTaxTableSelector('FEE');
+                $this->api->cart->AddItem($c_item);
+            }
         }
-        $total_fee += $fixed_fee;
-        $fee = $total_fee;
-        $tax = ($fee / $bigRate) * $rate;
-        $fee= $fee-$tax;
-
-
-        //add pay after delivery fee if enabled
-        if (Mage::getStoreConfig('msp/msp_payafter/fee')) {
-            $c_item = new MspItem('Fee', 'Fee', 1, $fee, 'KG', 0); // Todo adjust the amount to cents, and round it up.
-            $c_item->SetMerchantItemId('Fee');
-            $c_item->SetTaxTableSelector('FEE');
-            $this->api->cart->AddItem($c_item);
-        }
-
 
         //add none taxtable
         $table = new MspAlternateTaxTable();
@@ -463,9 +466,9 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
             $this->api->customer['phone'] = '';
             $this->api->gatewayinfo['phone'] = '';
         }
-        
-        
-        
+
+
+
         //ALL data available? Then request the transaction link
         $url = $this->api->startCheckout();
 
@@ -487,7 +490,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
             // raise error
             //Mage::throwException(Mage::helper("msp")->__("An error occured: ") . $this->api->error_code . " - " . $this->api->error);
             if ($this->api->error_code == '1024') {
-                $errorMessage = Mage::helper("msp")->__("An error occured: ") . $this->api->error_code . " - " . $this->api->error . '<br />' . Mage::helper("msp")->__('We are sorry to inform you that your request for payment after delivery has been denied by Multifactor.<BR /> If you have questions about this rejection, you can checkout the FAQ on the website of Multifactor (<a href="http://www.multifactor.nl/contact" target="_blank">http://www.multifactor.nl/faq</a>). You can also contact Multifactor by calling 020-8500533 (at least 2 hours after this rejection) or by sending an email to <a href="mailto:support@multifactor.nl">support@multifactor.nl</a>. Please retry placing your order and select a different payment method.');
+                $errorMessage = Mage::helper("msp")->__("An error occured: ") . $this->api->error_code . /*" - " . $this->api->error .*/ '<br />' . Mage::helper("msp")->__('We are sorry to inform you that your request for payment after delivery has been denied by Multifactor.<BR /> If you have questions about this rejection, you can checkout the FAQ on the website of Multifactor'). '<a href="http://www.multifactor.nl/contact" target="_blank">http://www.multifactor.nl/faq</a>'. Mage::helper("msp")->__('You can also contact Multifactor by calling 020-8500533 (at least 2 hours after this rejection) or by sending an email to ').' <a href="mailto:support@multifactor.nl">support@multifactor.nl</a>.'.Mage::helper("msp")->__('Please retry placing your order and select a different payment method.');
             } else {
                 $errorMessage = Mage::helper("msp")->__("An error occured: ") . $this->api->error_code . " - " . $this->api->error . '<br />' . Mage::helper("msp")->__("Please retry placing your order and select a different payment method.");
             }
@@ -532,13 +535,13 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
     /**
      * @return bool
      */
-    protected function _isTestPayAfterDelivery() {
+    protected function _isTestPayAfterDelivery($gateway) {
         $isTest = ($this->getConfigData('test_api_pad') == MultiSafepay_Msp_Model_Config_Sources_Accounts::TEST_MODE);
         if ($isTest) {
             return true;
         }
 
-        if ($ips = Mage::getStoreConfig('msp/msp_payafter/ip_filter_test_for_live_mode')) {
+        if ($ips = Mage::getStoreConfig('msp/' . $gateway . '/ip_filter_test_for_live_mode')) {
             if (in_array($_SERVER["REMOTE_ADDR"], explode(';', $ips))) {
                 return true;
             }
@@ -712,15 +715,15 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
             //$quantity = round($item->getQtyOrdered(), 2);
 
             $ndata = $item->getData();
-            
+
             if ($ndata['price'] != 0) {
                 //Test-> Magento rounds at 2 decimals so the recalculation goes wrong with large quantities.
-               /* $price_with_tax = $ndata['price_incl_tax'];
-                $tax_rate = $rate;
-                $divided_value = 1 + ($tax_rate);
-                $price_without_tax = $price_with_tax / $divided_value;
-                $price = round($price_without_tax, 4);*/
-                
+                /* $price_with_tax = $ndata['price_incl_tax'];
+                  $tax_rate = $rate;
+                  $divided_value = 1 + ($tax_rate);
+                  $price_without_tax = $price_with_tax / $divided_value;
+                  $price = round($price_without_tax, 4); */
+
                 $price = number_format($this->_convertCurrency($ndata['price'], $currentCurrencyCode, $targetCurrencyCode), 4, '.', '');
 
                 $tierprices = $proddata->getTierPrice();
@@ -730,21 +733,20 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
                     foreach ($product_tier_prices as $key => $value) {
                         $value = (object) $value;
                         if ($item->getQtyOrdered() >= $value->price_qty)
-                          	/*$price_with_tax = $value->price;
-						  	$tax_rate = $rate;
-						  	$divided_value = 1 + ($tax_rate);
-						  	$price_without_tax = $price_with_tax / $divided_value;
-						  	$price = round($price_without_tax, 4);*/
-						  	
-						  	if($ndata['price'] < $value->price){
-							  	$price = $ndata['price'];
-						  	}else{
-							  		$price = $value->price;
-						  	}
-						  	
-						  	$price = number_format($this->_convertCurrency($price, $currentCurrencyCode, $targetCurrencyCode), 4, '.', '');
-                    	}
-                	}
+                        /* $price_with_tax = $value->price;
+                          $tax_rate = $rate;
+                          $divided_value = 1 + ($tax_rate);
+                          $price_without_tax = $price_with_tax / $divided_value;
+                          $price = round($price_without_tax, 4); */
+                            if ($ndata['price'] < $value->price) {
+                                $price = $ndata['price'];
+                            } else {
+                                $price = $value->price;
+                            }
+
+                        $price = number_format($this->_convertCurrency($price, $currentCurrencyCode, $targetCurrencyCode), 4, '.', '');
+                    }
+                }
 
 
                 // create item
@@ -801,7 +803,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
         if ($gateway_data['method'] == 'msp') {
             $currencies = explode(',', Mage::getStoreConfig('payment/msp/allowed_currency'));
         } else {
-            $currencies = explode(',', Mage::getStoreConfig('msp/' .  strtolower($gateway)  . '/allowed_currency'));
+            $currencies = explode(',', Mage::getStoreConfig('msp/' . strtolower($gateway_data['method']) . '/allowed_currency'));
         }
 
         $canUseCurrentCurrency = in_array(Mage::app()->getStore()->getCurrentCurrencyCode(), $currencies);
@@ -847,6 +849,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
                 $gateway_data['method'] == 'msp_lief' ||
                 $gateway_data['method'] == 'msp_parfumcadeaukaart' ||
                 $gateway_data['method'] == 'msp_parfumnl' ||
+                $gateway_data['method'] == 'msp_wijncadeau' ||
                 $gateway_data['method'] == 'msp_yourgift'
         ) {
             $api = $this->getGatewaysApi(null, $order, $gateway_data['method']);
@@ -884,6 +887,32 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
         if (isset($_SERVER['HTTP_USER_AGENT'])) {
             $api->customer['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
         }
+
+
+        //add shipping details, used for PayPal
+        if (is_object($shipping)) {
+            $this->api->parseDeliveryAddress($shipping->getStreet(1));
+
+            if ($this->api->delivery['housenumber'] == '') {
+                $this->api->delivery['housenumber'] = $shipping->getStreet(2);
+                $this->api->delivery['address1'] = $shipping->getStreet(1);
+            }
+
+            $api->delivery['firstname'] = $shipping->getFirstname();
+            $api->delivery['lastname'] = $shipping->getLastname();
+            $api->delivery['address2'] = $shipping->getStreet(2);
+            $api->delivery['zipcode'] = $shipping->getPostcode();
+            $api->delivery['city'] = $shipping->getCity();
+            $api->delivery['state'] = $shipping->getState();
+            $api->delivery['country'] = $shipping->getCountry();
+            $api->delivery['phone'] = $shipping->getTelephone();
+        }
+
+        if ($gateway == "DIRECTEBANKING") {
+            $gateway = 'DIRECTBANK';
+        }
+
+
         $api->transaction['id'] = $orderId;
         $api->transaction['amount'] = $amount;
         $api->transaction['currency'] = $currencyCode;
@@ -1004,7 +1033,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
             $base->preventLockDelete();
 
             if ($initial) {
-                return;
+                return false;
             } else {
 
                 return false;
@@ -1025,7 +1054,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
         }
 
         // get the status
-        if ($payment_method_code == 'msp_payafter') {
+        if ($payment_method_code == 'msp_payafter' || $payment_method_code == 'msp_klarna') {
             $api = $this->getPayAfterApi($orderId, $order);
         } elseif ($payment_method_code == 'msp_ebon' ||
                 $payment_method_code == 'msp_webgift' ||
@@ -1038,6 +1067,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
                 $payment_method_code == 'msp_lief' ||
                 $payment_method_code == 'msp_parfumcadeaukaart' ||
                 $payment_method_code == 'msp_parfumnl' ||
+                $payment_method_code == 'msp_wijncadeau' ||
                 $payment_method_code == 'msp_yourgift'
         ) {
             $api = $this->getGatewaysApi(null, $order, $payment_method_code);
@@ -1092,11 +1122,12 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
             Mage::throwException(Mage::helper("msp")->__("Imposible convert %s to %s", $currentCurrencyCode, $targetCurrencyCode));
         }
 
-        if (strlen((string) $rateCurrentToTarget) < 12) {
-            $revertCheckingCode = Mage::getModel('directory/currency')->load($targetCurrencyCode);
-            $revertCheckingRate = $revertCheckingCode->getAnyRate($currentCurrencyCode);
-            $rateCurrentToTarget = 1 / $revertCheckingRate;
-        }
+        //Disabled check, fixes PLGMAG-10. Magento seems to not to update USD->EUR rate in db, resulting in wrong conversions. Now we calculate the rate manually and and don't trust Magento stored rate.
+        // if (strlen((string) $rateCurrentToTarget) < 12) { 
+        $revertCheckingCode = Mage::getModel('directory/currency')->load($targetCurrencyCode);
+        $revertCheckingRate = $revertCheckingCode->getAnyRate($currentCurrencyCode);
+        $rateCurrentToTarget = 1 / $revertCheckingRate;
+        //}
 
         return round($amount * $rateCurrentToTarget, 2);
     }

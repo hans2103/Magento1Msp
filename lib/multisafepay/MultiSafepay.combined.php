@@ -2240,7 +2240,7 @@ class MspCart {
 
                 $xml_data->Pop($ship->type);
             } else if ($ship->type == "pickup") {
-                $xml_data->Push('pickup', array('name' => $ship->name));
+                $xml_data->Push('pickup', array('name' => $ship->name, 'provider'=> $ship->provider));
                 $xml_data->Element('price', $ship->price, array('currency' => $this->currency));
                 $xml_data->Pop('pickup');
             }
@@ -3648,14 +3648,16 @@ class MspPickUp {
     var $price;
     var $name;
     var $type = "pickup";
+    var $provider;
 
     /**
      * @param string $name the name of this shipping option
      * @param double $price the handling cost (if there is one)
      */
-    function MspPickUp($name, $price) {
+    function MspPickUp($name, $price, $provider = '') {
         $this->price = $price;
         $this->name = $name;
+        $this->provider = $provider;
     }
 
 }

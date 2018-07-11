@@ -70,7 +70,7 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
 
         $paymentModel->setParams($this->getRequest()->getParams());
 
-        if ($selected_gateway != 'PAYAFTER') {
+        if ($selected_gateway != 'PAYAFTER' && $selected_gateway != 'KLARNA') {
             $paymentLink = $paymentModel->startTransaction();
         } else {
             $paymentLink = $paymentModel->startPayAfterTransaction();
@@ -132,7 +132,8 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
         //add keep cart function in cancelaction to have better support for onestepcheckout modules that overrule the observer
         if (Mage::getStoreConfig('payment/msp/keep_cart', $quote->getStoreId()) ||
                 Mage::getStoreConfig('msp/settings/keep_cart', $quote->getStoreId()) ||
-                $quote->getPayment()->getMethod() == 'msp_payafter') {
+                $quote->getPayment()->getMethod() == 'msp_payafter'||
+                $quote->getPayment()->getMethod() == 'msp_klarna') {
 
             if ($quoteId = $checkout->getLastQuoteId()) {
                 $quote = Mage::getModel('sales/quote')->load($quoteId);

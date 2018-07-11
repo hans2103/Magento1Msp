@@ -26,6 +26,7 @@ class MultiSafepay_Msp_Model_Api_Paylink {
         'id' => '',
         'currency' => '',
         'amount' => '',
+        'days_active' => '',
     );
     public $signature;
     public $api_url;
@@ -62,6 +63,11 @@ class MultiSafepay_Msp_Model_Api_Paylink {
         'msp_directebanking' => 'DIRECTBANK',
         'msp_directdebit' => 'DIRDEB',
         'msp_amex',
+        'msp_yourgift',
+        'msp_wijncadeau',
+        'msp_lief',
+        'msp_gezondheidsbon',
+        'msp_fashioncheque',
     );
 
     /**
@@ -97,7 +103,7 @@ class MultiSafepay_Msp_Model_Api_Paylink {
         $mapi->merchant['site_id'] = $this->merchant['site_id'];
         $mapi->merchant['site_code'] = $this->merchant['security_code'];
 
-        $mapi->test = $this->getApiUrl();
+        $mapi->test = $this->test;
         $mapi->merchant['notification_url'] = Mage::getUrl("msp/standard/notification") . '&type=initial';
         $mapi->merchant['cancel_url'] = Mage::getUrl("msp/standard/cancel", array("_secure" => true));
         $mapi->merchant['redirect_url'] = Mage::getUrl("msp/standard/return", array("_secure" => true));
@@ -126,7 +132,7 @@ class MultiSafepay_Msp_Model_Api_Paylink {
         $mapi->transaction['description'] = 'Order #' . $this->transaction['id'] . ' at ' . $storename;
         $mapi->transaction['gateway'] = $this->availablePaymentMethodCodes[$pm_code];
         $mapi->transaction['items'] = $items;
-        $mapi->transaction['daysactive'] = '30';
+        $mapi->transaction['daysactive'] = $this->transaction['days_active'];
 
         $url = $mapi->startTransaction();
 

@@ -9,7 +9,7 @@
 <config>
     <modules>
         <MultiSafepay_Msp>
-            <version>2.1.1</version>
+            <version>2.1.2</version>
         </MultiSafepay_Msp>
     </modules>
     <global>
@@ -242,6 +242,7 @@
                 <expired_status>canceled</expired_status>
                 <autocreate_invoice>0</autocreate_invoice>
                 <mail_invoice>0</mail_invoice>
+                <keep_cart>1</keep_cart>
                 <test_api>live</test_api>
                 <use_refund_credit_memo>0</use_refund_credit_memo>
                 <allow_convert_currency>1</allow_convert_currency>
@@ -262,6 +263,11 @@
                 <model>msp/gateway_payafter</model>
                 <title>MSP Betaal na Ontvangst</title>
             </msp_payafter>
+            <msp_klarna>
+                <active>1</active>
+                <model>msp/gateway_klarna</model>
+                <title>Klarna</title>
+            </msp_klarna>
             <msp_amex>
                 <active>1</active>
                 <model>msp/gateway_amex</model>
@@ -352,6 +358,11 @@
                 <model>msp/gateway_yourgift</model>
                 <title>MSP Your Giftcard</title>
             </msp_yourgift>
+            <msp_wijncadeau>
+                <active>1</active>
+                <model>msp/gateway_wijncadeau</model>
+                <title>MSP Wijncadeau</title>
+            </msp_wijncadeau>
             <msp_degrotespeelgoedwinkel>
                 <active>1</active>
                 <model>msp/gateway_degrotespeelgoedwinkel</model>
@@ -403,6 +414,7 @@
                 <autocreate_invoice>0</autocreate_invoice>
                 <mail_invoice>0</mail_invoice>
                 <test_api>live</test_api>
+                <keep_cart>1</keep_cart>
                 <allow_convert_currency>1</allow_convert_currency>
                 <use_refund_credit_memo>0</use_refund_credit_memo>
             </settings>
@@ -423,6 +435,16 @@
                 <max_order_total>300</max_order_total>
                 <send_request_after_shipping>0</send_request_after_shipping>
             </msp_payafter>
+            <msp_klarna translate="title" module="msp">
+                <active>0</active>
+                <model>msp/gateway_klarna</model>
+                <title>Klarna Factuur</title>
+                <allowed_currency>EUR</allowed_currency>
+                <lang>nl</lang>
+                <min_order_total>15</min_order_total>
+                <max_order_total>300</max_order_total>
+                <send_request_after_shipping>0</send_request_after_shipping>
+            </msp_klarna>
             <msp_amex translate="title" module="msp">
                 <active>0</active>
                 <model>msp/gateway_amex</model>
@@ -549,6 +571,13 @@
                 <allowed_currency>EUR</allowed_currency>
                 <lang>nl</lang>
             </msp_yourgift>
+            <msp_wijncadeau translate="title" module="msp">
+                <active>0</active>
+                <model>msp/gateway_wijncadeau</model>
+                <title>Wijncadeau</title>
+                <allowed_currency>EUR</allowed_currency>
+                <lang>nl</lang>
+            </msp_wijncadeau>
             <msp_degrotespeelgoedwinkel translate="title" module="msp">
                 <active>0</active>
                 <model>msp/gateway_degrotespeelgoedwinkel</model>
