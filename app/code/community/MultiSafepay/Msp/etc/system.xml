@@ -9,7 +9,7 @@
 <config>
     <tabs>
         <ms translate="label">
-            <label><![CDATA[<div style="display:inline-block;color:#00adee;text-transform: capitalize;font-size: 120%;font-weight:900;font-family:Tahoma, Geneva, sans-serif;">Multi</div><div style="display:inline-block;color:black;text-transform: capitalize;font-size: 120%;font-weight:900;font-family:Tahoma, Geneva, sans-serif;">Safepay</div><div style="display: inline-block;vertical-align: middle;border: 3px dotted #666;width:8px;height:8px;border-radius:8px;margin-bottom:3px;margin-left:3px;"></div>&nbsp;&nbsp;]]> (2.4.1)</label>
+            <label><![CDATA[<div style="display:inline-block;color:#00adee;text-transform: capitalize;font-size: 120%;font-weight:900;font-family:Tahoma, Geneva, sans-serif;">Multi</div><div style="display:inline-block;color:black;text-transform: capitalize;font-size: 120%;font-weight:900;font-family:Tahoma, Geneva, sans-serif;">Safepay</div><div style="display: inline-block;vertical-align: middle;border: 3px dotted #666;width:8px;height:8px;border-radius:8px;margin-bottom:3px;margin-left:3px;"></div>&nbsp;&nbsp;]]> (2.4.2)</label>
             <sort_order>301</sort_order>
             <!--<class>admin-system-config-msp</class>-->
         </ms>
@@ -118,7 +118,7 @@
                             <show_in_store>1</show_in_store>
                         </allow_convert_currency>
                         <use_redirect translate="label comment">
-                            <label>Auto. redirect</label>
+                            <label>Auto redirect</label>
                             <comment>Automatically redirects a customer back to the webshop after a succesful payment. (Skips MultiSafepay's 'Transaction Complete' screen)</comment>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
@@ -752,7 +752,7 @@
                             <show_in_store>1</show_in_store>
                         </title>
                         <pad_daysactive translate="label">
-                            <label>Days active before requests expires?</label>
+                            <label>Days active before transaction requests expires?</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>61</sort_order>
                             <show_in_default>1</show_in_default>
@@ -1043,7 +1043,7 @@
                             <show_in_store>1</show_in_store>
                         </title>
                         <pad_daysactive translate="label">
-                            <label>Days active before requests expires?</label>
+                            <label>Days active before transaction requests expires?</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>61</sort_order>
                             <show_in_default>1</show_in_default>
@@ -1331,7 +1331,7 @@
                             <show_in_store>1</show_in_store>
                         </title>
                         <pad_daysactive translate="label">
-                            <label>Days active before requests expires?</label>
+                            <label>Days active before transaction requests expires?</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>67</sort_order>
                             <show_in_default>1</show_in_default>
@@ -8637,7 +8637,7 @@
                         </use_refund_credit_memo>
                         <use_redirect translate="label comment">
                             <label>Auto redirect</label>
-                            <comment>Automatically redirects the customer back to the webshop after payment. (Skips the 'Transaction Complete' screen)</comment>
+                            <comment><comment>Automatically redirects a customer back to the webshop after a succesful payment. (Skips MultiSafepay's 'Transaction Complete' screen)</comment></comment>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>70</sort_order>
@@ -8984,7 +8984,7 @@
                     <show_in_store>1</show_in_store>
                     <fields>
                         <active>
-                            <label>Enable</label>
+                            <label>Enabled</label>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>10</sort_order>

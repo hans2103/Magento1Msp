@@ -342,11 +342,6 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object
             return true;
         }
 
-        if ( in_array ($usedMethod, array ('PAYAFTER', 'KLARNA', 'EINVOICE', 'AFTERPAY')) &&
-             in_array ($mspStatus, array ('cancelled', 'void')) ) {
-            return true;
-        }
-
         $payment_method_quote = $quote->getPayment();
         $payment = $order->getPayment();
 
