@@ -29,6 +29,7 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
     const MSP_GENERAL_CODE = 'msp';
     const MSP_FASTCHECKOUT_CODE = 'mspcheckout';
     const MSP_GENERAL_PAD_CODE = 'msp_payafter';
+    const MSP_GENERAL_KLARNA_CODE = 'msp_klarna';
     const MSP_GATEWAYS_CODE_PREFIX = 'msp_';
 
     public $availablePaymentMethodCodes = array(
@@ -36,6 +37,7 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
         'mspcheckout',
         'msp_ideal',
         'msp_payafter',
+        'msp_klarna',
         'msp_mistercash',
         'msp_visa',
         'msp_mastercard',
@@ -56,6 +58,11 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
         'msp_directdebit',
         'msp_fastcheckout',
         'msp_amex',
+        'msp_yourgift',
+        'msp_wijncadeau',
+        'msp_lief',
+        'msp_gezondheidsbon',
+        'msp_fashioncheque',
     );
 
     public function __construct() {
@@ -95,6 +102,10 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
             $selectedgroup = trim($this->getConfigData('specificgroups'));
 
             if (!in_array($group_id, $specificgroups) && $selectedgroup !== "") {
+                $this->_canUseCheckout = false;
+            }
+        } else {
+            if (trim($this->getConfigData('specificgroups')) !== "") {
                 $this->_canUseCheckout = false;
             }
         }
@@ -320,6 +331,9 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
             case self::MSP_GENERAL_PAD_CODE:
                 $settingsPathPrefix = 'msp/' . self::MSP_GENERAL_PAD_CODE;
                 break;
+            case self::MSP_GENERAL_KLARNA_CODE:
+                $settingsPathPrefix = 'msp/' . self::MSP_GENERAL_KLARNA_CODE;
+                break;
 
             // MSP - Gateways
             default:
@@ -329,7 +343,7 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
         $config = Mage::getStoreConfig($settingsPathPrefix, $order->getStoreId());
 
         // use refund by Credit Memo is enabled
-        $pathCreditMemoIsEnabled = ($payment->getCode() == self::MSP_GENERAL_PAD_CODE) ? 'msp/settings' : $settingsPathPrefix;
+        $pathCreditMemoIsEnabled = (($payment->getCode() == self::MSP_GENERAL_PAD_CODE || $payment->getCode() == self::MSP_GENERAL_KLARNA_CODE)) ? 'msp/settings' : $settingsPathPrefix;
         if (!Mage::getStoreConfigFlag($pathCreditMemoIsEnabled . '/use_refund_credit_memo', $order->getStoreId())) {
             Mage::getSingleton('adminhtml/session')->addNotice(Mage::helper('msp')->__('Refund has not been send to MultiSafepay. You need to refund manually at MultiSafepay. Please check if the creditmemo option is configured within the MultiSafepay payment methods configuration!'));
             return $this;
@@ -358,7 +372,7 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
 
         if ($mapi->error) {
             Mage::getSingleton('adminhtml/session')->addError($mapi->error_code . ' - ' . $mapi->error);
-            return false;
+            //return false;
         } else {
             Mage::getSingleton('adminhtml/session')->addNotice(Mage::helper('msp')->__('Refund request has been sent successfully to MultiSafepay, your transaction has been refunded.'));
         }

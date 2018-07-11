@@ -111,7 +111,7 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
             return $this->api;
         }
 
-        $isTestMode = (Mage::getStoreConfig('msp/msp_payafter/test_api_pad', $order->getStoreId()) == MultiSafepay_Msp_Model_Config_Sources_Accounts::TEST_MODE);
+        $isTestMode = (Mage::getStoreConfig('msp/' . $order->getPayment()->getMethodInstance()->getCode() . '/test_api_pad', $order->getStoreId()) == MultiSafepay_Msp_Model_Config_Sources_Accounts::TEST_MODE);
         $suffix = '';
 
         if ($isTestMode) {
@@ -123,9 +123,9 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
         $this->api->version = Mage::getConfig()->getNode('modules/MultiSafepay_Msp/version');
         $this->api->use_shipping_notification = false;
         $this->api->test = $isTestMode;
-        $this->api->merchant['account_id'] = Mage::getStoreConfig('msp/msp_payafter/account_id_pad' . $suffix, $order->getStoreId());
-        $this->api->merchant['site_id'] = Mage::getStoreConfig('msp/msp_payafter/site_id_pad' . $suffix, $order->getStoreId());
-        $this->api->merchant['site_code'] = Mage::getStoreConfig('msp/msp_payafter/secure_code_pad' . $suffix, $order->getStoreId());
+        $this->api->merchant['account_id'] = Mage::getStoreConfig('msp/' . $order->getPayment()->getMethodInstance()->getCode() . '/account_id_pad' . $suffix, $order->getStoreId());
+        $this->api->merchant['site_id'] = Mage::getStoreConfig('msp/' . $order->getPayment()->getMethodInstance()->getCode() . '/site_id_pad' . $suffix, $order->getStoreId());
+        $this->api->merchant['site_code'] = Mage::getStoreConfig('msp/' . $order->getPayment()->getMethodInstance()->getCode() . '/secure_code_pad' . $suffix, $order->getStoreId());
         $this->api->plugin['shop'] = 'Magento';
         $this->api->plugin['shop_version'] = Mage::getVersion();
         $this->api->plugin['plugin_version'] = $this->api->version;
@@ -180,6 +180,12 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
         $statusRefunded = $this->getConfigData("refunded_status");
         $statusPartialRefunded = $this->getConfigData("partial_refunded_status");
         $autocreateInvoice = $this->getConfigData("autocreate_invoice");
+
+        $creditmemo_enabled = $this->getConfigData("use_refund_credit_memo");
+
+        if ($creditmemo_enabled && ($mspStatus == 'refunded' || $mspStatus == 'partial_refunded')) {
+            return true;
+        }
 
         /**
          *    Create the transaction details array
@@ -258,6 +264,12 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
         $newState = null;
         $newStatus = true; // makes Magento use the default status belonging to state
         $statusMessage = '';
+
+
+        //If the order already has in invoice than it was paid for using another method? So if our transaction expires we shouldn't update it to cancelled because it was already invoiced.
+        if ($order->hasInvoices() && $mspStatus == 'expired') {
+            return true;
+        }
 
         switch ($mspStatus) {
             case "initialized":
@@ -610,11 +622,11 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
                 $gateway = $order->getPayment()->getMethodInstance()->_gateway;
 
 
-                if ($mail_invoice && $gateway != 'PAYAFTER') {
+                if ($mail_invoice && $gateway != 'PAYAFTER' && $gateway != 'KLARNA') {
                     $invoice->setEmailSent(true);
                     $invoice->sendEmail();
                     $invoice->save();
-                } elseif ($gateway == 'PAYAFTER' && $send_bno_invoice && $mail_invoice) {
+                } elseif (($gateway == 'PAYAFTER' || $gateway == 'KLARNA') && $send_bno_invoice && $mail_invoice) {
                     $invoice->setEmailSent(true);
                     $invoice->sendEmail();
                     $invoice->save();

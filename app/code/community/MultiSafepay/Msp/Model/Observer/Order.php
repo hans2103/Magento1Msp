@@ -10,6 +10,7 @@ class MultiSafepay_Msp_Model_Observer_Order extends MultiSafepay_Msp_Model_Obser
     const MSP_GENERAL_CODE = 'msp';
     const MSP_FASTCHECKOUT_CODE = 'mspcheckout';
     const MSP_GENERAL_PAD_CODE = 'msp_payafter';
+    const MSP_GENERAL_KLARNA_CODE = 'msp_klarna';
     const MSP_GATEWAYS_CODE_PREFIX = 'msp_';
 
     public $availablePaymentMethodCodes = array(
@@ -35,6 +36,13 @@ class MultiSafepay_Msp_Model_Observer_Order extends MultiSafepay_Msp_Model_Obser
         'msp_multisafepay',
         'msp_directebanking',
         'msp_directdebit',
+        'msp_yourgift',
+        'msp_wijncadeau',
+        'msp_lief',
+        'msp_amex',
+        'msp_paypal',
+        'msp_gezondheidsbon',
+        'msp_fashioncheque',
     );
 
     public function sales_order_place_after(Varien_Event_Observer $observer) {
@@ -72,7 +80,9 @@ class MultiSafepay_Msp_Model_Observer_Order extends MultiSafepay_Msp_Model_Obser
             case self::MSP_GENERAL_PAD_CODE:
                 $settingsPathPrefix = 'msp/' . self::MSP_GENERAL_PAD_CODE;
                 break;
-
+            case self::MSP_GENERAL_KLARNA_CODE:
+                $settingsPathPrefix = 'msp/' . self::MSP_GENERAL_KLARNA_CODE;
+                break;
             // MSP - Gateways
             default:
                 $settingsPathPrefix = 'msp/settings';
@@ -95,7 +105,7 @@ class MultiSafepay_Msp_Model_Observer_Order extends MultiSafepay_Msp_Model_Obser
         $api = Mage::getModel('msp/api_paylink');
 
         if (!$api->isPaymentLinkCreated($order)) {
-            if ($payment->getCode() == self::MSP_GENERAL_PAD_CODE) {
+            if ($payment->getCode() == self::MSP_GENERAL_PAD_CODE || $payment->getCode() == self::MSP_GENERAL_KLARNA_CODE) {
                 $configMain = Mage::getStoreConfig('msp/settings', $order->getStoreId());
                 $api->test = ($config['test_api_pad'] == 'test');
                 $suffix = '';
@@ -108,6 +118,7 @@ class MultiSafepay_Msp_Model_Observer_Order extends MultiSafepay_Msp_Model_Obser
                 $api->merchant['site_id'] = $config['site_id_pad' . $suffix];
                 $api->merchant['security_code'] = $config['secure_code_pad' . $suffix];
                 $api->merchant['api_key'] = $configMain['api_key'];
+                $api->transaction['id'] = $configMain['daysactive'];
                 $api->debug = $configMain['debug'];
             } else {
                 $api->test = ($config['test_api'] == 'test');
@@ -115,6 +126,7 @@ class MultiSafepay_Msp_Model_Observer_Order extends MultiSafepay_Msp_Model_Obser
                 $api->merchant['site_id'] = $config['site_id'];
                 $api->merchant['security_code'] = $config['secure_code'];
                 $api->merchant['api_key'] = $config['api_key'];
+                $api->transaction['id'] = $configMain['daysactive'];
                 $api->debug = $config['debug'];
             }
 

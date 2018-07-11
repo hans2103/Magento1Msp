@@ -18,6 +18,7 @@ app/design/frontend/base/default/template/msp/idealissuers.phtml            app/
 app/design/frontend/base/default/template/msp/linkText.phtml            app/design/frontend/base/default/template/msp/linkText.phtml
 app/design/frontend/base/default/template/msp/bno.phtml            app/design/frontend/base/default/template/msp/bno.phtml
 app/design/frontend/base/default/template/msp/agreements.phtml            app/design/frontend/base/default/template/msp/agreements.phtml
+app/design/frontend/base/default/template/msp/klarna.phtml            app/design/frontend/base/default/template/msp/klarna.phtml
 app/design/adminhtml/default/default/template/msp/idealissuers.phtml            app/design/adminhtml/default/default/template/msp/idealissuers.phtml
 app/design/adminhtml/default/default/template/msp/gateways.phtml            app/design/adminhtml/default/default/template/msp/gateways.phtml
 # lib
@@ -57,6 +58,7 @@ media/msp/nl/msp_mastercard.png            media/msp/nl/msp_mastercard.png
 media/msp/nl/msp_payafter.png            media/msp/nl/msp_payafter.png
 media/msp/nl/msp_directdebit.png            media/msp/nl/msp_directdebit.png
 media/msp/nl/msp_parfumcadeaukaart.png            media/msp/nl/msp_parfumcadeaukaart.png
+media/msp/nl/msp_klarna.png            media/msp/nl/msp_klarna.png
 media/msp/nl/msp_amex.png            media/msp/nl/msp_amex.png
 media/msp/nl/msp_maestro.png            media/msp/nl/msp_maestro.png
 media/msp/nl/msp_webgift.png            media/msp/nl/msp_webgift.png

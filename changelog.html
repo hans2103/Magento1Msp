@@ -7,6 +7,62 @@
 <body>
 	<div id="container" style="width:900px; margin-left:100">
 
+	
+	<!--  Version 2.1.2 --->
+	
+		<div id="version" style="background-color:#E0E0E0 ;">
+			<b>Release Notes - Magento 2.1.2 (May 7th, 2015)</b>
+		</div>
+		<p>
+		<!--
+			<b>New features</b>
+			<hr size=1 color="#E0E0E0";>
+			<ul>
+				<li></li>
+			</ul>
+			<br/>			
+		-->
+			
+			<b>Improvements</b>
+			<hr size=1 color="#E0E0E0";>
+			<ul>
+				<li>Paymentlinks generated in the Magento back-end for manually created orders now use the 'Daysactive' setting in the main plug-in configuration.</li>
+				<li>The transaction status 'Expired' no longer triggers the plug-in to cancel orders with an invoice.</li>
+			</ul>
+			<br/>			
+
+			<b>Changes</b>
+			<hr size=1 color="#E0E0E0";>
+			<ul>
+				<li>The 'Keep Cart Alive' plug-in setting has been enabled by default.</li>
+				<li>The 'Keep Cart Alive' plug-in setting now only works for MultiSafepay payment methods.</li>
+				<li>Fast Checkout no longer creates an order for an expired pretransaction</li>
+			</ul>
+			<br/>			
+			
+			<b>Fixes</b>
+			<hr size=1 color="#E0E0E0";>
+			<ul>
+				<li>'Allowed currencies' for the MultiSafepay Gateways were not requested correctly.</li>
+				<li>Added delivery address data to pretransactions for PayPal's Sellers Protection.</li>
+				<li>Call to undefined method error occuring with the Pay After Delivery object</li>
+				<li>Paymentlinks generated in the Magento back-end for manually created orders always used the test environment</li>
+				<li>Fixed double payment method titles</li>
+				<li>Resolved DIRECTebanking gateway code bug</li>
+				<li>Magento didn't always update and store the amount correctly when converting from USD to EUR resulting in the wrong amount paid after the plug-in conversion.</li>
+				<li>The Pay After Delivery (MultiFactor) rejection message has been added to the language files.</li>
+				<li>The Pay After Delivery (MultiFactor) rejection message has been altered to only show relevant information to customers.</li>
+				<li>Available payment methods are no longer shown when the visibility has been limited to specified user groups.</li>
+				<li>The plug-in processes the refund status and closes the order if the credit memo option isn't enabled when creating a credit memo</li>
+			</ul>
+			
+		</p>
+		<br/>
+		<br/>
+
+	<!--  Version 2.1.2 --->
+	
+	
 		<div id="version" style="background-color:#E0E0E0 ;">
 			<b>Release Notes - Magento 2.1.1 (Mar 20, 2015)</b>
 		</div>

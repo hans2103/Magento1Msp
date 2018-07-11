@@ -9,6 +9,7 @@ class MultiSafepay_Msp_Model_Observer_Shipment extends MultiSafepay_Msp_Model_Ob
 
     public $availablePaymentMethodCodes = array(
         'msp_payafter',
+        'msp_klarna',
     );
 
     public function sales_order_shipment_save_after(Varien_Event_Observer $observer) {
@@ -22,7 +23,7 @@ class MultiSafepay_Msp_Model_Observer_Shipment extends MultiSafepay_Msp_Model_Ob
         $order = $shipment->getOrder();
 
         // use send request if enabled
-        if (!Mage::getStoreConfigFlag('msp/msp_payafter/send_request_after_shipping', $order->getStoreId())) {
+        if (!Mage::getStoreConfigFlag('msp/'.$order->getPayment()->getMethodInstance()->getCode().'/send_request_after_shipping', $order->getStoreId())) {
             return $this;
         }
 
@@ -47,7 +48,7 @@ class MultiSafepay_Msp_Model_Observer_Shipment extends MultiSafepay_Msp_Model_Ob
         /** @var $base MultiSafepay_Msp_Model_Base */
         $base = $checkout->getBase($order->getId());
 
-        $configPayAfter = Mage::getStoreConfig('msp/msp_payafter', $order->getStoreId());
+        $configPayAfter = Mage::getStoreConfig('msp/'.$order->getPayment()->getMethodInstance()->getCode(), $order->getStoreId());
         $configGateway = Mage::getStoreConfig('msp/settings', $order->getStoreId());
 
         /** @var $api MultiSafepay_Msp_Model_Api_Shipment */
