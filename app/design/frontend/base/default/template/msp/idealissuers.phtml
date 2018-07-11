@@ -1,9 +1,14 @@
+<?php
+$_code=$this->getMethodCode();
+?>
 
-<fieldset class="form-list">
-    <ul id="payment_form_<?php echo $this->getMethodCode() ?>" style="display:none">	
+
+
+    <ul  class="form-list" id="payment_form_<?php echo $_code ?>" style="display:none">	
         <li>
          <?php $_banks = $this->getIdealIssuers(); ?>
-		 <select name="payment[bankid]" class="input-text" id="<?php echo $this->escapeHtml($this->getMethodCode()) ?>_bank_id" title="<?php echo $this->escapeHtml($this->getMethodCode()) ?>_bank_id">
+		 <select id="<?php echo $_code ?>_bank" name="payment[<?php echo $_code ?>_bank]" class="input-text validate-text required-entry">
+			<option value=""><?php echo $this->__('Selecteer een bank...'); ?></option>
 				<?php foreach ($_banks as $bank){ ?>
 					<option value="<?php echo $bank['code']['VALUE'] ?>"><?php echo $bank['description']['VALUE'] ?></option>
 				<?php } ?>
@@ -12,4 +17,3 @@
         </li>
 
     </ul>
-</fieldset>

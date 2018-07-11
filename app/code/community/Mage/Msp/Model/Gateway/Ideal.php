@@ -5,35 +5,16 @@ class Mage_Msp_Model_Gateway_Ideal extends Mage_Msp_Model_Gateway_Abstract
 	protected $_code    		= "msp_ideal";
 	protected $_model   		= "ideal";
 	public $_gateway 			= "IDEAL";
-	public $bank_id				= '';
 	protected $_formBlockType 	= 'msp/idealIssuers';  
-
-	public function assignData($data)
-	{
-		if ( !($data instanceof Varien_Object) ) {
-			$data = new Varien_Object($data);
-		}
-			foreach($data as $key => $value)
-			{
-				if($key == '_data'){
-					foreach($value as $index => $val)
-					{
-						if($index == 'bankid'){
-							$bank_id = $val;
-						}	
-					}
-				}
-			}
-
-			$_SESSION['bankid'] = $bank_id;
-			
-		return $this;
-	}
 	
 	public function getOrderPlaceRedirectUrl() 
-	{
-		return $this->getModelUrl("msp/standard/redirect/issuer/" . $this->_issuer );
-	}
+	{	
+		$bank = $_POST['payment']['msp_ideal_bank'];
+		$url = $this->getModelUrl("msp/standard/redirect/issuer/".$this->_issuer);
+		if (!strpos($url, "?")) $url .= '?bank=' . $bank;
+		else $url .= '&bank=' . $bank;
+		return $url;
+		}
 	
 	public function getPayment($storeId = null) 
 	{

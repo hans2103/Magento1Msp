@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <config>
 	<sections>
-    <payment>
-      <groups>
-        <msp translate="label" module="msp">
-          <label>MultiSafepay</label>
+		<payment>
+			<groups>
+				<msp translate="label" module="msp">
+					<label>MultiSafepay</label>
 					<sort_order>671</sort_order>
 					<show_in_default>1</show_in_default>
 					<show_in_website>1</show_in_website>
@@ -27,7 +27,6 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</title>
-						
 						<test_api translate="label comment">
 							<label>Type account</label>
 							<frontend_type>select</frontend_type>
@@ -82,7 +81,6 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</use_onestepcheckout>
-
 						<gateway_select translate="label">
 							<label>Gateway selection</label>
 							<frontend_type>select</frontend_type>
@@ -110,7 +108,25 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</mail_invoice>
-						
+						<send_update_email translate="label comment">
+							<label>Send the order update e-mail to customer?</label>
+							<frontend_type>select</frontend_type>
+							<source_model>adminhtml/system_config_source_yesno</source_model>
+							<sort_order>92</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</send_update_email>
+						<keep_cart translate="label comment">
+							<label>Keep the cart</label>
+							<comment>Cart is active when client goes back or cancelles the order </comment>
+							<frontend_type>select</frontend_type>
+							<source_model>adminhtml/system_config_source_yesno</source_model>
+							<sort_order>93</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</keep_cart>
 						<new_order_mail translate="label comment">
 							<label>New order mail</label>
 							<frontend_type>select</frontend_type>
@@ -212,22 +228,22 @@
 							<show_in_store>1</show_in_store>
 						</expired_status>
 						<allowspecific translate="label">
-								<label>Payment from applicable countries</label>
-								<frontend_type>allowspecific</frontend_type>
-								<sort_order>300</sort_order>
-								<source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
-								<show_in_default>1</show_in_default>
-								<show_in_website>1</show_in_website>
-								<show_in_store>1</show_in_store>
+							<label>Payment from applicable countries</label>
+							<frontend_type>allowspecific</frontend_type>
+							<sort_order>300</sort_order>
+							<source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
 						</allowspecific>
 						<specificcountry translate="label">
-								<label>Payment from Specific countries</label>
-								<frontend_type>multiselect</frontend_type>
-								<sort_order>310</sort_order>
-								<source_model>adminhtml/system_config_source_country</source_model>
-								<show_in_default>1</show_in_default>
-								<show_in_website>1</show_in_website>
-								<show_in_store>1</show_in_store>
+							<label>Payment from Specific countries</label>
+							<frontend_type>multiselect</frontend_type>
+							<sort_order>310</sort_order>
+							<source_model>adminhtml/system_config_source_country</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
 						</specificcountry>
 						<sort_order translate="label">
 							<label>Sort order</label>
@@ -246,42 +262,19 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</debug>
-						
-						<!--<support_email translate="label comment">
-							<label>Support E-mail</label>
-							<frontend_type>text</frontend_type>
-							<comment>An e-mail will be send to this address whenever a notification tries to change an order with a cancelled state.(In case of a second chance etc)</comment>
-							<source_model>adminhtml/msp_config_source_accounts</source_model>
-							<sort_order>410</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>1</show_in_store>
-						</support_email>
-						
-						<send_support_email translate="label comment">
-							<label>Send Support E-mail when notification tries to change cancelled order?</label>
-							<comment>E-mail above will be used in this situation. Happens in case of second chance payments that occure when an order has already been cancelled (expire->cancelled etc)</comment>
-							<frontend_type>select</frontend_type>
-							<source_model>adminhtml/system_config_source_yesno</source_model>
-							<sort_order>420</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>1</show_in_store>
-						</send_support_email >-->
 					</fields>
-        </msp>
-      </groups>
-    </payment>
-
-    <msp translate="label" module="msp">
-      <label>MultiSafepay Gateways</label>
-      <tab>sales</tab>
-      <frontend_type>text</frontend_type>
-      <sort_order>1000</sort_order>
-      <show_in_default>1</show_in_default>
-      <show_in_website>1</show_in_website>
-      <show_in_store>1</show_in_store>
-      <groups>
+				</msp>
+			</groups>
+		</payment>
+		<msp translate="label" module="msp">
+			<label>MultiSafepay Gateways</label>
+			<tab>sales</tab>
+			<frontend_type>text</frontend_type>
+			<sort_order>1000</sort_order>
+			<show_in_default>1</show_in_default>
+			<show_in_website>1</show_in_website>
+			<show_in_store>1</show_in_store>
+			<groups>
 				<settings translate="label">
 					<label>Settings</label>
 					<sort_order>670</sort_order>
@@ -361,7 +354,6 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</mail_invoice>
-
 						<new_order_mail translate="label comment">
 							<label>New order mail</label>
 							<frontend_type>select</frontend_type>
@@ -371,7 +363,24 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</new_order_mail>
-						
+						<send_update_email translate="label comment">
+							<label>Send the order update e-mail to customer?</label>
+							<frontend_type>select</frontend_type>
+							<source_model>adminhtml/system_config_source_yesno</source_model>
+							<sort_order>78</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</send_update_email>
+						<keep_cart translate="label comment">
+							<label>Keep the cart?(Cart is active when client goes back or cancelles the order)</label>
+							<frontend_type>select</frontend_type>
+							<source_model>adminhtml/system_config_source_yesno</source_model>
+							<sort_order>79</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</keep_cart>
 						<order_status translate="label">
 							<label>New order status</label>
 							<frontend_type>select</frontend_type>
@@ -381,7 +390,6 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</order_status>
-						
 						<complete_status translate="label">
 							<label>Payment complete status</label>
 							<frontend_type>select</frontend_type>
@@ -391,7 +399,6 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</complete_status>
-						
 						<initialized_status translate="label">
 							<label>Status: initialized</label>
 							<frontend_type>select</frontend_type>
@@ -401,7 +408,6 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</initialized_status>
-						
 						<uncleared_status translate="label">
 							<label>Status: uncleared</label>
 							<frontend_type>select</frontend_type>
@@ -465,7 +471,7 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</expired_status>
-						
+
 						<debug translate="label">
 							<label>Debug</label>
 							<frontend_type>select</frontend_type>
@@ -475,29 +481,8 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</debug>
-					<!--	<support_email translate="label comment">
-							<label>Support E-mail</label>
-							<frontend_type>text</frontend_type>
-							<comment>An e-mail will be send to this address whenever a notification tries to change an order with a cancelled state.(In case of a second chance etc)</comment>
-							<source_model>adminhtml/msp_config_source_accounts</source_model>
-							<sort_order>410</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>1</show_in_store>
-						</support_email>
-						<send_support_email translate="label comment">
-							<label>Send Support E-mail when notification tries to change cancelled order?</label>
-							<comment>E-mail above will be used in this situation. Happens in case of second chance payments that occure when an order has already been cancelled (expire->cancelled etc)</comment>
-							<frontend_type>select</frontend_type>
-							<source_model>adminhtml/system_config_source_yesno</source_model>
-							<sort_order>420</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>1</show_in_store>
-						</send_support_email >-->
 					</fields>
 				</settings>
-				
 				<msp_ideal translate="label" module="msp">
 					<label>iDeal</label>
 					<sort_order>680</sort_order>
@@ -507,13 +492,13 @@
 					<fields>
 						<bank_select translate='label'>
 							<label>Show banklist in checkout</label>
-								<frontend_type>select</frontend_type>
-								<source_model>adminhtml/system_config_source_yesno</source_model>
-								<sort_order>1</sort_order>
-								<show_in_default>1</show_in_default>
-								<show_in_website>1</show_in_website>
-								<show_in_store>1</show_in_store>
-							</bank_select>
+							<frontend_type>select</frontend_type>
+							<source_model>adminhtml/system_config_source_yesno</source_model>
+							<sort_order>1</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</bank_select>
 						<active translate="label">
 							<label>Enabled</label>
 							<frontend_type>select</frontend_type>
@@ -531,23 +516,23 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</title>
-						 <allowspecific translate="label">
-								<label>Payment from applicable countries</label>
-								<frontend_type>allowspecific</frontend_type>
-								<sort_order>13</sort_order>
-								<source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
-								<show_in_default>1</show_in_default>
-								<show_in_website>1</show_in_website>
-								<show_in_store>1</show_in_store>
+						<allowspecific translate="label">
+							<label>Payment from applicable countries</label>
+							<frontend_type>allowspecific</frontend_type>
+							<sort_order>13</sort_order>
+							<source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
 						</allowspecific>
 						<specificcountry translate="label">
-								<label>Payment from Specific countries</label>
-								<frontend_type>multiselect</frontend_type>
-								<sort_order>14</sort_order>
-								<source_model>adminhtml/system_config_source_country</source_model>
-								<show_in_default>1</show_in_default>
-								<show_in_website>1</show_in_website>
-								<show_in_store>1</show_in_store>
+							<label>Payment from Specific countries</label>
+							<frontend_type>multiselect</frontend_type>
+							<sort_order>14</sort_order>
+							<source_model>adminhtml/system_config_source_country</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
 						</specificcountry>
 						<sort_order translate="label">
 							<label>Sort order</label>
@@ -583,23 +568,23 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</title>
-						 <allowspecific translate="label">
-								<label>Payment from applicable countries</label>
-								<frontend_type>allowspecific</frontend_type>
-								<sort_order>13</sort_order>
-								<source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
-								<show_in_default>1</show_in_default>
-								<show_in_website>1</show_in_website>
-								<show_in_store>1</show_in_store>
+						<allowspecific translate="label">
+							<label>Payment from applicable countries</label>
+							<frontend_type>allowspecific</frontend_type>
+							<sort_order>13</sort_order>
+							<source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
 						</allowspecific>
 						<specificcountry translate="label">
-								<label>Payment from Specific countries</label>
-								<frontend_type>multiselect</frontend_type>
-								<sort_order>14</sort_order>
-								<source_model>adminhtml/system_config_source_country</source_model>
-								<show_in_default>1</show_in_default>
-								<show_in_website>1</show_in_website>
-								<show_in_store>1</show_in_store>
+							<label>Payment from Specific countries</label>
+							<frontend_type>multiselect</frontend_type>
+							<sort_order>14</sort_order>
+							<source_model>adminhtml/system_config_source_country</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
 						</specificcountry>
 						<sort_order translate="label">
 							<label>Sort order</label>
@@ -635,23 +620,23 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</title>
-						 <allowspecific translate="label">
-								<label>Payment from applicable countries</label>
-								<frontend_type>allowspecific</frontend_type>
-								<sort_order>13</sort_order>
-								<source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
-								<show_in_default>1</show_in_default>
-								<show_in_website>1</show_in_website>
-								<show_in_store>1</show_in_store>
+						<allowspecific translate="label">
+							<label>Payment from applicable countries</label>
+							<frontend_type>allowspecific</frontend_type>
+							<sort_order>13</sort_order>
+							<source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
 						</allowspecific>
 						<specificcountry translate="label">
-								<label>Payment from Specific countries</label>
-								<frontend_type>multiselect</frontend_type>
-								<sort_order>14</sort_order>
-								<source_model>adminhtml/system_config_source_country</source_model>
-								<show_in_default>1</show_in_default>
-								<show_in_website>1</show_in_website>
-								<show_in_store>1</show_in_store>
+							<label>Payment from Specific countries</label>
+							<frontend_type>multiselect</frontend_type>
+							<sort_order>14</sort_order>
+							<source_model>adminhtml/system_config_source_country</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
 						</specificcountry>
 						<sort_order translate="label">
 							<label>Sort order</label>
@@ -663,7 +648,6 @@
 						</sort_order>
 					</fields>
 				</msp_mistercash>
-				
 				<msp_visa translate="label" module="msp">
 					<label>Visa</label>
 					<sort_order>700</sort_order>
@@ -688,23 +672,23 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</title>
-						 <allowspecific translate="label">
-								<label>Payment from applicable countries</label>
-								<frontend_type>allowspecific</frontend_type>
-								<sort_order>13</sort_order>
-								<source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
-								<show_in_default>1</show_in_default>
-								<show_in_website>1</show_in_website>
-								<show_in_store>1</show_in_store>
+						<allowspecific translate="label">
+							<label>Payment from applicable countries</label>
+							<frontend_type>allowspecific</frontend_type>
+							<sort_order>13</sort_order>
+							<source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
 						</allowspecific>
 						<specificcountry translate="label">
-								<label>Payment from Specific countries</label>
-								<frontend_type>multiselect</frontend_type>
-								<sort_order>14</sort_order>
-								<source_model>adminhtml/system_config_source_country</source_model>
-								<show_in_default>1</show_in_default>
-								<show_in_website>1</show_in_website>
-								<show_in_store>1</show_in_store>
+							<label>Payment from Specific countries</label>
+							<frontend_type>multiselect</frontend_type>
+							<sort_order>14</sort_order>
+							<source_model>adminhtml/system_config_source_country</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
 						</specificcountry>
 						<sort_order translate="label">
 							<label>Sort order</label>
@@ -740,23 +724,23 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</title>
-						 <allowspecific translate="label">
-								<label>Payment from applicable countries</label>
-								<frontend_type>allowspecific</frontend_type>
-								<sort_order>13</sort_order>
-								<source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
-								<show_in_default>1</show_in_default>
-								<show_in_website>1</show_in_website>
-								<show_in_store>1</show_in_store>
+						<allowspecific translate="label">
+							<label>Payment from applicable countries</label>
+							<frontend_type>allowspecific</frontend_type>
+							<sort_order>13</sort_order>
+							<source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
 						</allowspecific>
 						<specificcountry translate="label">
-								<label>Payment from Specific countries</label>
-								<frontend_type>multiselect</frontend_type>
-								<sort_order>14</sort_order>
-								<source_model>adminhtml/system_config_source_country</source_model>
-								<show_in_default>1</show_in_default>
-								<show_in_website>1</show_in_website>
-								<show_in_store>1</show_in_store>
+							<label>Payment from Specific countries</label>
+							<frontend_type>multiselect</frontend_type>
+							<sort_order>14</sort_order>
+							<source_model>adminhtml/system_config_source_country</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
 						</specificcountry>
 						<sort_order translate="label">
 							<label>Sort order</label>
@@ -792,23 +776,23 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</title>
-						 <allowspecific translate="label">
-								<label>Payment from applicable countries</label>
-								<frontend_type>allowspecific</frontend_type>
-								<sort_order>13</sort_order>
-								<source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
-								<show_in_default>1</show_in_default>
-								<show_in_website>1</show_in_website>
-								<show_in_store>1</show_in_store>
+						<allowspecific translate="label">
+							<label>Payment from applicable countries</label>
+							<frontend_type>allowspecific</frontend_type>
+							<sort_order>13</sort_order>
+							<source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
 						</allowspecific>
 						<specificcountry translate="label">
-								<label>Payment from Specific countries</label>
-								<frontend_type>multiselect</frontend_type>
-								<sort_order>14</sort_order>
-								<source_model>adminhtml/system_config_source_country</source_model>
-								<show_in_default>1</show_in_default>
-								<show_in_website>1</show_in_website>
-								<show_in_store>1</show_in_store>
+							<label>Payment from Specific countries</label>
+							<frontend_type>multiselect</frontend_type>
+							<sort_order>14</sort_order>
+							<source_model>adminhtml/system_config_source_country</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
 						</specificcountry>
 						<sort_order translate="label">
 							<label>Sort order</label>
@@ -844,23 +828,23 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</title>
-						 <allowspecific translate="label">
-								<label>Payment from applicable countries</label>
-								<frontend_type>allowspecific</frontend_type>
-								<sort_order>13</sort_order>
-								<source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
-								<show_in_default>1</show_in_default>
-								<show_in_website>1</show_in_website>
-								<show_in_store>1</show_in_store>
+						<allowspecific translate="label">
+							<label>Payment from applicable countries</label>
+							<frontend_type>allowspecific</frontend_type>
+							<sort_order>13</sort_order>
+							<source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
 						</allowspecific>
 						<specificcountry translate="label">
-								<label>Payment from Specific countries</label>
-								<frontend_type>multiselect</frontend_type>
-								<sort_order>14</sort_order>
-								<source_model>adminhtml/system_config_source_country</source_model>
-								<show_in_default>1</show_in_default>
-								<show_in_website>1</show_in_website>
-								<show_in_store>1</show_in_store>
+							<label>Payment from Specific countries</label>
+							<frontend_type>multiselect</frontend_type>
+							<sort_order>14</sort_order>
+							<source_model>adminhtml/system_config_source_country</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
 						</specificcountry>
 						<sort_order translate="label">
 							<label>Sort order</label>
@@ -896,23 +880,23 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</title>
-						 <allowspecific translate="label">
-								<label>Payment from applicable countries</label>
-								<frontend_type>allowspecific</frontend_type>
-								<sort_order>13</sort_order>
-								<source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
-								<show_in_default>1</show_in_default>
-								<show_in_website>1</show_in_website>
-								<show_in_store>1</show_in_store>
+						<allowspecific translate="label">
+							<label>Payment from applicable countries</label>
+							<frontend_type>allowspecific</frontend_type>
+							<sort_order>13</sort_order>
+							<source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
 						</allowspecific>
 						<specificcountry translate="label">
-								<label>Payment from Specific countries</label>
-								<frontend_type>multiselect</frontend_type>
-								<sort_order>14</sort_order>
-								<source_model>adminhtml/system_config_source_country</source_model>
-								<show_in_default>1</show_in_default>
-								<show_in_website>1</show_in_website>
-								<show_in_store>1</show_in_store>
+							<label>Payment from Specific countries</label>
+							<frontend_type>multiselect</frontend_type>
+							<sort_order>14</sort_order>
+							<source_model>adminhtml/system_config_source_country</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
 						</specificcountry>
 						<sort_order translate="label">
 							<label>Sort order</label>
@@ -948,23 +932,23 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</title>
-						 <allowspecific translate="label">
-								<label>Payment from applicable countries</label>
-								<frontend_type>allowspecific</frontend_type>
-								<sort_order>13</sort_order>
-								<source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
-								<show_in_default>1</show_in_default>
-								<show_in_website>1</show_in_website>
-								<show_in_store>1</show_in_store>
+						<allowspecific translate="label">
+							<label>Payment from applicable countries</label>
+							<frontend_type>allowspecific</frontend_type>
+							<sort_order>13</sort_order>
+							<source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
 						</allowspecific>
 						<specificcountry translate="label">
-								<label>Payment from Specific countries</label>
-								<frontend_type>multiselect</frontend_type>
-								<sort_order>14</sort_order>
-								<source_model>adminhtml/system_config_source_country</source_model>
-								<show_in_default>1</show_in_default>
-								<show_in_website>1</show_in_website>
-								<show_in_store>1</show_in_store>
+							<label>Payment from Specific countries</label>
+							<frontend_type>multiselect</frontend_type>
+							<sort_order>14</sort_order>
+							<source_model>adminhtml/system_config_source_country</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
 						</specificcountry>
 						<sort_order translate="label">
 							<label>Sort order</label>
@@ -1000,23 +984,23 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</title>
-						 <allowspecific translate="label">
-								<label>Payment from applicable countries</label>
-								<frontend_type>allowspecific</frontend_type>
-								<sort_order>13</sort_order>
-								<source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
-								<show_in_default>1</show_in_default>
-								<show_in_website>1</show_in_website>
-								<show_in_store>1</show_in_store>
+						<allowspecific translate="label">
+							<label>Payment from applicable countries</label>
+							<frontend_type>allowspecific</frontend_type>
+							<sort_order>13</sort_order>
+							<source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
 						</allowspecific>
 						<specificcountry translate="label">
-								<label>Payment from Specific countries</label>
-								<frontend_type>multiselect</frontend_type>
-								<sort_order>14</sort_order>
-								<source_model>adminhtml/system_config_source_country</source_model>
-								<show_in_default>1</show_in_default>
-								<show_in_website>1</show_in_website>
-								<show_in_store>1</show_in_store>
+							<label>Payment from Specific countries</label>
+							<frontend_type>multiselect</frontend_type>
+							<sort_order>14</sort_order>
+							<source_model>adminhtml/system_config_source_country</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
 						</specificcountry>
 						<sort_order translate="label">
 							<label>Sort order</label>
@@ -1052,23 +1036,23 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</title>
-						 <allowspecific translate="label">
-								<label>Payment from applicable countries</label>
-								<frontend_type>allowspecific</frontend_type>
-								<sort_order>13</sort_order>
-								<source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
-								<show_in_default>1</show_in_default>
-								<show_in_website>1</show_in_website>
-								<show_in_store>1</show_in_store>
+						<allowspecific translate="label">
+							<label>Payment from applicable countries</label>
+							<frontend_type>allowspecific</frontend_type>
+							<sort_order>13</sort_order>
+							<source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
 						</allowspecific>
 						<specificcountry translate="label">
-								<label>Payment from Specific countries</label>
-								<frontend_type>multiselect</frontend_type>
-								<sort_order>14</sort_order>
-								<source_model>adminhtml/system_config_source_country</source_model>
-								<show_in_default>1</show_in_default>
-								<show_in_website>1</show_in_website>
-								<show_in_store>1</show_in_store>
+							<label>Payment from Specific countries</label>
+							<frontend_type>multiselect</frontend_type>
+							<sort_order>14</sort_order>
+							<source_model>adminhtml/system_config_source_country</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
 						</specificcountry>
 						<sort_order translate="label">
 							<label>Sort order</label>
@@ -1104,23 +1088,23 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</title>
-						 <allowspecific translate="label">
-								<label>Payment from applicable countries</label>
-								<frontend_type>allowspecific</frontend_type>
-								<sort_order>13</sort_order>
-								<source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
-								<show_in_default>1</show_in_default>
-								<show_in_website>1</show_in_website>
-								<show_in_store>1</show_in_store>
+						<allowspecific translate="label">
+							<label>Payment from applicable countries</label>
+							<frontend_type>allowspecific</frontend_type>
+							<sort_order>13</sort_order>
+							<source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
 						</allowspecific>
 						<specificcountry translate="label">
-								<label>Payment from Specific countries</label>
-								<frontend_type>multiselect</frontend_type>
-								<sort_order>14</sort_order>
-								<source_model>adminhtml/system_config_source_country</source_model>
-								<show_in_default>1</show_in_default>
-								<show_in_website>1</show_in_website>
-								<show_in_store>1</show_in_store>
+							<label>Payment from Specific countries</label>
+							<frontend_type>multiselect</frontend_type>
+							<sort_order>14</sort_order>
+							<source_model>adminhtml/system_config_source_country</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
 						</specificcountry>
 						<sort_order translate="label">
 							<label>Sort order</label>
@@ -1156,23 +1140,23 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</title>
-						 <allowspecific translate="label">
-								<label>Payment from applicable countries</label>
-								<frontend_type>allowspecific</frontend_type>
-								<sort_order>13</sort_order>
-								<source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
-								<show_in_default>1</show_in_default>
-								<show_in_website>1</show_in_website>
-								<show_in_store>1</show_in_store>
+						<allowspecific translate="label">
+							<label>Payment from applicable countries</label>
+							<frontend_type>allowspecific</frontend_type>
+							<sort_order>13</sort_order>
+							<source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
 						</allowspecific>
 						<specificcountry translate="label">
-								<label>Payment from Specific countries</label>
-								<frontend_type>multiselect</frontend_type>
-								<sort_order>14</sort_order>
-								<source_model>adminhtml/system_config_source_country</source_model>
-								<show_in_default>1</show_in_default>
-								<show_in_website>1</show_in_website>
-								<show_in_store>1</show_in_store>
+							<label>Payment from Specific countries</label>
+							<frontend_type>multiselect</frontend_type>
+							<sort_order>14</sort_order>
+							<source_model>adminhtml/system_config_source_country</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
 						</specificcountry>
 						<sort_order translate="label">
 							<label>Sort order</label>
@@ -1208,23 +1192,23 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</title>
-						 <allowspecific translate="label">
-								<label>Payment from applicable countries</label>
-								<frontend_type>allowspecific</frontend_type>
-								<sort_order>13</sort_order>
-								<source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
-								<show_in_default>1</show_in_default>
-								<show_in_website>1</show_in_website>
-								<show_in_store>1</show_in_store>
+						<allowspecific translate="label">
+							<label>Payment from applicable countries</label>
+							<frontend_type>allowspecific</frontend_type>
+							<sort_order>13</sort_order>
+							<source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
 						</allowspecific>
 						<specificcountry translate="label">
-								<label>Payment from Specific countries</label>
-								<frontend_type>multiselect</frontend_type>
-								<sort_order>14</sort_order>
-								<source_model>adminhtml/system_config_source_country</source_model>
-								<show_in_default>1</show_in_default>
-								<show_in_website>1</show_in_website>
-								<show_in_store>1</show_in_store>
+							<label>Payment from Specific countries</label>
+							<frontend_type>multiselect</frontend_type>
+							<sort_order>14</sort_order>
+							<source_model>adminhtml/system_config_source_country</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
 						</specificcountry>
 						<sort_order translate="label">
 							<label>Sort order</label>
@@ -1260,23 +1244,23 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</title>
-						 <allowspecific translate="label">
-								<label>Payment from applicable countries</label>
-								<frontend_type>allowspecific</frontend_type>
-								<sort_order>13</sort_order>
-								<source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
-								<show_in_default>1</show_in_default>
-								<show_in_website>1</show_in_website>
-								<show_in_store>1</show_in_store>
+						<allowspecific translate="label">
+							<label>Payment from applicable countries</label>
+							<frontend_type>allowspecific</frontend_type>
+							<sort_order>13</sort_order>
+							<source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
 						</allowspecific>
 						<specificcountry translate="label">
-								<label>Payment from Specific countries</label>
-								<frontend_type>multiselect</frontend_type>
-								<sort_order>14</sort_order>
-								<source_model>adminhtml/system_config_source_country</source_model>
-								<show_in_default>1</show_in_default>
-								<show_in_website>1</show_in_website>
-								<show_in_store>1</show_in_store>
+							<label>Payment from Specific countries</label>
+							<frontend_type>multiselect</frontend_type>
+							<sort_order>14</sort_order>
+							<source_model>adminhtml/system_config_source_country</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
 						</specificcountry>
 						<sort_order translate="label">
 							<label>Sort order</label>
@@ -1312,23 +1296,23 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</title>
-						 <allowspecific translate="label">
-								<label>Payment from applicable countries</label>
-								<frontend_type>allowspecific</frontend_type>
-								<sort_order>13</sort_order>
-								<source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
-								<show_in_default>1</show_in_default>
-								<show_in_website>1</show_in_website>
-								<show_in_store>1</show_in_store>
+						<allowspecific translate="label">
+							<label>Payment from applicable countries</label>
+							<frontend_type>allowspecific</frontend_type>
+							<sort_order>13</sort_order>
+							<source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
 						</allowspecific>
 						<specificcountry translate="label">
-								<label>Payment from Specific countries</label>
-								<frontend_type>multiselect</frontend_type>
-								<sort_order>14</sort_order>
-								<source_model>adminhtml/system_config_source_country</source_model>
-								<show_in_default>1</show_in_default>
-								<show_in_website>1</show_in_website>
-								<show_in_store>1</show_in_store>
+							<label>Payment from Specific countries</label>
+							<frontend_type>multiselect</frontend_type>
+							<sort_order>14</sort_order>
+							<source_model>adminhtml/system_config_source_country</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
 						</specificcountry>
 						<sort_order translate="label">
 							<label>Sort order</label>
@@ -1364,23 +1348,23 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</title>
-						 <allowspecific translate="label">
-								<label>Payment from applicable countries</label>
-								<frontend_type>allowspecific</frontend_type>
-								<sort_order>13</sort_order>
-								<source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
-								<show_in_default>1</show_in_default>
-								<show_in_website>1</show_in_website>
-								<show_in_store>1</show_in_store>
+						<allowspecific translate="label">
+							<label>Payment from applicable countries</label>
+							<frontend_type>allowspecific</frontend_type>
+							<sort_order>13</sort_order>
+							<source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
 						</allowspecific>
 						<specificcountry translate="label">
-								<label>Payment from Specific countries</label>
-								<frontend_type>multiselect</frontend_type>
-								<sort_order>14</sort_order>
-								<source_model>adminhtml/system_config_source_country</source_model>
-								<show_in_default>1</show_in_default>
-								<show_in_website>1</show_in_website>
-								<show_in_store>1</show_in_store>
+							<label>Payment from Specific countries</label>
+							<frontend_type>multiselect</frontend_type>
+							<sort_order>14</sort_order>
+							<source_model>adminhtml/system_config_source_country</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
 						</specificcountry>
 						<sort_order translate="label">
 							<label>Sort order</label>
@@ -1416,23 +1400,23 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</title>
-						 <allowspecific translate="label">
-								<label>Payment from applicable countries</label>
-								<frontend_type>allowspecific</frontend_type>
-								<sort_order>13</sort_order>
-								<source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
-								<show_in_default>1</show_in_default>
-								<show_in_website>1</show_in_website>
-								<show_in_store>1</show_in_store>
+						<allowspecific translate="label">
+							<label>Payment from applicable countries</label>
+							<frontend_type>allowspecific</frontend_type>
+							<sort_order>13</sort_order>
+							<source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
 						</allowspecific>
 						<specificcountry translate="label">
-								<label>Payment from Specific countries</label>
-								<frontend_type>multiselect</frontend_type>
-								<sort_order>14</sort_order>
-								<source_model>adminhtml/system_config_source_country</source_model>
-								<show_in_default>1</show_in_default>
-								<show_in_website>1</show_in_website>
-								<show_in_store>1</show_in_store>
+							<label>Payment from Specific countries</label>
+							<frontend_type>multiselect</frontend_type>
+							<sort_order>14</sort_order>
+							<source_model>adminhtml/system_config_source_country</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
 						</specificcountry>
 						<sort_order translate="label">
 							<label>Sort order</label>
@@ -1468,23 +1452,23 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</title>
-						 <allowspecific translate="label">
-								<label>Payment from applicable countries</label>
-								<frontend_type>allowspecific</frontend_type>
-								<sort_order>13</sort_order>
-								<source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
-								<show_in_default>1</show_in_default>
-								<show_in_website>1</show_in_website>
-								<show_in_store>1</show_in_store>
+						<allowspecific translate="label">
+							<label>Payment from applicable countries</label>
+							<frontend_type>allowspecific</frontend_type>
+							<sort_order>13</sort_order>
+							<source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
 						</allowspecific>
 						<specificcountry translate="label">
-								<label>Payment from Specific countries</label>
-								<frontend_type>multiselect</frontend_type>
-								<sort_order>14</sort_order>
-								<source_model>adminhtml/system_config_source_country</source_model>
-								<show_in_default>1</show_in_default>
-								<show_in_website>1</show_in_website>
-								<show_in_store>1</show_in_store>
+							<label>Payment from Specific countries</label>
+							<frontend_type>multiselect</frontend_type>
+							<sort_order>14</sort_order>
+							<source_model>adminhtml/system_config_source_country</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
 						</specificcountry>
 						<sort_order translate="label">
 							<label>Sort order</label>
@@ -1496,19 +1480,69 @@
 						</sort_order>
 					</fields>
 				</msp_directdebit>
+				<msp_fastcheckout translate="label" module="msp">
+					<label>Fast Checkout</label>
+					<sort_order>780</sort_order>
+					<show_in_default>1</show_in_default>
+					<show_in_website>1</show_in_website>
+					<show_in_store>1</show_in_store>
+					<fields>
+						<active translate="label">
+							<label>Enabled</label>
+							<frontend_type>select</frontend_type>
+							<source_model>adminhtml/system_config_source_yesno</source_model>
+							<sort_order>1</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</active>
+						<title translate="label">
+							<label>Title</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>2</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</title>
+						<allowspecific translate="label">
+							<label>Payment from applicable countries</label>
+							<frontend_type>allowspecific</frontend_type>
+							<sort_order>13</sort_order>
+							<source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</allowspecific>
+						<specificcountry translate="label">
+							<label>Payment from Specific countries</label>
+							<frontend_type>multiselect</frontend_type>
+							<sort_order>14</sort_order>
+							<source_model>adminhtml/system_config_source_country</source_model>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</specificcountry>
+						<sort_order translate="label">
+							<label>Sort order</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>100</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</sort_order>
+					</fields>
+				</msp_fastcheckout>
 			</groups>
-    </msp>
-    
-
-    <mspcheckout translate="label" module="msp">
-      <label>MultiSafepay fast checkout</label>
-      <tab>sales</tab>
-      <frontend_type>text</frontend_type>
-      <sort_order>1001</sort_order>
-      <show_in_default>1</show_in_default>
-      <show_in_website>1</show_in_website>
-      <show_in_store>1</show_in_store>
-      <groups>
+		</msp>
+		<mspcheckout translate="label" module="msp">
+			<label>MultiSafepay fast checkout</label>
+			<tab>sales</tab>
+			<frontend_type>text</frontend_type>
+			<sort_order>1001</sort_order>
+			<show_in_default>1</show_in_default>
+			<show_in_website>1</show_in_website>
+			<show_in_store>1</show_in_store>
+			<groups>
 				<settings translate="label">
 					<label>Settings</label>
 					<sort_order>1</sort_order>
@@ -1559,7 +1593,7 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</secure_code>
-            <use_redirect translate="label comment">
+						<use_redirect translate="label comment">
 							<label>Auto redirect</label>
 							<comment>Automatically redirects the customer back to the webshop after payment. (Skips the 'Transaction Complete' screen)</comment>
 							<frontend_type>select</frontend_type>
@@ -1569,6 +1603,35 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</use_redirect>
+						<send_new_account_email translate="label comment">
+							<label>Send new account email</label>
+							<comment>Send the new account email when a customer account is created after using Fast Checkout</comment>
+							<frontend_type>select</frontend_type>
+							<source_model>adminhtml/system_config_source_yesno</source_model>
+							<sort_order>71</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</send_new_account_email>
+						<auto_login_fco_user translate="label comment">
+							<label>Automatic login</label>
+							<comment>Login the customer after returning from Fast Checkout </comment>
+							<frontend_type>select</frontend_type>
+							<source_model>adminhtml/system_config_source_yesno</source_model>
+							<sort_order>72</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</auto_login_fco_user>
+						<redirect_to_account translate="label comment">
+							<label>Let the customer redirect to their account page</label>
+							<frontend_type>select</frontend_type>
+							<source_model>adminhtml/system_config_source_yesno</source_model>
+							<sort_order>73</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</redirect_to_account>
 						<autocreate_invoice translate="label comment">
 							<label>Create invoice after payment</label>
 							<frontend_type>select</frontend_type>
@@ -1587,7 +1650,6 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</mail_invoice>
-						
 						<new_order_mail translate="label comment">
 							<label>New order mail</label>
 							<frontend_type>select</frontend_type>
@@ -1597,7 +1659,6 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</new_order_mail>
-						
 						<order_status translate="label">
 							<label>New order status</label>
 							<frontend_type>select</frontend_type>
@@ -1607,7 +1668,6 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</order_status>
-						
 						<complete_status translate="label">
 							<label>Payment complete status</label>
 							<frontend_type>select</frontend_type>
@@ -1617,7 +1677,6 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</complete_status>
-						
 						<initialized_status translate="label">
 							<label>Status: initialized</label>
 							<frontend_type>select</frontend_type>
@@ -1627,7 +1686,6 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</initialized_status>
-						
 						<uncleared_status translate="label">
 							<label>Status: uncleared</label>
 							<frontend_type>select</frontend_type>
@@ -1691,7 +1749,6 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</expired_status>
-						
 						<debug translate="label">
 							<label>Debug</label>
 							<frontend_type>select</frontend_type>
@@ -1701,374 +1758,340 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</debug>
-						<!--<support_email translate="label comment">
-							<label>Support E-mail</label>
-							<frontend_type>text</frontend_type>
-							<comment>An e-mail will be send to this address whenever a notification tries to change an order with a cancelled state.(In case of a second chance etc)</comment>
-							<source_model>adminhtml/msp_config_source_accounts</source_model>
-							<sort_order>410</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>1</show_in_store>
-						</support_email>
-						<send_support_email translate="label comment">
-							<label>Send Support E-mail when notification tries to change cancelled order?</label>
-							<comment>E-mail above will be used in this situation. Happens in case of second chance payments that occure when an order has already been cancelled (expire->cancelled etc)</comment>
-							<frontend_type>select</frontend_type>
-							<source_model>adminhtml/system_config_source_yesno</source_model>
-							<sort_order>420</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>1</show_in_website>
-							<show_in_store>1</show_in_store>
-						</send_support_email >-->
 					</fields>
 				</settings>
-
-               <checkout_custom_fields translate="label">
-                    <label>Extra checkout fields</label>
-                    <frontend_type>text</frontend_type>
-                    <sort_order>33</sort_order>
-                    <show_in_default>1</show_in_default>
-                    <show_in_website>1</show_in_website>
-                    <show_in_store>1</show_in_store>
-                    <fields>
-                        <agreements_active>
-                            <label>Force accept agreements</label>
-                            <comment>If enabled the customer must accept the terms and conditions in the fast checkout process</comment>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>10</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </agreements_active>
-                        <agreements_url>
-                            <label>Alternate Agreements URL</label>
-                            <comment>Leave this empty for the standard URL for the agreements</comment>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>20</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </agreements_url>
-                        
-                        <company_active>
-                            <label>Company name</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/msp_config_source_fields</source_model>
-                            <sort_order>30</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </company_active>
-                        <xtra_birthday>
-                            <label>Birthday</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/msp_config_source_fields</source_model>
-                            <sort_order>50</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                       </xtra_birthday>
-                       <xtra_chamberofcommerce>
-                            <label>Chamber of Commerce (CoC/KvK)</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/msp_config_source_fields</source_model>
-                            <sort_order>50</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                       </xtra_chamberofcommerce>
-                       <xtra_vatnumber>
-                            <label>VAT number</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/msp_config_source_fields</source_model>
-                            <sort_order>50</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                       </xtra_vatnumber>
-                       <xtra_passportnumber>
-                            <label>Passport number</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/msp_config_source_fields</source_model>
-                            <sort_order>50</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                       </xtra_passportnumber>
-                       <xtra_driverslicense>
-                            <label>Drivers license</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/msp_config_source_fields</source_model>
-                            <sort_order>50</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                       </xtra_driverslicense>
-                       <xtra_sex>
-                            <label>Sex</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/msp_config_source_fields</source_model>
-                            <sort_order>50</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                       </xtra_sex>
-                       <xtra_salutation>
-                            <label>Salutation</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/msp_config_source_fields</source_model>
-                            <sort_order>50</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                       </xtra_salutation>
-                       <xtra_comment>
-                            <label>Comment</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/msp_config_source_fields</source_model>
-                            <sort_order>50</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                       </xtra_comment>
-                       <xtra_newsletter>
-                            <label>Newsletter</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>50</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                       </xtra_newsletter>
-                    </fields>
-                </checkout_custom_fields>
-
-               <checkout_google_analytics translate="label">
-                    <label>Google Analytics</label>
-                    <frontend_type>text</frontend_type>
-                    <sort_order>33</sort_order>
-                    <show_in_default>1</show_in_default>
-                    <show_in_website>1</show_in_website>
-                    <show_in_store>1</show_in_store>
-                    <fields>
-                        <active>
-                            <label>Enable</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>10</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </active>
-                        <account>
-                            <label>Account</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>20</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </account>
-                    </fields>
-                </checkout_google_analytics>
-
-               <checkout_shipping_pickup translate="label">
-                    <label>Shipping - Pickup</label>
-                    <frontend_type>text</frontend_type>
-                    <sort_order>34</sort_order>
-                    <show_in_default>1</show_in_default>
-                    <show_in_website>1</show_in_website>
-                    <show_in_store>0</show_in_store>
-                    <fields>
-                        <active>
-                            <label>Enable Pickup</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>10</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>0</show_in_store>
-                        </active>
-                        <title>
-                            <label>Pickup Title</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>20</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>0</show_in_store>
-                        </title>
-                        <price>
-                            <label>Pickup Price</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>30</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>0</show_in_store>
-                        </price>
-                    </fields>
-                </checkout_shipping_pickup>
-                
-                <checkout_shipping_tablerate>
-                    <label>Shipping - Table Rates</label>
-                    <frontend_type>text</frontend_type>
-                    <sort_order>35</sort_order>
-                    <show_in_default>1</show_in_default>
-                    <show_in_website>1</show_in_website>
-                    <show_in_store>0</show_in_store>
-                    <fields>
-                        <active translate="label">
-                            <label>Enable Table Rates</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <comment>This will enable the Table Rates method configured at Shipping Methods -> Table Rates</comment>
-                            <sort_order>10</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>0</show_in_store>
-                        </active>
-                    </fields>
-                </checkout_shipping_tablerate>
-
-                <checkout_shipping_flatrate translate="label">
-                    <label>Shipping - Flat Rate</label>
-                    <frontend_type>text</frontend_type>
-                    <sort_order>36</sort_order>
-                    <show_in_default>1</show_in_default>
-                    <show_in_website>1</show_in_website>
-                    <show_in_store>0</show_in_store>
-                    <fields>
-                        <active translate="label">
-                            <label>Enable Flat Rate</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>10</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>0</show_in_store>
-                        </active>
-                        <title_1 translate="label">
-                            <label>Rate 1 Title</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>20</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>0</show_in_store>
-                        </title_1>
-                        <price_1 translate="label">
-                            <label>Rate 1 Amount</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>22</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>0</show_in_store>
-                        </price_1>
-
-                        <sallowspecific_1 translate="label">
-                            <label>Rate 1 Ship To Applicable Countries</label>
-                            <frontend_type>select</frontend_type>
-                            <sort_order>24</sort_order>
-                            <source_model>adminhtml/system_config_source_shipping_allspecificcountries</source_model>
-                            <frontend_model>googlecheckout/adminhtml_shipping_applicable_countries</frontend_model>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>0</show_in_store>
-                            <can_be_empty>1</can_be_empty>
-                        </sallowspecific_1>
-                        <specificcountry_1 translate="label">
-                            <label>Rate 1 Ship to Specific Countries</label>
-                            <frontend_type>multiselect</frontend_type>
-                            <sort_order>26</sort_order>
-                            <source_model>adminhtml/system_config_source_country</source_model>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>0</show_in_store>
-                            <can_be_empty>1</can_be_empty>
-                        </specificcountry_1>
-
-
-                        <title_2 translate="label">
-                            <label>Rate 2 Title</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>30</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>0</show_in_store>
-                        </title_2>
-                        <price_2 translate="label">
-                            <label>Rate 2 Amount</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>32</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>0</show_in_store>
-                        </price_2>
-
-                        <sallowspecific_2 translate="label">
-                            <label>Rate 2 Ship To Applicable Countries</label>
-                            <frontend_type>select</frontend_type>
-                            <sort_order>34</sort_order>
-                            <source_model>adminhtml/system_config_source_shipping_allspecificcountries</source_model>
-                            <frontend_model>googlecheckout/adminhtml_shipping_applicable_countries</frontend_model>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>0</show_in_store>
-                            <can_be_empty>1</can_be_empty>
-                        </sallowspecific_2>
-                        <specificcountry_2 translate="label">
-                            <label>Rate 2 Ship to Specific Countries</label>
-                            <frontend_type>multiselect</frontend_type>
-                            <sort_order>36</sort_order>
-                            <source_model>adminhtml/system_config_source_country</source_model>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>0</show_in_store>
-                            <can_be_empty>1</can_be_empty>
-                        </specificcountry_2>
-
-
-                        <title_3 translate="label">
-                            <label>Rate 3 Title</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>40</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>0</show_in_store>
-                        </title_3>
-                        <price_3 translate="label">
-                            <label>Rate 3 Amount</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>42</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>0</show_in_store>
-                        </price_3>
-                        <sallowspecific_3 translate="label">
-                            <label>Rate 3 Ship To Applicable Countries</label>
-                            <frontend_type>select</frontend_type>
-                            <sort_order>44</sort_order>
-                            <source_model>adminhtml/system_config_source_shipping_allspecificcountries</source_model>
-                            <frontend_model>googlecheckout/adminhtml_shipping_applicable_countries</frontend_model>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>0</show_in_store>
-                            <can_be_empty>1</can_be_empty>
-                        </sallowspecific_3>
-                        <specificcountry_3 translate="label">
-                            <label>Rate 3 Ship to Specific Countries</label>
-                            <frontend_type>multiselect</frontend_type>
-                            <sort_order>46</sort_order>
-                            <source_model>adminhtml/system_config_source_country</source_model>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>0</show_in_store>
-                            <can_be_empty>1</can_be_empty>
-                        </specificcountry_3>
-                    </fields>
-                </checkout_shipping_flatrate>
-
-
-			</groups>
-    </mspcheckout>
-	</sections>
+				<checkout_custom_fields translate="label">
+					<label>Extra checkout fields</label>
+					<frontend_type>text</frontend_type>
+					<sort_order>33</sort_order>
+					<show_in_default>1</show_in_default>
+					<show_in_website>1</show_in_website>
+					<show_in_store>1</show_in_store>
+					<fields>
+						<agreements_active>
+							<label>Force accept agreements</label>
+							<comment>If enabled the customer must accept the terms and conditions in the fast checkout process</comment>
+							<frontend_type>select</frontend_type>
+							<source_model>adminhtml/system_config_source_yesno</source_model>
+							<sort_order>10</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</agreements_active>
+						<agreements_url>
+							<label>Alternate Agreements URL</label>
+							<comment>Leave this empty for the standard URL for the agreements</comment>
+							<frontend_type>text</frontend_type>
+							<sort_order>20</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</agreements_url>
+						<company_active>
+							<label>Company name</label>
+							<frontend_type>select</frontend_type>
+							<source_model>adminhtml/msp_config_source_fields</source_model>
+							<sort_order>30</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</company_active>
+						<xtra_birthday>
+							<label>Birthday</label>
+							<frontend_type>select</frontend_type>
+							<source_model>adminhtml/msp_config_source_fields</source_model>
+							<sort_order>50</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</xtra_birthday>
+						<xtra_chamberofcommerce>
+							<label>Chamber of Commerce (CoC/KvK)</label>
+							<frontend_type>select</frontend_type>
+							<source_model>adminhtml/msp_config_source_fields</source_model>
+							<sort_order>50</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</xtra_chamberofcommerce>
+						<xtra_vatnumber>
+							<label>VAT number</label>
+							<frontend_type>select</frontend_type>
+							<source_model>adminhtml/msp_config_source_fields</source_model>
+							<sort_order>50</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</xtra_vatnumber>
+						<xtra_passportnumber>
+							<label>Passport number</label>
+							<frontend_type>select</frontend_type>
+							<source_model>adminhtml/msp_config_source_fields</source_model>
+							<sort_order>50</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</xtra_passportnumber>
+						<xtra_driverslicense>
+							<label>Drivers license</label>
+							<frontend_type>select</frontend_type>
+							<source_model>adminhtml/msp_config_source_fields</source_model>
+							<sort_order>50</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</xtra_driverslicense>
+						<xtra_sex>
+							<label>Sex</label>
+							<frontend_type>select</frontend_type>
+							<source_model>adminhtml/msp_config_source_fields</source_model>
+							<sort_order>50</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</xtra_sex>
+						<xtra_salutation>
+							<label>Salutation</label>
+							<frontend_type>select</frontend_type>
+							<source_model>adminhtml/msp_config_source_fields</source_model>
+							<sort_order>50</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</xtra_salutation>
+						<xtra_comment>
+							<label>Comment</label>
+							<frontend_type>select</frontend_type>
+							<source_model>adminhtml/msp_config_source_fields</source_model>
+							<sort_order>50</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</xtra_comment>
+						<xtra_newsletter>
+							<label>Newsletter</label>
+							<frontend_type>select</frontend_type>
+							<source_model>adminhtml/system_config_source_yesno</source_model>
+							<sort_order>50</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</xtra_newsletter>
+					</fields>
+				</checkout_custom_fields>
+				<checkout_google_analytics translate="label">
+					<label>Google Analytics</label>
+					<frontend_type>text</frontend_type>
+					<sort_order>33</sort_order>
+					<show_in_default>1</show_in_default>
+					<show_in_website>1</show_in_website>
+					<show_in_store>1</show_in_store>
+					<fields>
+						<active>
+							<label>Enable</label>
+							<frontend_type>select</frontend_type>
+							<source_model>adminhtml/system_config_source_yesno</source_model>
+							<sort_order>10</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</active>
+						<account>
+							<label>Account</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>20</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</account>
+					</fields>
+				</checkout_google_analytics>
+				<checkout_shipping_pickup translate="label">
+					<label>Shipping - Pickup</label>
+					<frontend_type>text</frontend_type>
+					<sort_order>34</sort_order>
+					<show_in_default>1</show_in_default>
+					<show_in_website>1</show_in_website>
+					<show_in_store>0</show_in_store>
+					<fields>
+						<active>
+							<label>Enable Pickup</label>
+							<frontend_type>select</frontend_type>
+							<source_model>adminhtml/system_config_source_yesno</source_model>
+							<sort_order>10</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>0</show_in_store>
+						</active>
+						<title>
+							<label>Pickup Title</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>20</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>0</show_in_store>
+						</title>
+						<price>
+							<label>Pickup Price</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>30</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>0</show_in_store>
+						</price>
+					</fields>
+				</checkout_shipping_pickup>
+				<checkout_shipping_tablerate>
+					<label>Shipping - Table Rates</label>
+					<frontend_type>text</frontend_type>
+					<sort_order>35</sort_order>
+					<show_in_default>1</show_in_default>
+					<show_in_website>1</show_in_website>
+					<show_in_store>0</show_in_store>
+					<fields>
+						<active translate="label">
+							<label>Enable Table Rates</label>
+							<frontend_type>select</frontend_type>
+							<source_model>adminhtml/system_config_source_yesno</source_model>
+							<comment>This will enable the Table Rates method configured at Shipping Methods -> Table Rates</comment>
+						<sort_order>10</sort_order>
+						<show_in_default>1</show_in_default>
+						<show_in_website>1</show_in_website>
+						<show_in_store>0</show_in_store>
+					</active>
+				</fields>
+			</checkout_shipping_tablerate>
+			<checkout_shipping_flatrate translate="label">
+				<label>Shipping - Flat Rate</label>
+				<frontend_type>text</frontend_type>
+				<sort_order>36</sort_order>
+				<show_in_default>1</show_in_default>
+				<show_in_website>1</show_in_website>
+				<show_in_store>0</show_in_store>
+				<fields>
+					<active translate="label">
+						<label>Enable Flat Rate</label>
+						<frontend_type>select</frontend_type>
+						<source_model>adminhtml/system_config_source_yesno</source_model>
+						<sort_order>10</sort_order>
+						<show_in_default>1</show_in_default>
+						<show_in_website>1</show_in_website>
+						<show_in_store>0</show_in_store>
+					</active>
+					<title_1 translate="label">
+						<label>Rate 1 Title</label>
+						<frontend_type>text</frontend_type>
+						<sort_order>20</sort_order>
+						<show_in_default>1</show_in_default>
+						<show_in_website>1</show_in_website>
+						<show_in_store>0</show_in_store>
+					</title_1>
+					<price_1 translate="label">
+						<label>Rate 1 Amount</label>
+						<frontend_type>text</frontend_type>
+						<sort_order>22</sort_order>
+						<show_in_default>1</show_in_default>
+						<show_in_website>1</show_in_website>
+						<show_in_store>0</show_in_store>
+					</price_1>
+					<sallowspecific_1 translate="label">
+						<label>Rate 1 Ship To Applicable Countries</label>
+						<frontend_type>select</frontend_type>
+						<sort_order>24</sort_order>
+						<source_model>adminhtml/system_config_source_shipping_allspecificcountries</source_model>
+						<frontend_model>googlecheckout/adminhtml_shipping_applicable_countries</frontend_model>
+						<show_in_default>1</show_in_default>
+						<show_in_website>1</show_in_website>
+						<show_in_store>0</show_in_store>
+						<can_be_empty>1</can_be_empty>
+					</sallowspecific_1>
+					<specificcountry_1 translate="label">
+						<label>Rate 1 Ship to Specific Countries</label>
+						<frontend_type>multiselect</frontend_type>
+						<sort_order>26</sort_order>
+						<source_model>adminhtml/system_config_source_country</source_model>
+						<show_in_default>1</show_in_default>
+						<show_in_website>1</show_in_website>
+						<show_in_store>0</show_in_store>
+						<can_be_empty>1</can_be_empty>
+					</specificcountry_1>
+					<title_2 translate="label">
+						<label>Rate 2 Title</label>
+						<frontend_type>text</frontend_type>
+						<sort_order>30</sort_order>
+						<show_in_default>1</show_in_default>
+						<show_in_website>1</show_in_website>
+						<show_in_store>0</show_in_store>
+					</title_2>
+					<price_2 translate="label">
+						<label>Rate 2 Amount</label>
+						<frontend_type>text</frontend_type>
+						<sort_order>32</sort_order>
+						<show_in_default>1</show_in_default>
+						<show_in_website>1</show_in_website>
+						<show_in_store>0</show_in_store>
+					</price_2>
+					<sallowspecific_2 translate="label">
+						<label>Rate 2 Ship To Applicable Countries</label>
+						<frontend_type>select</frontend_type>
+						<sort_order>34</sort_order>
+						<source_model>adminhtml/system_config_source_shipping_allspecificcountries</source_model>
+						<frontend_model>googlecheckout/adminhtml_shipping_applicable_countries</frontend_model>
+						<show_in_default>1</show_in_default>
+						<show_in_website>1</show_in_website>
+						<show_in_store>0</show_in_store>
+						<can_be_empty>1</can_be_empty>
+					</sallowspecific_2>
+					<specificcountry_2 translate="label">
+						<label>Rate 2 Ship to Specific Countries</label>
+						<frontend_type>multiselect</frontend_type>
+						<sort_order>36</sort_order>
+						<source_model>adminhtml/system_config_source_country</source_model>
+						<show_in_default>1</show_in_default>
+						<show_in_website>1</show_in_website>
+						<show_in_store>0</show_in_store>
+						<can_be_empty>1</can_be_empty>
+					</specificcountry_2>
+					<title_3 translate="label">
+						<label>Rate 3 Title</label>
+						<frontend_type>text</frontend_type>
+						<sort_order>40</sort_order>
+						<show_in_default>1</show_in_default>
+						<show_in_website>1</show_in_website>
+						<show_in_store>0</show_in_store>
+					</title_3>
+					<price_3 translate="label">
+						<label>Rate 3 Amount</label>
+						<frontend_type>text</frontend_type>
+						<sort_order>42</sort_order>
+						<show_in_default>1</show_in_default>
+						<show_in_website>1</show_in_website>
+						<show_in_store>0</show_in_store>
+					</price_3>
+					<sallowspecific_3 translate="label">
+						<label>Rate 3 Ship To Applicable Countries</label>
+						<frontend_type>select</frontend_type>
+						<sort_order>44</sort_order>
+						<source_model>adminhtml/system_config_source_shipping_allspecificcountries</source_model>
+						<frontend_model>googlecheckout/adminhtml_shipping_applicable_countries</frontend_model>
+						<show_in_default>1</show_in_default>
+						<show_in_website>1</show_in_website>
+						<show_in_store>0</show_in_store>
+						<can_be_empty>1</can_be_empty>
+					</sallowspecific_3>
+					<specificcountry_3 translate="label">
+						<label>Rate 3 Ship to Specific Countries</label>
+						<frontend_type>multiselect</frontend_type>
+						<sort_order>46</sort_order>
+						<source_model>adminhtml/system_config_source_country</source_model>
+						<show_in_default>1</show_in_default>
+						<show_in_website>1</show_in_website>
+						<show_in_store>0</show_in_store>
+						<can_be_empty>1</can_be_empty>
+					</specificcountry_3>
+				</fields>
+			</checkout_shipping_flatrate>
+		</groups>
+	</mspcheckout>
+</sections>
 </config>

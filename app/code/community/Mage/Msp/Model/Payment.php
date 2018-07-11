@@ -40,7 +40,8 @@ class Mage_Msp_Model_Payment extends Varien_Object
 		$this->_gateway = $gateway;
 	}
 	
-	public function setIdealIssuer($idealissuer){
+	public function setIdealIssuer($idealissuer)
+	{
 		$this->_idealissuer = $idealissuer;
 	}
 	
@@ -221,6 +222,13 @@ class Mage_Msp_Model_Payment extends Varien_Object
 		$api->customer['user_agent']		=	$_SERVER['HTTP_USER_AGENT'];
 		$api->customer['ipaddress']			= 	$_SERVER['REMOTE_ADDR'];
 		
+		$api->gatewayinfo['email']          = 	$this->getOrder()->getCustomerEmail();
+		$api->gatewayinfo['phone']			= 	$billing->getTelephone();
+		$api->gatewayinfo['bankaccount']    =	'';//not available
+		$api->gatewayinfo['referrer']		=	$_SERVER['HTTP_REFERER'];
+		$api->gatewayinfo['user_agent']		=	$_SERVER['HTTP_USER_AGENT'];
+		$api->gatewayinfo['birthday']		= 	'';//not available
+		
 		$api->transaction['id']            	= 	$orderId;
 		$api->transaction['amount']        	=	$amount;
 		$api->transaction['currency']      	= 	"EUR";
@@ -238,30 +246,32 @@ class Mage_Msp_Model_Payment extends Varien_Object
 	
 		
 		$discount_amount = $this->getOrder()->getData();
-		$discount_amount_final	= round($discount_amount['base_discount_amount'],2);
+		//$discount_amount_final	= round($discount_amount['base_discount_amount'],4);
+		$discount_amount_final	= number_format($discount_amount['base_discount_amount'], 4, '.', '');
 		
 		
 		//Add discount line item
 		$c_item = new MspItem('Discount', 'Discount', 1, $discount_amount_final	, 'KG', 0);// Todo adjust the amount to cents, and round it up.
 		$c_item->SetMerchantItemId('Discount');
-		$c_item->SetTaxTableSelector('none');
+		$c_item->SetTaxTableSelector('BTW0');
 		$this->api->cart->AddItem($c_item);
 
 
-		// add none taxtable
+		 //add none taxtable
 		$table 						= 	new MspAlternateTaxTable();
 		$table->name				=	'none';
-		$rule 						= 	new MspAlternateTaxRule(0);
+		$rule 						= 	new MspAlternateTaxRule('0.00');
 		$table->AddAlternateTaxRules($rule);
 		$this->api->cart->AddAlternateTaxTables($table);
 		
+		$this->api->setDefaultTaxZones();
 		
 		//Add shipping line item
 		$title = $this->getOrder()->getShippingDescription();	
 		$price = $this->getOrder()->getShippingAmount();
-		$price = number_format($price, 2, '.','');
+		$price = number_format($price, 4, '.','');
 		$price = (float) Mage::helper('tax')->getShippingPrice($price, false, false);
-
+		$price = number_format($price, 4, '.','');
 		if (empty($title) || trim($price)  === '') 
 		{
 			continue;
@@ -287,7 +297,7 @@ class Mage_Msp_Model_Payment extends Varien_Object
 		
 		$this->getBase($orderId)->log($api->request_xml);
 		$this->getBase($orderId)->log($api->reply_xml);
-
+		
 		// error
 		if ($api->error)
 		{
@@ -304,7 +314,7 @@ class Mage_Msp_Model_Payment extends Varien_Object
 		// save payment link to status history
 		if ($this->getConfigData("save_payment_link") || true)
 		{
-			$this->getOrder()->addStatusToHistory($this->getOrder()->getStatus(), Mage::helper("msp")->__("User redirected to MultiSafepay").'<br/>'.Mage::helper("msp")->__("Payment link:") .'<br/>' . $url);
+			//$this->getOrder()->addStatusToHistory($this->getOrder()->getStatus(), Mage::helper("msp")->__("User redirected to MultiSafepay").'<br/>'.Mage::helper("msp")->__("Payment link:") .'<br/>' . $url);
 			$this->getOrder()->save();
 		}
 		
@@ -318,7 +328,7 @@ class Mage_Msp_Model_Payment extends Varien_Object
 				$this->getOrder()->sendNewOrderEmail();
 			}
 		}
-	
+		
 		return $url;
 	}
 
@@ -470,15 +480,34 @@ class Mage_Msp_Model_Payment extends Varien_Object
 	
 	protected function getItems($order)
 	{
-		foreach ($order->getAllItems() as $item) 
+	
+		// we need to get the items from the origional quote as the tax class id isn't available within the product data inside the order.
+		$items = Mage::getSingleton('checkout/cart')->getQuote($order->getQuoteId())->getAllItems();
+
+
+	
+		foreach ($items as $item) 
 		{
+			$product_id = $item->getProductId();
+			
+			foreach ($order->getAllItems() as $order_item) 
+			{
+				$order_product_id = $order_item->getProductId();
+				if($order_product_id == $product_id){
+					$quantity = round($order_item->getQtyOrdered(), 2);
+				}
+			}
+		
 			if ($item->getParentItem()) 
 			{
 				continue;
 			}
 			$taxClass = ($item->getTaxClassId() == 0 ? 'none' : $item->getTaxClassId());
+	
+			
 			$weight = (float) $item->getWeight();
-      
+			$product_id = $item->getProductId();
+			
 			// name and options
 			$itemName = $item->getName();
 			$options = $this->getProductOptions($item);
@@ -495,9 +524,9 @@ class Mage_Msp_Model_Payment extends Varien_Object
 				$itemName .= $optionString;
 				$itemName .= ')';
 			}
-	  
-			$price = round($item->getPrice(), 2); // Magento uses the rounded number, so we do too
-			$quantity = round($item->getQtyOrdered(), 2);
+	
+			$price	= number_format($item->getPrice(), 4, '.', '');
+			//$quantity = round($item->getQtyOrdered(), 2);
 		
 			// create item
 			$c_item = new MspItem($itemName, $item->getDescription(), $quantity, $price, 'KG', $item->getWeight());
@@ -505,6 +534,7 @@ class Mage_Msp_Model_Payment extends Varien_Object
 			$c_item->SetTaxTableSelector($taxClass);
 			$this->api->cart->AddItem($c_item);
 		}
+
 	}
 	
 	
@@ -513,6 +543,7 @@ class Mage_Msp_Model_Payment extends Varien_Object
 	*/
 	public function startTransaction()
 	{
+	
 		// amount
 		$amount = intval((string)($this->getOrder()->getBaseGrandTotal() * 100));
 
@@ -586,23 +617,20 @@ class Mage_Msp_Model_Payment extends Varien_Object
 		$api->transaction['gateway']       = 	$this->_gateway;
 		$api->transaction['issuer']        = 	$this->_issuer;
 		
-		
-		if($this->_gateway == 'IDEAL' && isset($_SESSION['bankid'])){
-			$api->extravars					= 	$_SESSION['bankid'];
-			unset($_SESSION['bankid']);
+		if($this->_gateway == 'IDEAL' && (isset($_REQUEST['bank']) && !empty($_REQUEST['bank']))){
+			$api->extravars					= 	$_REQUEST['bank'];
 			$url 							= 	$api->startDirectXMLTransaction();
 		}elseif($this->_gateway == 'BANKTRANS')
 		{
-			$api->customer['accountid']				= 	$_SESSION['accountid'];
+			/*$api->customer['accountid']				= 	$_SESSION['accountid'];
 			$api->customer['accountholdername']		=	$_SESSION['accountholdername'];
 			$api->customer['accountholdercity'] 	= 	$_SESSION['accountholdercity'];
 			$api->customer['accountholdercountry']	= 	$_SESSION['accountholdercountry'];
 			unset($_SESSION['accountid']);
 			unset($_SESSION['accountholdername']);
 			unset($_SESSION['accountholdercity']);
-			unset($_SESSION['accountholdercountry']);
+			unset($_SESSION['accountholdercountry']);*/
 			
-			//print_r($api);exit;
 			$data =$api->startDirectBankTransfer();
 			$url = Mage::getUrl("checkout/onepage/success?utm_nooverride=1", array("_secure" => true));
 		}else
@@ -629,7 +657,7 @@ class Mage_Msp_Model_Payment extends Varien_Object
 		// save payment link to status history
 		if ($this->getConfigData("save_payment_link") || true)
 		{
-			$this->getOrder()->addStatusToHistory($this->getOrder()->getStatus(), Mage::helper("msp")->__("User redirected to MultiSafepay").'<br/>'.Mage::helper("msp")->__("Payment link:") .'<br/>' . $url);
+			//$this->getOrder()->addStatusToHistory($this->getOrder()->getStatus(), Mage::helper("msp")->__("User redirected to MultiSafepay").'<br/>'.Mage::helper("msp")->__("Payment link:") .'<br/>' . $url);
 			$this->getOrder()->save();
 		}
 		
@@ -643,6 +671,7 @@ class Mage_Msp_Model_Payment extends Varien_Object
 				$this->getOrder()->sendNewOrderEmail();
 			}
 		}
+
 		return $url;
 	}
 

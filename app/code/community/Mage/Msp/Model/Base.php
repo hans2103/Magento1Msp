@@ -94,6 +94,11 @@ class Mage_Msp_Model_Base extends Varien_Object
 		$this->api->merchant['account_id']  	= $this->getConfigData("account_id");
 		$this->api->merchant['site_id']     	= $this->getConfigData("site_id");
 		$this->api->merchant['site_code']   	= $this->getConfigData("secure_code");
+		$msp->plugin['shop']					= 'Magento';
+		$msp->plugin['shop_version']			= Mage::getVersion();
+		$msp->plugin['plugin_version']			= $this->api->version;
+		$msp->plugin['partner']					= '';
+		$msp->plugin['shop_root_url']			= '';
 
 		return $this->api;
 	}
@@ -176,39 +181,11 @@ class Mage_Msp_Model_Base extends Varien_Object
 
 		// only update from certain states //
 		$current_state = $order->getState();
-		
 		$canUpdate = false;
 		
 		
-		//foreach($order->getItemsCollection() as $item)    
-			//{        
-                //echo $item->getId();exit;
-				/*$current = $item->getQty();
-					
-				$new = $current - $item->getQtyCanceled() ;
-				
-				$product = Mage::getModel('catalog/product')->loadByAttribute('id', $item->getId());
-
-				$stock_obj = Mage::getModel('cataloginventory/stock_item')->loadByProduct($product->getId());
-
-				$stockData = $stock_obj->getData();
-				$stockData['qty'] = $new;
-				$stock_obj->setData($stockData);
-				$stock_obj->save();*/
-				
-					//$current = $item->getQty();
-					
-					//$new = $current - $item->getQtyCanceled() ;
-				
-					//$item->setQtyCanceled(0)->save(); 
-					//$item->setStockData($new);
-					
-									
-          //  }
-		
 		/*
 		*	 TESTING UNDO CANCEL
-		*
 		*	Start undo cancel function
 		*/
 		if($current_state == Mage_Sales_Model_Order::STATE_CANCELED && $newState != Mage_Sales_Model_Order::STATE_CANCELED)
@@ -259,7 +236,7 @@ class Mage_Msp_Model_Base extends Varien_Object
 		}
 		
 		/*
-		*	ENDING UNDO CANCEL CODE
+		*	ENDING UNDO CANCEL CODE 
 		*/
 		if($order->getState() == Mage_Sales_Model_Order::STATE_PROCESSING){
 			$is_already_invoiced = true;
@@ -267,22 +244,29 @@ class Mage_Msp_Model_Base extends Varien_Object
 			$is_already_invoiced = false;
 		}
 		
-		if ($order->getState() == Mage_Sales_Model_Order::STATE_NEW )// test without || $order->getState() == Mage_Sales_Model_Order::STATE_PROCESSING to avoid duplicate cancel bug
+		if ($order->getState() == Mage_Sales_Model_Order::STATE_NEW )
 		{
 			$canUpdate = true;
 		}
-
+ 
 		// update the status if changed
 		if ($canUpdate && (($newState != $order->getState()) || ($newStatus != $order->getStatus())))
 		{
 			$order->setState($newState, $newStatus, $statusMessage);
-
+		
 			// create an invoice when the payment is completed
 			if ($complete && $autocreateInvoice && !$is_already_invoiced)
 			{
-				$this->createInvoice($order);
+				$send_update_email = $this->getConfigData("send_update_email");
+				
+				if($send_update_email){
+					$order->sendOrderUpdateEmail(true);
+				}
+				$this->createInvoice($order);// Validate this function with 1.7.0.2 and lower
 			}
-		}else{
+		}
+		else
+		{
 			// add status to history if it's not there
 			if (!$this->isStatusInHistory($order, $mspStatus) && (ucfirst($order->getState()) != ucfirst(Mage_Sales_Model_Order::STATE_CANCELED)))
 			{
@@ -395,34 +379,45 @@ class Mage_Msp_Model_Base extends Varien_Object
 	{
 		if ($order->canInvoice() && !$order->getInvoiceCollection()->getSize()) 
 		{
+		
 			$invoice = $order->prepareInvoice();
-			$invoice->register();
-
+			$invoice->getOrder()->setIsInProcess(true);
+			//$invoice->register()->capture();
+		
 			// hack for 1.3
 			if ($this->getMagentoVersion() <= 13){ //  <= 1.3.x.x
-				$invoice->capture();
+				//$invoice->capture();
+				$invoice->register()->capture();
 			}else{
-				$invoice->pay();
+				//$invoice->pay();
+				$invoice->register()->pay();
 			}
 
-			$invoice->save();
-
-			$transactionSave = Mage::getModel('core/resource_transaction')->addObject($invoice)->addObject($invoice->getOrder());
-			$transactionSave->save();
+			//$invoice->save();
+			try 
+			{
+				Mage::getModel('core/resource_transaction')->addObject($invoice)->addObject($invoice->getOrder())->save();
+			} catch (Exception $e) {
+				//$payment->writeLog($e->getMessage());
+			}
+			
+			//$transactionSave = Mage::getModel('core/resource_transaction')->addObject($invoice)->addObject($invoice->getOrder());
+			//$transactionSave->save();
 			
 			$mail_invoice = $this->getConfigData("mail_invoice");
 			if ($mail_invoice)
 			{
 				$invoice->setEmailSent(true);
-				$invoice->save();
 				$invoiceSaved = true;
 				$invoice->sendEmail();
 			}
+			
 			// save invoice if we haven't already
 			if (!$invoiceSaved)
 			{
 				$invoice->save();
 			}
+
 			return true;
 		}
 		return false;

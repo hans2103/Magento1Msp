@@ -2,7 +2,7 @@
 <config>
 	<modules>
 		<Mage_Msp>
-			<version>1.3.1</version>
+			<version>1.3.3</version>
 		</Mage_Msp>
 	</modules>
 	<global>
@@ -10,6 +10,11 @@
 			<msp>
 				<class>Mage_Msp_Model</class>
 			</msp>
+			<sales>
+				<rewrite>
+					<service_quote>Mage_Msp_Model_Service_Quote</service_quote>
+				</rewrite>
+			</sales>
 		</models>
 		<resources>
 			<msp_setup>
@@ -31,63 +36,49 @@
 				</connection>
 			</msp_read>
 		</resources>
-    <blocks>
-      <msp>
-        <class>Mage_Msp_Block</class>
-      </msp>
-      <payment>
-        <class>Mage_Msp_Block</class>
-        <class>Mage_Payment_Block</class>
-      </payment>
-    </blocks>
+		<blocks>
+			<msp>
+				<class>Mage_Msp_Block</class>
+			</msp>
+			<payment>
+				<class>Mage_Msp_Block</class>
+				<class>Mage_Payment_Block</class>
+			</payment>
+		</blocks>
 	</global>
-  <adminhtml>
-<!--
-        <events>
-          <sales_order_invoice_save_after>
-            <observers>
-              <multisafepay_observer>
-                <type>model</type>
-                <class>Mage_Msp_Model_Checkout</class>
-                <method>invoiceNotification</method>
-              </multisafepay_observer>
-            </observers>            
-          </sales_order_invoice_save_after>
-        </events>
-
--->
-    <translate>
-        <modules>
-            <Mage_Msp>
-                <files>
-                    <default>Mage_Msp.csv</default>
-                </files>
-            </Mage_Msp>
-        </modules>
-    </translate>
-    <acl>
-        <resources>
-            <admin>
-                <children>
-                    <system>
-                        <children>
-                            <config>
-                                <children>
-                                    <msp>
-                                        <title>MultiSafepay Settings</title>
-                                    </msp>
-                                    <mspcheckout>
-                                        <title>MultiSafepay Fast Checkout</title>
-                                    </mspcheckout>
-                                </children>
-                            </config>
-                        </children>
-                    </system>
-                </children>
-            </admin>
-        </resources>
-    </acl>
-  </adminhtml>
+	<adminhtml>
+		<translate>
+			<modules>
+				<Mage_Msp>
+					<files>
+						<default>Mage_Msp.csv</default>
+					</files>
+				</Mage_Msp>
+			</modules>
+		</translate>
+		<acl>
+			<resources>
+				<admin>
+					<children>
+						<system>
+							<children>
+								<config>
+									<children>
+										<msp>
+											<title>MultiSafepay Settings</title>
+										</msp>
+										<mspcheckout>
+											<title>MultiSafepay Fast Checkout</title>
+										</mspcheckout>
+									</children>
+								</config>
+							</children>
+						</system>
+					</children>
+				</admin>
+			</resources>
+		</acl>
+	</adminhtml>
 	<frontend>
 		<routers>
 			<msp>
@@ -98,22 +89,22 @@
 				</args>
 			</msp>
 		</routers>
-    <translate>
-        <modules>
-            <Mage_Msp>
-                <files>
-                    <default>Mage_Msp.csv</default>
-                </files>
-            </Mage_Msp>
-        </modules>
-    </translate>
-    <layout>
-        <updates>
-            <msp>
-                <file>msp.xml</file>
-            </msp>
-        </updates>
-    </layout>
+		<translate>
+			<modules>
+				<Mage_Msp>
+					<files>
+						<default>Mage_Msp.csv</default>
+					</files>
+				</Mage_Msp>
+			</modules>
+		</translate>
+		<layout>
+			<updates>
+				<msp>
+					<file>msp.xml</file>
+				</msp>
+			</updates>
+		</layout>
 	</frontend>
 	<default>
 		<payment>
@@ -138,42 +129,42 @@
 				<test_api>live</test_api>
 			</msp>
 			<mspcheckout>
-        <active>1</active>
+				<active>1</active>
 				<model>msp/checkout</model>
 				<title>MultiSafepay Fast Checkout</title>
 			</mspcheckout>
 			<msp_ideal>
-        <active>1</active>
+				<active>1</active>
 				<model>msp/gateway_ideal</model>
 				<title>MSP iDeal</title>
 			</msp_ideal>
 			<msp_payafter>
-        <active>1</active>
+				<active>1</active>
 				<model>msp/gateway_payafter</model>
 				<title>MSP Pay after Delivery</title>
 			</msp_payafter>
 			<msp_mistercash>
-        <active>1</active>
+				<active>1</active>
 				<model>msp/gateway_mistercash</model>
 				<title>MSP MisterCash</title>
 			</msp_mistercash>
 			<msp_visa>
-        <active>1</active>
+				<active>1</active>
 				<model>msp/gateway_visa</model>
 				<title>MSP Visa</title>
 			</msp_visa>
 			<msp_mastercard>
-        <active>1</active>
+				<active>1</active>
 				<model>msp/gateway_mastercard</model>
 				<title>MSP MasterCard</title>
 			</msp_mastercard>
 			<msp_banktransfer>
-        <active>1</active>
+				<active>1</active>
 				<model>msp/gateway_banktransfer</model>
 				<title>MSP Bank Transfer</title>
 			</msp_banktransfer>
 			<msp_maestro>
-        <active>1</active>
+				<active>1</active>
 				<model>msp/gateway_maestro</model>
 				<title>MSP Maestro</title>
 			</msp_maestro>
@@ -218,25 +209,30 @@
 				<title>MSP Parfum cadeaukaart</title>
 			</msp_parfumcadeaukaart>
 			<msp_giropay>
-        <active>1</active>
+				<active>1</active>
 				<model>msp/gateway_giroPay</model>
 				<title>MSP GiroPay</title>
 			</msp_giropay>
 			<msp_multisafepay>
-        <active>1</active>
+				<active>1</active>
 				<model>msp/gateway_multiSafepay</model>
 				<title>MSP Wallet</title>
 			</msp_multisafepay>
 			<msp_directebanking>
-        <active>1</active>
+				<active>1</active>
 				<model>msp/gateway_directEbanking</model>
 				<title>MSP Direct e-banking</title>
 			</msp_directebanking>
 			<msp_directdebit>
-        <active>1</active>
+				<active>1</active>
 				<model>msp/gateway_directDebit</model>
 				<title>MSP Direct Debit</title>
 			</msp_directdebit>
+			<msp_fastcheckout>
+				<active>1</active>
+				<model>msp/gateway_fastcheckout</model>
+				<title>MSP Fast Checkout</title>
+			</msp_fastcheckout>
 		</payment>
 		<msp>
 			<settings>
@@ -369,6 +365,12 @@
 				<title>Direct Debit</title>
 				<lang>nl</lang>
 			</msp_directdebit>
+			<msp_fastcheckout translate="title" module="msp">
+				<active>0</active>
+				<model>msp/gateway_fastcheckout</model>
+				<title>Fast Checkout</title>
+				<lang>nl</lang>
+			</msp_fastcheckout>
 		</msp>
 		<mspcheckout>
 			<settings>
@@ -384,9 +386,11 @@
 				<expired_status>canceled</expired_status>
 				<autocreate_invoice>0</autocreate_invoice>
 				<mail_invoice>0</mail_invoice>
+				<send_new_account_email>1</send_new_account_email>
+				<redirect_to_account>0</redirect_to_account>
+				<auto_login_fco_user>0</auto_login_fco_user>
 				<test_api>live</test_api>
 			</settings>
-    </mspcheckout>
-	
+		</mspcheckout>
 	</default>
 </config>

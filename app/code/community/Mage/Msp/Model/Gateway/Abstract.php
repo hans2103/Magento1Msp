@@ -6,8 +6,8 @@ abstract class Mage_Msp_Model_Gateway_Abstract extends Mage_Payment_Model_Method
 	protected $_settings = "msp"; // config root for settings (always msp for now)
 	protected $_code;             // payment method code
 	protected $_model;            // payment model
-	public $_gateway;          // msp 'gateway'
-	protected $_idealissuer;	  // ideal issuer
+	public 	  $_gateway;          // msp 'gateway'
+	public 	  $_idealissuer;
 	protected $_params;
 	protected $_loadSettingsConfig = true; // load 'settings' before payment config
 	protected $_loadGatewayConfig  = true; 
@@ -187,9 +187,11 @@ abstract class Mage_Msp_Model_Gateway_Abstract extends Mage_Payment_Model_Method
 		return $this->_gateway;
 	}
 	
-	public function getIdealIssuer(){
+	public function getIdealIssuer()
+	{
 		return $this->_idealissuer;
 	}
+	
   
 	/**
 	* Pass params to the model
