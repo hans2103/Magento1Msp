@@ -466,13 +466,13 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
             $total_fee += $fixed_fee;
             $fee = $total_fee;
             $tax = ($fee / $bigRate) * $rate;
-            $fee = $fee - $tax;
+            $fee = $fee - $tax; 
 
 
             //add pay after delivery fee if enabled
-            if (Mage::getStoreConfig('msp/msp_' . strtolower($this->_gateway) . '/fee')) {
+            if (Mage::getStoreConfig('msp_gateways/msp_' . strtolower($this->_gateway) . '/fee')) {
                 $c_item = new MspItem('Fee', 'Fee', 1, $fee, 'KG', 0); // Todo adjust the amount to cents, and round it up.
-                $c_item->SetMerchantItemId('msp-fee');
+                $c_item->SetMerchantItemId('payment-fee');
                 $c_item->SetTaxTableSelector('FEE');
                 $this->api->cart->AddItem($c_item);
             }
@@ -487,8 +487,17 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
 
         //Add shipping line item
         $title = $this->getOrder()->getShippingDescription();
-        $price = number_format($this->_convertCurrency($this->getOrder()->getShippingAmount(), $currentCurrencyCode, $currencyCode), 4, '.', '');
-        //$price = (float) Mage::helper('tax')->getShippingPrice($price, false, false);
+        
+        //Code blow added to recalculate excluding tax for the shipping cost. Older Magento installations round differently, causing a 1 cent mismatch. This is why we recalculate it.
+        $diff= $this->getOrder()->getShippingInclTax()- $this->getOrder()->getShippingAmount();
+		$test = ($diff/$this->getOrder()->getShippingAmount())*100;
+		$shipping_percentage = 1 + round($test, 0)/100;
+		$shippin_exc_tac_calculated = $this->getOrder()->getShippingInclTax()/$shipping_percentage;
+
+		$price = number_format($this->_convertCurrency($shippin_exc_tac_calculated, $currentCurrencyCode, $currencyCode), 10, '.', '');
+        /*End code */
+        
+        //$price = number_format($this->_convertCurrency($this->getOrder()->getShippingAmount(), $currentCurrencyCode, $currencyCode), 10, '.', '');
 
         $shipping_tax_id = 'none';
 
@@ -506,7 +515,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
         }
 
         $c_item = new MspItem($title, 'Shipping', 1, $price, 'KG', 0);
-        $c_item->SetMerchantItemId('shipping');
+        $c_item->SetMerchantItemId('msp-shipping');
         $c_item->SetTaxTableSelector($shipping_tax_id); //TODO Validate this one. 
         $this->api->cart->AddItem($c_item);
         //End shipping line item
@@ -554,7 +563,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
             Mage::app()->getFrontController()->getResponse()->setRedirect(Mage::getUrl('checkout/cart'));
             Mage::app()->getResponse()->sendResponse();
             $newState = Mage_Sales_Model_Order::STATE_CANCELED;
-            $statusMessage = Mage::helper("msp")->__("Canceleld because of transaction request error");
+            $statusMessage = Mage::helper("msp")->__("Canceled because of transaction request error");
             $newStatus = $this->getConfigData("void_status");
 
             $order->cancel(); // this trigers stock updates
@@ -779,6 +788,13 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
             //$quantity = round($item->getQtyOrdered(), 2);
 
             $ndata = $item->getData();
+            
+            
+            if($this->api->transaction['gateway'] == 'KLARNA'){
+                $rounding = 10;
+            }else{
+              $rounding = 10;
+            }
 
             if ($ndata['price'] != 0) {
                 //Test-> Magento rounds at 2 decimals so the recalculation goes wrong with large quantities.
@@ -788,7 +804,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
                   $price_without_tax = $price_with_tax / $divided_value;
                   $price = round($price_without_tax, 4); */
 
-                $price = number_format($this->_convertCurrency($ndata['price'], $currentCurrencyCode, $targetCurrencyCode), 4, '.', '');
+                $price = number_format($this->_convertCurrency($ndata['price'], $currentCurrencyCode, $targetCurrencyCode), $rounding, '.', '');
 
                 $tierprices = $proddata->getTierPrice();
                 if (count($tierprices) > 0) {
@@ -808,13 +824,14 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
                                 $price = $value->price;
                             }
 
-                        $price = number_format($this->_convertCurrency($price, $currentCurrencyCode, $targetCurrencyCode), 4, '.', '');
+                        $price = number_format($this->_convertCurrency($price, $currentCurrencyCode, $targetCurrencyCode), $rounding, '.', '');
                     }
                 }
                 
                 // Fix for 1027 with catalog prices including tax 
                 if (Mage::getStoreConfig('tax/calculation/price_includes_tax')) {
                     $price = ($item->getRowTotalInclTax() / $item->getQtyOrdered() / (1 + ($item->getTaxPercent() / 100)));
+                    $price = round($price, $rounding);
                 }
 
 

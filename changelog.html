@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html> 
+<html>
 
 <head>
 </head>
@@ -8,6 +8,42 @@
 	<div id="container" style="width:900px; margin-left:100">
 	
 		<div id="version" style="background-color:#E0E0E0 ;">
+			<b>Release Notes - Magento 2.2.1 (Nov 12th, 2015)</b>
+		</div>
+		<p>
+			<b>New features</b>
+			<hr size=1 color="#E0E0E0";>
+			<ul>
+				<li>Payment fee can now be refunded </li>
+				<li>Added min/max amount restrictions for all gateways.</li>
+            </ul>
+			<br/>			
+			
+			<b>Improvements</b>
+			<hr size=1 color="#E0E0E0";>
+			<ul>
+				<li>Added Klarna to the language file.</li>
+            </ul>
+			<br/>			
+
+			<b>Fixes</b>
+			<hr size=1 color="#E0E0E0";>
+			<ul>
+				<li>Fixed undefined variable isAllowConvert notice.</li>
+				<li>Fixed undefined variable Currencies notice.</li>
+                <li>Fixed issue using wrong StoreConfig.</li>
+                <li>Fixed issue when selecting all the available currencies in the configuration.</li>
+                <li>Fixed issue using the wrong account credentials for FastCheckout.</li>
+                <li>Fixed issue causing shippingmethod not to be correct for Klarna and Pay After Delivery.</li>
+                <li>Fixed issue which prevented accepting gender, bankaccount and date of birth twice when using Klarna.</li>
+                <li>Fixed issue which resulted in 1 cent mismatch when using Klarna on older Magento instalations.</li>
+            </ul>
+		</p>
+		<br/>
+		<br/>
+
+
+		<div id="version" style="background-color:#E0E0E0 ;">
 			<b>Release Notes - Magento 2.2.0 (Aug 20th, 2015)</b>
 		</div>
 		<p>
@@ -15,7 +51,7 @@
 			<hr size=1 color="#E0E0E0";>
 			<ul>
 				<li>Added Klarna as payment method.</li>
-				<li>Giftcard now have their own API key config.</li> 
+				<li>Giftcard now have their own API key config.</li>
 				<li>Refunds now work for Klarna, Coupons and Pay After Delivery.</li>
 				<li>Success page now visible when using a payment link or pay using second chance.</li>
 				<li>FCO button now also language based.</li>
@@ -247,7 +283,7 @@
 				<li>Added version number to config title line</li>
 				<li>Textual improvements</li>
 				<li>Better check on order confirmation email sending</li>
-				<li>Rrecalculate the product price without tax as Magento round at 2 decimals by default and we use 4. 
+				<li>Rrecalculate the product price without tax as Magento round at 2 decimals by default and we use 4.
 				    This resulted in a amount mismatch when ordering larger quantities of the same product</li>
 				<li>Better support for special chars</li>
 				<li>Enabled locking again but return false instead of showing error and exit. This should avoid duplicate invoices when callback is called while before the redirecturl set the orderstatus</li>

@@ -23,9 +23,11 @@ class MultiSafepay_Msp_Model_Observer_Shipment extends MultiSafepay_Msp_Model_Ob
         $order = $shipment->getOrder();
 
         // use send request if enabled
-        if (!Mage::getStoreConfigFlag('msp/'.$order->getPayment()->getMethodInstance()->getCode().'/send_request_after_shipping', $order->getStoreId())) {
+        if (!Mage::getStoreConfigFlag('msp_gateways/'.$order->getPayment()->getMethodInstance()->getCode().'/send_request_after_shipping', $order->getStoreId())) {
             return $this;
         }
+        
+        
 
         /** @var $payment Mage_Payment_Model_Method_Abstract */
         $payment = $order->getPayment()->getMethodInstance();
@@ -46,9 +48,9 @@ class MultiSafepay_Msp_Model_Observer_Shipment extends MultiSafepay_Msp_Model_Ob
         $checkout = Mage::getModel('msp/checkout');
 
         /** @var $base MultiSafepay_Msp_Model_Base */
-        $base = $checkout->getBase($order->getId());
+        $base = $checkout->getBase($order->getId()); 
 
-        $configPayAfter = Mage::getStoreConfig('msp/'.$order->getPayment()->getMethodInstance()->getCode(), $order->getStoreId());
+        $configPayAfter = Mage::getStoreConfig('msp_gateways/'.$order->getPayment()->getMethodInstance()->getCode(), $order->getStoreId());
         $configGateway = Mage::getStoreConfig('msp/settings', $order->getStoreId());
 
         /** @var $api MultiSafepay_Msp_Model_Api_Shipment */
@@ -92,7 +94,7 @@ class MultiSafepay_Msp_Model_Observer_Shipment extends MultiSafepay_Msp_Model_Ob
         }
 
         if ($result) {
-            Mage::getSingleton('adminhtml/session')->addNotice(Mage::helper('msp')->__('The order has been successfully set to shipped within your MultiSafepay transaction, the Pay After Delivery process continues.'));
+            Mage::getSingleton('adminhtml/session')->addNotice(Mage::helper('msp')->__('The order has been successfully set to shipped within your MultiSafepay transaction, the process continues.'));
         } else {
             Mage::getSingleton('adminhtml/session')->addError($api->error_code . ' - ' . $api->error);
         }

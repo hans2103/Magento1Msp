@@ -12,4 +12,26 @@
             </action>
         </reference>
     </adminhtml_system_config_edit>
+    
+     <adminhtml_sales_order_creditmemo_new>
+        <reference name="creditmemo_totals">
+            <block name="servicecost" type="msp/adminhtml_servicecost_totals_creditmemo" before="tax"/>
+        </reference>
+        <reference name="adjustments">
+       		<action method = 'setTemplate'>
+       			<template>msp/servicecost/order/creditmemo/create/totals/adjustments.phtml</template>
+       		</action>
+        </reference>
+    </adminhtml_sales_order_creditmemo_new>
+    
+    <adminhtml_sales_order_creditmemo_updateqty>
+        <reference name="creditmemo_totals">
+            <block name="servicecost" type="msp/adminhtml_servicecost_totals_creditmemo" before="tax"/>
+        </reference>
+        <reference name="adjustments">
+       		<action method = 'setTemplate'>
+       			<template>msp/servicecost/order/creditmemo/create/totals/adjustments.phtml</template>
+       		</action>
+        </reference>
+    </adminhtml_sales_order_creditmemo_updateqty>
 </layout>

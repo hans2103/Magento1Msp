@@ -127,7 +127,8 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
                 }
             }
         } else {
-	       
+	       $isAllowConvert = false;
+	       $currencies = array();
 	        if(in_array($this->_code, $this->gateways)){
 		        $this->_configCode = 'msp_gateways';
 		        $this->_module = 'msp_gateways';
@@ -369,7 +370,15 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
     public function refund(Varien_Object $payment, $amount) {
         $order = $payment->getOrder();
         $payment = $order->getPayment()->getMethodInstance();
-
+		$data = Mage::app()->getRequest()->getPost('creditmemo');	
+		$refunded_servicecost = $data['servicecost'];	
+		
+	
+		if($refunded_servicecost != $order->getServicecost()){
+			$amount = $amount - $order->getServicecost() + $refunded_servicecost;
+		}
+			
+			
         switch ($payment->getCode()) {
             // MSP - Fast Checkout
             case self::MSP_FASTCHECKOUT_CODE:

@@ -43,7 +43,7 @@ if (is_array($locale) && isset($locale[0])) {
                 </script>
             </dd>
         <?php } elseif ($_code != 'msp_ideal' && $_code != 'msp') { ?>
-            <?php if ($instruction = Mage::getStoreConfig('msp/' . $_code . '/instructions')) { ?>
+            <?php if ($instruction = Mage::getStoreConfig('msp_gateways/' . $_code . '/instructions')) { ?>
                 <dd>
                     <ul  class="form-list" id="payment_form_<?php echo $_code ?>" style="display: none;">
                         <li>
@@ -56,7 +56,7 @@ if (is_array($locale) && isset($locale[0])) {
                     <?php echo $html; ?>
                 </dd>
             <?php } ?>
-        <?php } elseif ($_code == 'msp_ideal' && Mage::getStoreConfig('msp/' . $_code . '/bank_select')) { ?>
+        <?php } elseif ($_code == 'msp_ideal' && Mage::getStoreConfig('msp_gateways/' . $_code . '/bank_select')) { ?>
             <dd>
                 <ul class="5 form-list" id="payment_form_<?php echo $_code ?>" style="display: none;">
                     <li>
@@ -88,7 +88,7 @@ if (is_array($locale) && isset($locale[0])) {
             <?php if ($_code == 'msp') { ?>
                 <?php $instruction = Mage::getStoreConfig('payment/msp/instructions') ?>
             <?php } else { ?>
-                <?php $instruction = Mage::getStoreConfig('msp/' . $_code . '/instructions') ?>
+                <?php $instruction = Mage::getStoreConfig('msp_gateways/' . $_code . '/instructions') ?>
             <?php } ?>
             <?php if ($instruction): ?>
                 <dd>

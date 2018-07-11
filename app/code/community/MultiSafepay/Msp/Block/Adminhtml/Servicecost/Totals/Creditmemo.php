@@ -5,7 +5,7 @@ class MultiSafepay_Msp_Block_Adminhtml_Servicecost_Totals_Creditmemo extends Mag
     protected function _initTotals() {
         parent::_initTotals();
         $order = $this->getSource()->getOrder();
-        $amount = $order->getServicecostPdf();
+        $amount = /*$order->getServicecostPdf() -*/ $order->getServicecostRefunded();
         $tax = $order->getServicecostTax();
 
         $code = $order->getPayment()->getMethod();
@@ -22,11 +22,12 @@ class MultiSafepay_Msp_Block_Adminhtml_Servicecost_Totals_Creditmemo extends Mag
             );
 
 
-            $creditmemo = $this->getCreditMemo();
+           /* $creditmemo = $this->getCreditMemo();
             $creditmemo->setBaseTaxAmount($creditmemo->getBaseTaxAmount() + $tax);
             $creditmemo->setTaxAmount($creditmemo->getTaxAmount() + $tax);
-            $creditmemo->setBaseGrandTotal($creditmemo->getBaseGrandTotal() + $amount + $tax);
-            $creditmemo->setGrandTotal($creditmemo->getGrandTotal() + $amount + $tax);
+            $creditmemo->setBaseGrandTotal($order->getBaseTotalRefunded());
+            $creditmemo->setGrandTotal($order->getTotalRefunded());
+            $creditmemo->save();*/
         }
         return $this;
     }
