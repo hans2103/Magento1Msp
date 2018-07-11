@@ -1,8 +1,10 @@
 <?php
 
-class MultiSafepay_Msp_Model_Servicecost_Creditmemo_Total extends Mage_Sales_Model_Order_Creditmemo_Total_Abstract {
+class MultiSafepay_Msp_Model_Servicecost_Creditmemo_Total extends Mage_Sales_Model_Order_Creditmemo_Total_Abstract
+{
 
-    public function collect(Mage_Sales_Model_Order_Creditmemo $creditmemo) {
+    public function collect(Mage_Sales_Model_Order_Creditmemo $creditmemo)
+    {
         $order = $creditmemo->getOrder();
         $amount = $order->getServicecostInvoiced() - $order->getServicecostRefunded();
         $baseamount = $order->getBaseServicecostInvoiced() - $order->getBaseServicecostRefunded();

@@ -7,7 +7,8 @@
  */
 require_once(Mage::getBaseDir('lib') . DS . 'multisafepay' . DS . 'MultiSafepay.combined.php');
 
-class MultiSafepay_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract {
+class MultiSafepay_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
+{
 
     protected $_code = "mspcheckout";
     protected $_settings = 'mspcheckout';
@@ -27,7 +28,8 @@ class MultiSafepay_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
     protected $_canUseForMultishipping = false;
     protected $_cachedShippingInfo = array(); // Cache of possible shipping carrier-methods combinations per storeId
 
-    public function canUseCheckout() {
+    public function canUseCheckout()
+    {
         return false;
     }
 
@@ -41,7 +43,8 @@ class MultiSafepay_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
     /**
      * Returns an instance of the Base
      */
-    public function getBase($id = null) {
+    public function getBase($id = null)
+    {
         if ($this->base) {
             if ($id) {
                 $this->base->setLogId($id);
@@ -64,7 +67,8 @@ class MultiSafepay_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
     /**
      * Returns an instance of the Api
      */
-    public function getApi($id = null) {
+    public function getApi($id = null)
+    {
         if ($this->api) {
             if ($id) {
                 $this->getBase($id);
@@ -82,7 +86,8 @@ class MultiSafepay_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
     /**
      * Start checkout
      */
-    public function startCheckout() {
+    public function startCheckout()
+    {
         $storeId = Mage::app()->getStore()->getStoreId();
         $storeName = Mage::app()->getStore()->getName();
         $this->_storeId = $storeId;
@@ -216,7 +221,8 @@ class MultiSafepay_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
         return $url;
     }
 
-    public function getAgreementField() {
+    public function getAgreementField()
+    {
         $field = new MspCustomField('acceptagreements', 'checkbox', '');
 
         // description
@@ -244,7 +250,8 @@ class MultiSafepay_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
         $this->api->fields->AddField($field);
     }
 
-    public function getExtraFields() {
+    public function getExtraFields()
+    {
         $option = $this->getSectionConfigData('checkout_custom_fields/company_active');
         if ($option) {
             $field = new MspCustomField();
@@ -326,7 +333,8 @@ class MultiSafepay_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
     /**
      * Notification
      */
-    public function notification($quoteId, $initial = false) {
+    public function notification($quoteId, $initial = false)
+    {
         /** @var $quote Mage_Sales_Model_Quote */
         $quote = Mage::getSingleton('sales/quote')->load($quoteId);
 
@@ -396,7 +404,8 @@ class MultiSafepay_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
         return $ret;
     }
 
-    public function getCustomFieldsFromFile() {
+    public function getCustomFieldsFromFile()
+    {
         $ret = '';
         $file = dirname(dirname(__FILE__)) . DS . 'etc' . DS . 'customfields.xml';
         if (is_readable($file)) {
@@ -405,7 +414,8 @@ class MultiSafepay_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
         $this->api->fields->SetRaw($ret);
     }
 
-    protected function getItems() {
+    protected function getItems()
+    {
         foreach ($this->_quote->getAllItems() as $item) {
             if ($item->getParentItem()) {
                 continue;
@@ -446,7 +456,8 @@ class MultiSafepay_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
         }
     }
 
-    public function getProductOptions($item) {
+    public function getProductOptions($item)
+    {
         $options = array();
         if ($optionIds = $item->getOptionByCode('option_ids')) {
             $options = array();
@@ -473,7 +484,8 @@ class MultiSafepay_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
         return $options;
     }
 
-    protected function getShipping() {
+    protected function getShipping()
+    {
         if (!$this->getFreeShipping()) {
             $this->getFlatRateShipping();
             $this->getTableRateShipping();
@@ -481,13 +493,15 @@ class MultiSafepay_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
         }
     }
 
-    protected function _getShippingRates() {
+    protected function _getShippingRates()
+    {
         $this->_getFreeShippingRates();
         $this->_getFlatRateShippingRates();
         $this->_getAvailableShippingRates(array('flatrate_flatrate', 'freeshipping_freeshipping'));
     }
 
-    protected function _getFreeShippingRates() {
+    protected function _getFreeShippingRates()
+    {
         if (!Mage::getStoreConfigFlag('carriers/freeshipping/active')) {
             return $this;
         }
@@ -515,7 +529,8 @@ class MultiSafepay_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
         return $this;
     }
 
-    protected function _getFlatRateShippingRates() {
+    protected function _getFlatRateShippingRates()
+    {
         if (!Mage::getStoreConfigFlag('carriers/flatrate/active')) {
             return $this;
         }
@@ -567,7 +582,8 @@ class MultiSafepay_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
         return $this;
     }
 
-    protected function _getAvailableShippingRates($exceptMethods) {
+    protected function _getAvailableShippingRates($exceptMethods)
+    {
         /** @var $quote Mage_Sales_Model_Quote */
         $quote = Mage::getSingleton('sales/quote');
 
@@ -602,7 +618,8 @@ class MultiSafepay_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
     /**
      * @return bool
      */
-    public function getFreeShipping() {
+    public function getFreeShipping()
+    {
         if (!$this->getSectionConfigData('freeshipping/active')) {
             return false;
         }
@@ -634,7 +651,8 @@ class MultiSafepay_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
     /**
      * @return void
      */
-    public function getPickup() {
+    public function getPickup()
+    {
         if (!$this->getSectionConfigData('checkout_shipping_pickup/active')) {
             return;
         }
@@ -649,7 +667,8 @@ class MultiSafepay_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
     /**
      * @return void
      */
-    public function getFlatRateShipping() {
+    public function getFlatRateShipping()
+    {
         if (!$this->getSectionConfigData('checkout_shipping_flatrate/active')) {
             return;
         }
@@ -685,7 +704,8 @@ class MultiSafepay_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
      * @return array
      *
      */
-    public function getTableRateCountries() {
+    public function getTableRateCountries()
+    {
         $countries = array();
         $websiteId = $this->_quote->getStore()->getWebsiteId();
 
@@ -706,7 +726,8 @@ class MultiSafepay_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
     /**
      * @return void
      */
-    public function getTableRateShipping() {
+    public function getTableRateShipping()
+    {
         /* if (!$this->getSectionConfigData('checkout_shipping_tablerate/active')) {
           return;
           } */
@@ -773,13 +794,15 @@ class MultiSafepay_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
         }
     }
 
-    protected function setTaxes() {
+    protected function setTaxes()
+    {
         $this->_getTaxTable($this->_getShippingTaxRules(), 'default');
         $this->_getTaxTable($this->_getTaxRules(), 'alternate');
         // add 'none' group?
     }
 
-    protected function _getTaxTable($rules, $type) {
+    protected function _getTaxTable($rules, $type)
+    {
         if (is_array($rules)) {
             foreach ($rules as $group => $taxRates) {
                 if ($type != 'default') {
@@ -836,7 +859,8 @@ class MultiSafepay_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
         }
     }
 
-    protected function _getTaxRules() {
+    protected function _getTaxRules()
+    {
         $customerTaxClass = $this->_getCustomerTaxClass();
         if (Mage::helper('tax')->getTaxBasedOn() == 'origin') {
             $request = Mage::getSingleton('tax/calculation')->getRateRequest();
@@ -853,7 +877,8 @@ class MultiSafepay_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
         }
     }
 
-    protected function _getShippingTaxRules() {
+    protected function _getShippingTaxRules()
+    {
         $customerTaxClass = $this->_getCustomerTaxClass();
         if ($shippingTaxClass = Mage::getStoreConfig(Mage_Tax_Model_Config::CONFIG_XML_PATH_SHIPPING_TAX_CLASS, $this->_quote->getStoreId())) {
             if (Mage::helper('tax')->getTaxBasedOn() == 'origin') {
@@ -873,7 +898,8 @@ class MultiSafepay_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
         return array();
     }
 
-    protected function _getCustomerTaxClass() {
+    protected function _getCustomerTaxClass()
+    {
         $customerGroup = $this->_quote->getCustomerGroupId();
         if (!$customerGroup) {
             $customerGroup = Mage::getStoreConfig('customer/create_account/default_group', $this->_quote->getStoreId());
@@ -882,7 +908,8 @@ class MultiSafepay_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
         return Mage::getModel('customer/group')->load($customerGroup)->getTaxClassId();
     }
 
-    protected function _createOrder($quoteId) {
+    protected function _createOrder($quoteId)
+    {
         $this->getBase()->log("Creating order");
 
         $api = $this->api;
@@ -1077,7 +1104,8 @@ class MultiSafepay_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
         $order->sendNewOrderEmail();
     }
 
-    protected function _importAddress($values, Varien_Object $qAddress = null) {
+    protected function _importAddress($values, Varien_Object $qAddress = null)
+    {
         if (is_array($values)) {
             $values = new Varien_Object($values);
         }
@@ -1104,7 +1132,8 @@ class MultiSafepay_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
         return $qAddress;
     }
 
-    protected function _getShippingInfos($storeId = null) {
+    protected function _getShippingInfos($storeId = null)
+    {
         $cacheKey = ($storeId === null) ? 'nofilter' : $storeId;
         if (!isset($this->_cachedShippingInfo[$cacheKey])) {
             /* @var $shipping Mage_Shipping_Model_Shipping */
@@ -1146,7 +1175,8 @@ class MultiSafepay_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
         return $this->_cachedShippingInfo[$cacheKey];
     }
 
-    protected function _createShippingRate($code, $storeId = null) {
+    protected function _createShippingRate($code, $storeId = null)
+    {
         $rate = Mage::getModel('sales/quote_address_rate')->setCode($code);
 
         $infos = $this->_getShippingInfos($storeId);
@@ -1158,7 +1188,8 @@ class MultiSafepay_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
         return $rate;
     }
 
-    protected function _importTotals($qAddress) {
+    protected function _importTotals($qAddress)
+    {
         $details = $this->api->details;
 
         $qAddress->setTaxAmount($this->_reCalculateToStoreCurrency($details['total-tax']['total'], $qAddress->getQuote()));
@@ -1194,7 +1225,8 @@ class MultiSafepay_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
         $qAddress->setBaseGrandTotal($details['order-total']['total']);
     }
 
-    protected function _reCalculateToStoreCurrency($amount, $quote) {
+    protected function _reCalculateToStoreCurrency($amount, $quote)
+    {
         if ($quote->getQuoteCurrencyCode() != $quote->getBaseCurrencyCode()) {
             $amount = $amount * $quote->getStoreToQuoteRate();
         }
@@ -1202,7 +1234,8 @@ class MultiSafepay_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
         return $amount;
     }
 
-    public function getConfigData($field, $storeId = null) {
+    public function getConfigData($field, $storeId = null)
+    {
         if ($field == 'title') {
             return 'MultiSafepay fast checkout';
         }
@@ -1219,7 +1252,8 @@ class MultiSafepay_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
         return Mage::getStoreConfig($path, $storeId);
     }
 
-    public function getSectionConfigData($field, $storeId = null) {
+    public function getSectionConfigData($field, $storeId = null)
+    {
         if (null === $storeId) {
             if ($this->_storeId !== null) {
                 $storeId = $this->_storeId;
@@ -1237,7 +1271,8 @@ class MultiSafepay_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
     // 'name' => 'test-name'
     // 'cost' => '123'
     // 'currency' => 'EUR' (currently only this supported)
-    public function getShippingMethodsFiltered($country, $countryCode, $weight = '', $size = '', $transactionId) {
+    public function getShippingMethodsFiltered($country, $countryCode, $weight = '', $size = '', $transactionId)
+    {
         $out = array();
 
         // Pickup
@@ -1287,7 +1322,8 @@ class MultiSafepay_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
         return $out;
     }
 
-    public function getShippingRatesFiltered($transactionId, $countryCode, $zipCode, $settings) {
+    public function getShippingRatesFiltered($transactionId, $countryCode, $zipCode, $settings)
+    {
         $output = array();
 
         /** @var $quote Mage_Sales_Model_Quote */
@@ -1316,7 +1352,8 @@ class MultiSafepay_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
         return $output;
     }
 
-    public function getShippingMethodsFilteredXML($country, $countryCode, $weight = '', $size = '', $transactionId) {
+    public function getShippingMethodsFilteredXML($country, $countryCode, $weight = '', $size = '', $transactionId)
+    {
         $methods = $this->getShippingMethodsFiltered($country, $countryCode, $weight, $size, $transactionId);
 
         $outxml = '<shipping-info>';
@@ -1342,7 +1379,8 @@ class MultiSafepay_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
      * @param $settings      array
      * @return string
      */
-    public function getShippingRatesFilteredXML($transactionId, $countryCode, $zipCode, $settings) {
+    public function getShippingRatesFilteredXML($transactionId, $countryCode, $zipCode, $settings)
+    {
         $rates = $this->getShippingRatesFiltered($transactionId, $countryCode, $zipCode, $settings);
 
         $outxml = '<?xml version="1.0" encoding="UTF-8"?>';
@@ -1365,7 +1403,8 @@ class MultiSafepay_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
      * @param $key2  string
      * @return string
      */
-    protected function _getArrayValue($array, $key1, $key2) {
+    protected function _getArrayValue($array, $key1, $key2)
+    {
         if (isset($array[$key1])) {
             if (isset($array[$key1][$key2])) {
                 return $array[$key1][$key2];

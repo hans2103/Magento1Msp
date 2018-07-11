@@ -5,7 +5,8 @@
  * @category MultiSafepay
  * @package  MultiSafepay_Msp
  */
-class MultiSafepay_Msp_Model_Gateway_Klarna extends MultiSafepay_Msp_Model_Gateway_Abstract {
+class MultiSafepay_Msp_Model_Gateway_Klarna extends MultiSafepay_Msp_Model_Gateway_Abstract
+{
 
     protected $_code = "msp_klarna";
     public $_model = "klarna";
@@ -18,7 +19,7 @@ class MultiSafepay_Msp_Model_Gateway_Klarna extends MultiSafepay_Msp_Model_Gatew
         'msp_babygiftcard',
         'msp_boekenbon',
         'msp_erotiekbon',
-        'msp_giveacard',
+        'msp_givacard',
         'msp_parfumnl',
         'msp_parfumcadeaukaart',
         'msp_degrotespeelgoedwinkel',
@@ -40,10 +41,14 @@ class MultiSafepay_Msp_Model_Gateway_Klarna extends MultiSafepay_Msp_Model_Gatew
         'msp_einvoice',
         'msp_klarna',
         'msp_mistercash',
+        'msp_paysafecard',
         'msp_visa',
         'msp_eps',
         'msp_ferbuy',
         'msp_mastercard',
+        'msp_ing',
+        'msp_kbc',
+        'msp_belfius',
         'msp_banktransfer',
         'msp_maestro',
         'msp_paypal',
@@ -54,7 +59,8 @@ class MultiSafepay_Msp_Model_Gateway_Klarna extends MultiSafepay_Msp_Model_Gatew
         'msp_amex',
     );
 
-    public function __construct() {
+    public function __construct()
+    {
         $availableByIP = true;
         if (Mage::getStoreConfig('msp_gateways/msp_klarna/ip_check')) {
             if ($this->_isTestMode()) {
@@ -89,7 +95,7 @@ class MultiSafepay_Msp_Model_Gateway_Klarna extends MultiSafepay_Msp_Model_Gatew
                 $availableByCurrency = false;
             }
         }
-                $isavailablebygroup= true;
+        $isavailablebygroup = true;
         $group_id = 0; // If not logged in, customer group id is 0
         if (Mage::getSingleton('customer/session')->isLoggedIn()) { // If logged in, set customer group id
             $group_id = Mage::getSingleton('customer/session')->getCustomer()->getGroupId();
@@ -101,10 +107,18 @@ class MultiSafepay_Msp_Model_Gateway_Klarna extends MultiSafepay_Msp_Model_Gatew
             $isavailablebygroup = false;
         }
 
-        $this->_canUseCheckout = $availableByIP && $availableByCurrency && $isavailablebygroup;
+        $quote = Mage::getModel('checkout/cart')->getQuote();
+        if ($quote->getShippingAddress()->getSameAsBilling()) {
+            $can_use_klarna = true;
+        } else {
+            $can_use_klarna = false;
+        }
+
+        $this->_canUseCheckout = $availableByIP && $availableByCurrency && $isavailablebygroup && $can_use_klarna;
     }
 
-    public function getOrderPlaceRedirectUrl() {
+    public function getOrderPlaceRedirectUrl()
+    {
         if (isset($_POST['payment']['birthday'])) {
             $birthday = $_POST['payment']['birthday'];
         } else {
@@ -138,7 +152,8 @@ class MultiSafepay_Msp_Model_Gateway_Klarna extends MultiSafepay_Msp_Model_Gatew
      * @param null|integer|Mage_Core_Model_Store $store
      * @return bool
      */
-    protected function _isTestMode($store = null) {
+    protected function _isTestMode($store = null)
+    {
         $mode = Mage::getStoreConfig('msp_gateways/msp_klarna/test_api_pad', $store);
 
         return $mode == MultiSafepay_Msp_Model_Config_Sources_Accounts::TEST_MODE;

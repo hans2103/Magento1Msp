@@ -5,7 +5,8 @@
  * @category MultiSafepay
  * @package  MultiSafepay_Msp
  */
-class MultiSafepay_Msp_Model_Gateway_Default extends MultiSafepay_Msp_Model_Gateway_Abstract {
+class MultiSafepay_Msp_Model_Gateway_Default extends MultiSafepay_Msp_Model_Gateway_Abstract
+{
 
     protected $_module = "payment";
     protected $_code = "msp";
@@ -13,17 +14,20 @@ class MultiSafepay_Msp_Model_Gateway_Default extends MultiSafepay_Msp_Model_Gate
 
     //protected $_loadSettingsConfig = false; // dont use default settings
 
-    public function setParams($params) {
+    public function setParams($params)
+    {
         if (isset($params['gateway'])) {
             $this->_gateway = preg_replace("|[^a-zA-Z]+|", "", $params['gateway']);
         }
     }
 
-    public function getNotificationUrl() {
+    public function getNotificationUrl()
+    {
         return $this->getModelUrl("msp/standard/notification");
     }
 
-    public function getOrderPlaceRedirectUrl() {
+    public function getOrderPlaceRedirectUrl()
+    {
         return $this->getModelUrl("msp/standard/redirect/model/standard/gateway/" . $this->_gateway);
     }
 

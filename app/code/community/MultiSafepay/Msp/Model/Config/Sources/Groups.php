@@ -5,11 +5,13 @@
  * @category MultiSafepay
  * @package  MultiSafepay_Msp
  */
-class MultiSafepay_Msp_Model_Config_Sources_Groups {
+class MultiSafepay_Msp_Model_Config_Sources_Groups
+{
 
     var $_options = null;
 
-    public function toOptionArray() {
+    public function toOptionArray()
+    {
         if (!$this->_options) {
 
 

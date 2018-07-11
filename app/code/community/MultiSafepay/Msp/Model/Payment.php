@@ -7,7 +7,8 @@
  */
 require_once(Mage::getBaseDir('lib') . DS . 'multisafepay' . DS . 'MultiSafepay.combined.php');
 
-class MultiSafepay_Msp_Model_Payment extends Varien_Object {
+class MultiSafepay_Msp_Model_Payment extends Varien_Object
+{
 
     protected $_config;
     protected $_gateway;
@@ -28,7 +29,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
         'msp_babygiftcard',
         'msp_boekenbon',
         'msp_erotiekbon',
-        'msp_giveacard',
+        'msp_givacard',
         'msp_parfumnl',
         'msp_parfumcadeaukaart',
         'msp_degrotespeelgoedwinkel',
@@ -52,9 +53,13 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
         'msp_klarna',
         'msp_mistercash',
         'msp_visa',
+        'msp_paysafecard',
         'msp_eps',
         'msp_ferbuy',
         'msp_mastercard',
+        'msp_ing',
+        'msp_kbc',
+        'msp_belfius',
         'msp_banktransfer',
         'msp_maestro',
         'msp_paypal',
@@ -68,39 +73,47 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
     /**
      * Set some vars
      */
-    public function setNotificationUrl($url) {
+    public function setNotificationUrl($url)
+    {
         $this->_notification_url = $url;
     }
 
-    public function setReturnUrl($url) {
+    public function setReturnUrl($url)
+    {
         $this->_return_url = $url;
     }
 
-    public function setCancelUrl($url) {
+    public function setCancelUrl($url)
+    {
         $this->_cancel_url = $url;
     }
 
-    public function setGateway($gateway) {
+    public function setGateway($gateway)
+    {
         $this->_gateway = $gateway;
     }
 
-    public function setIdealIssuer($idealissuer) {
+    public function setIdealIssuer($idealissuer)
+    {
         $this->_idealissuer = $idealissuer;
     }
 
-    public function setIssuer($issuer) {
+    public function setIssuer($issuer)
+    {
         $this->_issuer = $issuer;
     }
 
     /**
      * Set the config object
      */
-    public function setConfigObject($config) {
+    public function setConfigObject($config)
+    {
         $this->_config = $config;
         return $this;
     }
 
-    function getConfigData($name) {
+    function getConfigData($name)
+    {
         if (isset($this->_config[$name])) {
             return $this->_config[$name];
         }
@@ -111,7 +124,8 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
     /**
      * Returns an instance of the Base
      */
-    public function getBase($id = null) {
+    public function getBase($id = null)
+    {
         if ($this->base) {
             if ($id) {
                 $this->base->setLogId($id);
@@ -132,7 +146,8 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
     /**
      * Returns an instance of the Api
      */
-    public function getApi($id = null) {
+    public function getApi($id = null)
+    {
         if ($this->api) {
             if ($id) {
                 $this->getBase($id);
@@ -150,7 +165,8 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
     /**
      * Returns an instance of the payafter Api
      */
-    public function getPayAfterApi($id = null, $order = null) {
+    public function getPayAfterApi($id = null, $order = null)
+    {
         if ($this->api) {
             if ($id) {
                 $this->getBase($id);
@@ -165,7 +181,8 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
     }
 
     //get API based on new gateway specific configuration (added for coupons as they now use their own account settings)
-    public function getGatewaysApi($id = null, $order = null, $gateway_code = null) {
+    public function getGatewaysApi($id = null, $order = null, $gateway_code = null)
+    {
         if ($this->api) {
             if ($id) {
                 $this->getBase($id);
@@ -182,7 +199,8 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
     /**
      * Get the current order object
      */
-    public function getOrder() {
+    public function getOrder()
+    {
         if ($this->_order == null) {
             $orderIncrementId = $this->getCheckout()->getLastRealOrderId();
             $this->_order = Mage::getModel('sales/order')->loadByIncrementId($orderIncrementId);
@@ -194,14 +212,16 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
     /**
      * Get the checkout order object
      */
-    public function getCheckout() {
+    public function getCheckout()
+    {
         return Mage::getSingleton("checkout/session");
     }
 
     /**
      * Get the gateway list
      */
-    public function getGateways() {
+    public function getGateways()
+    {
         $billing = $this->getCheckout()->getQuote()->getBillingAddress();
         if ($billing) {
             $country = $billing->getCountry();
@@ -227,7 +247,8 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
      *    Function that will use the fastcheckout xml data to process connect transactions.
      *    For now this will only be used for pay after delivery.
      */
-    public function startPayAfterTransaction() {
+    public function startPayAfterTransaction()
+    {
         $session = Mage::getSingleton('customer/session');
 
         /**
@@ -347,6 +368,25 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
 
         $this->api->customer['ipaddress'] = $_SERVER['REMOTE_ADDR'];
 
+
+        if (is_object($shipping)) {
+            $this->api->parseDeliveryAddress($shipping->getStreet(1));
+
+            if ($this->api->delivery['housenumber'] == '') {
+                $this->api->delivery['housenumber'] = $shipping->getStreet(2);
+                $this->api->delivery['address1'] = $shipping->getStreet(1);
+            }
+
+            $this->api->delivery['firstname'] = $shipping->getFirstname();
+            $this->api->delivery['lastname'] = $shipping->getLastname();
+            $this->api->delivery['address2'] = $shipping->getStreet(2);
+            $this->api->delivery['zipcode'] = $shipping->getPostcode();
+            $this->api->delivery['city'] = $shipping->getCity();
+            $this->api->delivery['state'] = $shipping->getState();
+            $this->api->delivery['country'] = $shipping->getCountry();
+            $this->api->delivery['phone'] = $shipping->getTelephone();
+        }
+
         $this->api->gatewayinfo['email'] = $this->getOrder()->getCustomerEmail();
         $this->api->gatewayinfo['phone'] = $billing->getTelephone();
 
@@ -381,8 +421,8 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
             $this->api->gatewayinfo['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
         }
 
-         if (isset($_GET['birthday'])) {
-	        $birthday = str_replace('/', '-', $_GET['birthday']);
+        if (isset($_GET['birthday'])) {
+            $birthday = str_replace('/', '-', $_GET['birthday']);
             $this->api->gatewayinfo['birthday'] = $birthday;
             $this->api->customer['birthday'] = $birthday;
         } else {
@@ -407,7 +447,8 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
         $this->api->transaction['gateway'] = $this->_gateway;
         $this->api->transaction['issuer'] = $this->_issuer;
         $this->api->transaction['items'] = $items;
-        $this->api->transaction['daysactive'] = $this->getConfigData("pad_daysactive" . $suffix);
+        $this->api->transaction['daysactive'] = $this->getConfigData("pad_daysactive");
+        $this->api->transaction['secondsactive'] = $this->getConfigData("pad_seconds_active");
         $this->api->setDefaultTaxZones();
 
         $this->getItems($this->getOrder(), $currencyCode);
@@ -506,10 +547,16 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
 
         //Code blow added to recalculate excluding tax for the shipping cost. Older Magento installations round differently, causing a 1 cent mismatch. This is why we recalculate it.
         $diff = $this->getOrder()->getShippingInclTax() - $this->getOrder()->getShippingAmount();
-        $test = ($diff / $this->getOrder()->getShippingAmount()) * 100;
-        $shipping_percentage = 1 + round($test, 0) / 100;
+
+        if ($this->getOrder()->getShippingAmount() > 0) { 
+            $cost = ($diff / $this->getOrder()->getShippingAmount()) * 100;
+        } else {
+            $cost = $diff * 100;
+        }
+
+        $shipping_percentage = 1 + round($cost, 0) / 100;
         $shippin_exc_tac_calculated = $this->getOrder()->getShippingInclTax() / $shipping_percentage;
-        $percentage = round($test, 0) / 100;
+        $percentage = round($cost, 0) / 100;
         $price = number_format($this->_convertCurrency($shippin_exc_tac_calculated, $currentCurrencyCode, $currencyCode), 10, '.', '');
         /* End code */
 
@@ -557,7 +604,6 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
 
         //ALL data available? Then request the transaction link
         $url = $this->api->startCheckout();
-
         $this->getBase($orderId)->log($this->api->request_xml);
         $this->getBase($orderId)->log($this->api->reply_xml);
 
@@ -577,9 +623,9 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
             //Mage::throwException(Mage::helper("msp")->__("An error occured: ") . $this->api->error_code . " - " . $this->api->error);
             if ($this->api->error_code == '1024' && $this->_gateway != "EINVOICE" && $this->_gateway != "KLARNA") {
                 $errorMessage = Mage::helper("msp")->__("An error occured: ") . $this->api->error_code . /* " - " . $this->api->error . */ '<br />' . Mage::helper("msp")->__('We are sorry to inform you that your request for payment after delivery has been denied by Multifactor.<BR /> If you have questions about this rejection, you can checkout the FAQ on the website of Multifactor') . '<a href="http://www.multifactor.nl/contact" target="_blank">http://www.multifactor.nl/faq</a>' . Mage::helper("msp")->__('You can also contact Multifactor by calling 020-8500533 (at least 2 hours after this rejection) or by sending an email to ') . ' <a href="mailto:support@multifactor.nl">support@multifactor.nl</a>.' . Mage::helper("msp")->__('Please retry placing your order and select a different payment method.');
-            }elseif($this->_gateway == "EINVOICE" && $this->api->error_code == '1024' ){
+            } elseif ($this->_gateway == "EINVOICE" && $this->api->error_code == '1024') {
                 $errorMessage = Mage::helper("msp")->__("An error occured: ") . $this->api->error_code . /* " - " . $this->api->error . */ '<br />' . Mage::helper("msp")->__('We are sorry to inform you that your request for E-invoicing has been denied.<BR /> Please select another payment method and try again');
-            }else {
+            } else {
                 $errorMessage = Mage::helper("msp")->__("An error occured: ") . $this->api->error_code . " - " . $this->api->error . '<br />' . Mage::helper("msp")->__("Please retry placing your order and select a different payment method.");
             }
             Mage::log($errorMessage);
@@ -623,7 +669,8 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
     /**
      * @return bool
      */
-    protected function _isTestPayAfterDelivery($gateway) {
+    protected function _isTestPayAfterDelivery($gateway)
+    {
         $isTest = ($this->getConfigData('test_api_pad') == MultiSafepay_Msp_Model_Config_Sources_Accounts::TEST_MODE);
         if ($isTest) {
             return true;
@@ -641,7 +688,8 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
     /**
      * @return bool
      */
-    protected function _isTestGiftcard($gateway) {
+    protected function _isTestGiftcard($gateway)
+    {
         $isTest = ($this->getConfigData('test_api_pad') == MultiSafepay_Msp_Model_Config_Sources_Accounts::TEST_MODE);
         if ($isTest) {
             return true;
@@ -649,14 +697,16 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
         return false;
     }
 
-    protected function getTaxes() {
+    protected function getTaxes()
+    {
         $this->_getTaxTable($this->_getShippingTaxRules(), 'default');
         $this->_getTaxTable($this->_getTaxRules(), 'alternate');
         $this->_getTaxTable($this->_getShippingTaxRules(), 'alternate');
         // add 'none' group?
     }
 
-    protected function _getTaxTable($rules, $type) {
+    protected function _getTaxTable($rules, $type)
+    {
         if (is_array($rules)) {
             foreach ($rules as $group => $taxRates) {
                 if ($type != 'default') {
@@ -714,7 +764,8 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
         }
     }
 
-    protected function _getTaxRules() {
+    protected function _getTaxRules()
+    {
         $customerTaxClass = $this->_getCustomerTaxClass();
         if (Mage::helper('tax')->getTaxBasedOn() == 'origin') {
             $request = Mage::getSingleton('tax/calculation')->getRateRequest();
@@ -730,7 +781,8 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
         }
     }
 
-    protected function _getShippingTaxRules() {
+    protected function _getShippingTaxRules()
+    {
         $customerTaxClass = $this->_getCustomerTaxClass();
 
         //validate the returned data. Doesn't work with connect pad
@@ -752,7 +804,8 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
         return array();
     }
 
-    protected function _getCustomerTaxClass() {
+    protected function _getCustomerTaxClass()
+    {
         $customerGroup = $this->getOrder()->getCustomerGroupId();
         if (!$customerGroup) {
             $customerGroup = Mage::getStoreConfig('customer/create_account/default_group', $this->getOrder()->getStoreId());
@@ -761,7 +814,8 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
         return Mage::getModel('customer/group')->load($customerGroup)->getTaxClassId();
     }
 
-    protected function getItems($order, $targetCurrencyCode) {
+    protected function getItems($order, $targetCurrencyCode)
+    {
         $items = $order->getAllItems();
 
 
@@ -873,7 +927,8 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
     /**
      * Send a transaction request to MultiSafepay and return the payment_url
      */
-    public function startTransaction() {
+    public function startTransaction()
+    {
         $session = Mage::getSingleton('customer/session');
 
         /**
@@ -964,7 +1019,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
                 $gateway_data['method'] == 'msp_boekenbon' ||
                 $gateway_data['method'] == 'msp_degrotespeelgoedwinkel' ||
                 $gateway_data['method'] == 'msp_erotiekbon' ||
-                $gateway_data['method'] == 'msp_giveacard' ||
+                $gateway_data['method'] == 'msp_givacard' ||
                 $gateway_data['method'] == 'msp_fashioncheque' ||
                 $gateway_data['method'] == 'msp_fashiongiftcard' ||
                 $gateway_data['method'] == 'msp_gezondheidsbon' ||
@@ -1045,6 +1100,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
         $api->transaction['items'] = $items;
         $api->transaction['gateway'] = $this->_gateway;
         $api->transaction['daysactive'] = $this->getConfigData("daysactive");
+        $api->transaction['secondsactive'] = $this->getConfigData("seconds_active");
         if ($api->transaction['gateway'] == '') {
             $api->transaction['gateway'] = $this->_gateway;
         }
@@ -1056,13 +1112,10 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
         $session = Mage::getSingleton('checkout/session');
         $payment_data = $session->getData('payment_additional');
 
-		$iss=$payment_data->msp_ideal_bank;
-		$cc= $payment_data->msp_creditcard_cc;
-
         if (is_object($payment_data)) {
-            if (!empty($iss)) {
+            if (!empty($payment_data->msp_ideal_bank)) {
                 $ideal_issuer = $payment_data->msp_ideal_bank;
-            } elseif (!empty($cc) && $this->_gateway == "CREDITCARD") {
+            } elseif ($this->_gateway == "CREDITCARD") {
                 $api->transaction['gateway'] = $payment_data->msp_creditcard_cc;
             }
         }
@@ -1148,7 +1201,8 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
         return $url;
     }
 
-    public function notification($orderId, $initial = false) {
+    public function notification($orderId, $initial = false)
+    {
         // get the order
         /** @var $order Mage_Sales_Model_Order */
         $order = Mage::getSingleton('sales/order')->loadByIncrementId($orderId);
@@ -1189,7 +1243,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
                 $payment_method_code == 'msp_boekenbon' ||
                 $payment_method_code == 'msp_degrotespeelgoedwinkel' ||
                 $payment_method_code == 'msp_erotiekbon' ||
-                $payment_method_code == 'msp_giveacard' ||
+                $payment_method_code == 'msp_givacard' ||
                 $payment_method_code == 'msp_fashioncheque' ||
                 $payment_method_code == 'msp_fashiongiftcard' ||
                 $payment_method_code == 'msp_gezondheidsbon' ||
@@ -1214,7 +1268,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
         // log the transaction status requests and responses
         $this->getBase($orderId)->log($this->api->request_xml);
         $this->getBase($orderId)->log($this->api->reply_xml);
-        
+
         /** @var $helper MultiSafepay_Msp_Helper_Data */
         $helper = Mage::helper('msp');
         /** @var $quote Mage_Sales_Model_Quote */
@@ -1247,7 +1301,8 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object {
      * @param string $targetCurrencyCode
      * @return float
      */
-    protected function _convertCurrency($amount, $currentCurrencyCode, $targetCurrencyCode) {
+    protected function _convertCurrency($amount, $currentCurrencyCode, $targetCurrencyCode)
+    {
         if ($currentCurrencyCode == $targetCurrencyCode) {
             return $amount;
         }

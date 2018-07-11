@@ -1,6 +1,7 @@
 <?php
 
-class MultiSafepay {
+class MultiSafepay
+{
 
     var $plugin_name = '';
     var $version = '';
@@ -73,6 +74,7 @@ class MultiSafepay {
         'manual' => 'false',
         'gateway' => '',
         'daysactive' => '',
+        'secondsactive' => '',
         'invoice_id' => '',
         'shipdate' => '',
         'special' => '',
@@ -116,13 +118,15 @@ class MultiSafepay {
     var $parsed_xml;
     var $parsed_root;
 
-    function __construct() {
+    function __construct()
+    {
         $this->cart = new MspCart();
         $this->fields = new MspCustomFields();
     }
 
     //STart direct xml function. Direct ideal gateway etc
-    function startDirectXMLTransaction() {
+    function startDirectXMLTransaction()
+    {
         $this->checkSettings();
 
         $this->setIp();
@@ -150,7 +154,8 @@ class MultiSafepay {
         return $this->payment_url;
     }
 
-    function startDirectBankTransfer() {
+    function startDirectBankTransfer()
+    {
         $this->checkSettings();
 
         $this->setIp();
@@ -182,14 +187,16 @@ class MultiSafepay {
      * Check the settings before using them
      */
 
-    function checkSettings() {
+    function checkSettings()
+    {
         // trim any spaces
         $this->merchant['account_id'] = trim($this->merchant['account_id']);
         $this->merchant['site_id'] = trim($this->merchant['site_id']);
         $this->merchant['site_code'] = trim($this->merchant['site_code']);
     }
 
-    public function getIdealIssuers() {
+    public function getIdealIssuers()
+    {
         $this->request_xml = $this->createIdealIssuersRequest();
         $this->api_url = $this->getApiUrl();
         $this->reply_xml = $this->xmlPost($this->api_url, $this->request_xml);
@@ -199,7 +206,8 @@ class MultiSafepay {
         return $issuers;
     }
 
-    function createIdealIssuersRequest() {
+    function createIdealIssuersRequest()
+    {
         $request = '<?xml version="1.0" encoding="UTF-8"?>
 		<idealissuers ua="iDeal Issuers Request">
 			<merchant>
@@ -215,7 +223,8 @@ class MultiSafepay {
      * Starts a transaction and returns the payment url
      */
 
-    function startTransaction() {
+    function startTransaction()
+    {
         $this->checkSettings();
 
         $this->setIp();
@@ -248,7 +257,8 @@ class MultiSafepay {
      * Starts a checkout transaction and returns the payment url
      */
 
-    function startCheckout() {
+    function startCheckout()
+    {
         $this->checkSettings();
 
         $this->setIp();
@@ -284,7 +294,8 @@ class MultiSafepay {
      * Return the status for the specified transactionid
      */
 
-    function getStatus() {
+    function getStatus()
+    {
         $this->checkSettings();
 
         // generate request
@@ -316,7 +327,8 @@ class MultiSafepay {
      * Send update transaction
      */
 
-    function updateTransaction() {
+    function updateTransaction()
+    {
         $this->checkSettings();
 
         // generate request
@@ -346,7 +358,8 @@ class MultiSafepay {
      * Send update transaction
      */
 
-    function updateInvoice() {
+    function updateInvoice()
+    {
         $this->checkSettings();
 
         // generate request
@@ -372,7 +385,8 @@ class MultiSafepay {
         return true;
     }
 
-    function refundTransaction() {
+    function refundTransaction()
+    {
         $this->checkSettings();
 
         // generate request
@@ -403,7 +417,8 @@ class MultiSafepay {
      *
      * @return string
      */
-    public function createRefundTransactionRequest() {
+    public function createRefundTransactionRequest()
+    {
         $request = '<?xml version="1.0" encoding="UTF-8"?>
     <refundtransaction ua="refund">
         <merchant>
@@ -413,6 +428,7 @@ class MultiSafepay {
             <signature>' . $this->xmlEscape($this->signature) . '</signature>
         </merchant>
         <transaction>
+			<description>' . $this->xmlEscape($this->transaction['description']) . '</description>
             <id>' . $this->xmlEscape($this->transaction['id']) . '</id>
             <amount>' . $this->xmlEscape($this->transaction['amount']) . '</amount>
             <currency>' . $this->xmlEscape($this->transaction['currency']) . '</currency>
@@ -422,11 +438,13 @@ class MultiSafepay {
         return $request;
     }
 
-    function _isXmlSectionEmpty($section) {
+    function _isXmlSectionEmpty($section)
+    {
         return isset($section['VALUE']);
     }
 
-    function processStatusReply($rootNode) {
+    function processStatusReply($rootNode)
+    {
         $xml = $rootNode;
         $result = array();
 
@@ -524,7 +542,8 @@ class MultiSafepay {
      * TODO-> Check error logs. This function gate an error on a private server. Research this problem or ask the merchants error log.
      */
 
-    function getGateways() {
+    function getGateways()
+    {
         $this->checkSettings();
 
         // generate request
@@ -582,7 +601,8 @@ class MultiSafepay {
      * Create the transaction request xml
      */
 
-    function createTransactionRequest() {
+    function createTransactionRequest()
+    {
         // issuer attribute
         $issuer = "";
         if (!empty($this->issuer)) {
@@ -649,6 +669,7 @@ class MultiSafepay {
         <items>' . $this->xmlEscape($this->transaction['items']) . '</items>
         <manual>' . $this->xmlEscape($this->transaction['manual']) . '</manual>
         <daysactive>' . $this->xmlEscape($this->transaction['daysactive']) . '</daysactive>
+        <secondsactive>' . $this->xmlEscape($this->transaction['secondsactive']) . '</secondsactive>
         <gateway' . $issuer . '>' . $this->xmlEscape($this->transaction['gateway']) . '</gateway>
       </transaction>
       <signature>' . $this->xmlEscape($this->signature) . '</signature>
@@ -657,7 +678,8 @@ class MultiSafepay {
         return $request;
     }
 
-    function createDirectXMLTransactionRequest() {
+    function createDirectXMLTransactionRequest()
+    {
         $issuer = "";
         if (!empty($this->issuer)) {
             $issuer = ' issuer="' . $this->xmlEscape($this->issuer) . '"';
@@ -683,6 +705,7 @@ class MultiSafepay {
 				<items>' . $this->xmlEscape($this->transaction['items']) . '</items>
 				<manual>' . $this->xmlEscape($this->transaction['manual']) . '</manual>
 				<daysactive>' . $this->xmlEscape($this->transaction['daysactive']) . '</daysactive>
+                <secondsactive>' . $this->xmlEscape($this->transaction['secondsactive']) . '</secondsactive>
 				<gateway' . $issuer . '>' . $this->xmlEscape($this->transaction['gateway']) . '</gateway>
 			</transaction>
 		  <merchant>
@@ -739,7 +762,8 @@ class MultiSafepay {
         return $request;
     }
 
-    function createDirectBankTransferTransactionRequest() {
+    function createDirectBankTransferTransactionRequest()
+    {
         $issuer = "";
         if (!empty($this->issuer)) {
             $issuer = ' issuer="' . $this->xmlEscape($this->issuer) . '"';
@@ -757,6 +781,7 @@ class MultiSafepay {
 				<items>' . $this->xmlEscape($this->transaction['items']) . '</items>
 				<manual>' . $this->xmlEscape($this->transaction['manual']) . '</manual>
 				<daysactive>' . $this->xmlEscape($this->transaction['daysactive']) . '</daysactive>
+                <secondsactive>' . $this->xmlEscape($this->transaction['secondsactive']) . '</secondsactive>
 				<gateway' . $issuer . '>' . $this->xmlEscape($this->transaction['gateway']) . '</gateway>
 			</transaction>
 		  <merchant>
@@ -822,7 +847,8 @@ class MultiSafepay {
      * Create the checkout request xml
      */
 
-    function createCheckoutRequest() {
+    function createCheckoutRequest()
+    {
         $this->cart_xml = $this->cart->GetXML();
         $this->fields_xml = $this->fields->GetXML();
 
@@ -943,7 +969,8 @@ class MultiSafepay {
      * Create the status request xml
      */
 
-    function createStatusRequest() {
+    function createStatusRequest()
+    {
         $request = '<?xml version="1.0" encoding="UTF-8"?>
     <status ua="' . $this->plugin_name . ' ' . $this->version . '">
       <merchant>
@@ -963,7 +990,8 @@ class MultiSafepay {
      * Create the gateway request xml
      */
 
-    function createGatewaysRequest() {
+    function createGatewaysRequest()
+    {
         $request = '<?xml version="1.0" encoding="UTF-8"?>
     <gateways ua="' . $this->plugin_name . ' ' . $this->version . '">
       <merchant>
@@ -983,7 +1011,8 @@ class MultiSafepay {
      * Create the update transaction request xml
      */
 
-    function createUpdateTransactionRequest() {
+    function createUpdateTransactionRequest()
+    {
         $request = '<?xml version="1.0" encoding="UTF-8"?>
     <updatetransaction>
     <merchant>
@@ -1005,7 +1034,8 @@ class MultiSafepay {
      * Create the update transaction request xml
      */
 
-    function createUpdateInvoiceRequest() {
+    function createUpdateInvoiceRequest()
+    {
         $request = '<?xml version="1.0" encoding="UTF-8"?>
     <updatetransaction>
     <merchant>
@@ -1026,7 +1056,8 @@ class MultiSafepay {
      * Creates the signature
      */
 
-    function createSignature() {
+    function createSignature()
+    {
         $this->signature = md5(
                 $this->transaction['amount'] .
                 $this->transaction['currency'] .
@@ -1040,12 +1071,13 @@ class MultiSafepay {
      * Sets the customers ip variables
      */
 
-    function setIp() {
+    function setIp()
+    {
 
         $ip = $_SERVER['REMOTE_ADDR'];
         $isValid = filter_var($ip, FILTER_VALIDATE_IP);
-        
-        if($isValid) {
+
+        if ($isValid) {
             $this->customer['ipaddress'] = $isValid;
         }
 
@@ -1062,7 +1094,8 @@ class MultiSafepay {
         }
     }
 
-    function SetRef() {
+    function SetRef()
+    {
         if (isset($_SERVER['HTTP_REFERER'])) {
             $this->customer['referer'] = $_SERVER['HTTP_REFERER'];
         } else {
@@ -1074,7 +1107,8 @@ class MultiSafepay {
      * Parses and sets customer address
      */
 
-    function parseCustomerAddress($street_address) {
+    function parseCustomerAddress($street_address)
+    {
         list($address, $apartment) = $this->parseAddress($street_address);
         $this->customer['address1'] = $address;
         $this->customer['housenumber'] = $apartment;
@@ -1083,7 +1117,8 @@ class MultiSafepay {
     /**
      * Parses and sets delivery address
      */
-    function parseDeliveryAddress($street_address) {
+    function parseDeliveryAddress($street_address)
+    {
         list($address, $apartment) = $this->parseAddress($street_address);
         $this->delivery['address1'] = $address;
         $this->delivery['housenumber'] = $apartment;
@@ -1093,7 +1128,8 @@ class MultiSafepay {
      * Parses and splits up an address in street and housenumber
      */
 
-    function parseAddress($street_address) {
+    function parseAddress($street_address)
+    {
         $address = $street_address;
         $apartment = "";
 
@@ -1119,7 +1155,8 @@ class MultiSafepay {
         return array($address, $apartment);
     }
 
-    function setDefaultTaxZones($globalRate = true, $shippingTaxed = true) {
+    function setDefaultTaxZones($globalRate = true, $shippingTaxed = true)
+    {
         $shippingTaxed = ($shippingTaxed) ? 'true' : 'false';
 
         if ($globalRate) {
@@ -1147,7 +1184,8 @@ class MultiSafepay {
      * Returns the api url
      */
 
-    function getApiUrl() {
+    function getApiUrl()
+    {
         if ($this->custom_api) {
             return $this->custom_api;
         }
@@ -1163,7 +1201,8 @@ class MultiSafepay {
      * Parse an xml response
      */
 
-    function parseXmlResponse($response) {
+    function parseXmlResponse($response)
+    {
         // strip xml line
         $response = preg_replace('#</\?xml[^>]*>#is', '', $response);
 
@@ -1189,7 +1228,8 @@ class MultiSafepay {
      * Returns the string escaped for use in XML documents
      */
 
-    function xmlEscape($str) {
+    function xmlEscape($str)
+    {
         return htmlspecialchars($str, ENT_COMPAT, "UTF-8");
     }
 
@@ -1197,7 +1237,8 @@ class MultiSafepay {
      * Returns the string with all XML escaping removed
      */
 
-    function xmlUnescape($str) {
+    function xmlUnescape($str)
+    {
         return html_entity_decode($str, ENT_COMPAT, "UTF-8");
     }
 
@@ -1205,7 +1246,8 @@ class MultiSafepay {
      * Post the supplied XML data and return the reply
      */
 
-    function xmlPost($url, $request_xml, $verify_peer = false) {
+    function xmlPost($url, $request_xml, $verify_peer = false)
+    {
         $curl_available = extension_loaded("curl");
 
         // generate request
@@ -1338,7 +1380,8 @@ class MultiSafepay {
     }
 
     // From http://www.php.net/manual/en/function.strrpos.php#78556
-    function rstrpos($haystack, $needle, $offset = null) {
+    function rstrpos($haystack, $needle, $offset = null)
+    {
         $size = strlen($haystack);
 
         if (is_null($offset)) {
@@ -1359,7 +1402,8 @@ class MultiSafepay {
 /**
  * Classes used to parse xml data
  */
-class msp_gc_xmlparser {
+class msp_gc_xmlparser
+{
 
     var $params = array(); //Stores the object representation of XML data
     var $root = NULL;
@@ -1370,7 +1414,8 @@ class msp_gc_xmlparser {
      * Takes in XML data as input( do not include the <xml> tag
      */
 
-    function __construct($input, $xmlParams = array(XML_OPTION_CASE_FOLDING => 0)) {
+    function __construct($input, $xmlParams = array(XML_OPTION_CASE_FOLDING => 0))
+    {
 
         // XML PARSE BUG: http://bugs.php.net/bug.php?id=45996
         $input = str_replace('&amp;', '[msp-amp]', $input);
@@ -1395,7 +1440,8 @@ class msp_gc_xmlparser {
         xml_parser_free($xmlp);
     }
 
-    function _foldCase($arg) {
+    function _foldCase($arg)
+    {
         return( $this->fold ? strtoupper($arg) : $arg);
     }
 
@@ -1407,7 +1453,8 @@ class msp_gc_xmlparser {
      * 
      */
 
-    function xml2ary($vals) {
+    function xml2ary($vals)
+    {
 
         $mnary = array();
         $ary = &$mnary;
@@ -1464,7 +1511,8 @@ class msp_gc_xmlparser {
     }
 
     // _Internal: Remove recursion in result array
-    function _del_p(&$ary) {
+    function _del_p(&$ary)
+    {
         foreach ($ary as $k => $v) {
             if ($k === '_p') {
                 unset($ary[$k]);
@@ -1476,13 +1524,15 @@ class msp_gc_xmlparser {
 
     /* Returns the root of the XML data */
 
-    function GetRoot() {
+    function GetRoot()
+    {
         return $this->root;
     }
 
     /* Returns the array representing the XML data */
 
-    function GetData() {
+    function GetData()
+    {
         return $this->params;
     }
 
@@ -1496,18 +1546,21 @@ class msp_gc_xmlparser {
 /**
  * Generates xml data
  */
-class msp_gc_XmlBuilder {
+class msp_gc_XmlBuilder
+{
 
     var $xml;
     var $indent;
     var $stack = array();
 
-    function __construct($indent = '  ') {
+    function __construct($indent = '  ')
+    {
         $this->indent = $indent;
         $this->xml = '<?xml version="1.0" encoding="utf-8"?>' . "\n";
     }
 
-    function _indent() {
+    function _indent()
+    {
         for ($i = 0, $j = count($this->stack); $i < $j; $i++) {
             $this->xml .= $this->indent;
         }
@@ -1515,7 +1568,8 @@ class msp_gc_XmlBuilder {
 
     //Used when an element has sub-elements
     // This function adds an open tag to the output
-    function Push($element, $attributes = array()) {
+    function Push($element, $attributes = array())
+    {
         $this->_indent();
         $this->xml .= '<' . $element;
         foreach ($attributes as $key => $value) {
@@ -1528,7 +1582,8 @@ class msp_gc_XmlBuilder {
     //Used when an element has no subelements.
     //Data within the open and close tags are provided with the 
     //contents variable
-    function Element($element, $content, $attributes = array()) {
+    function Element($element, $content, $attributes = array())
+    {
         $this->_indent();
         $this->xml .= '<' . $element;
         foreach ($attributes as $key => $value) {
@@ -1537,7 +1592,8 @@ class msp_gc_XmlBuilder {
         $this->xml .= '>' . htmlspecialchars($content) . '</' . $element . '>' . "\n";
     }
 
-    function EmptyElement($element, $attributes = array()) {
+    function EmptyElement($element, $attributes = array())
+    {
         $this->_indent();
         $this->xml .= '<' . $element;
         foreach ($attributes as $key => $value) {
@@ -1547,7 +1603,8 @@ class msp_gc_XmlBuilder {
     }
 
     //Used to close an open tag
-    function Pop($pop_element) {
+    function Pop($pop_element)
+    {
         $element = array_pop($this->stack);
         $this->_indent();
         if ($element !== $pop_element)
@@ -1556,7 +1613,8 @@ class msp_gc_XmlBuilder {
             $this->xml .= "</$element>\n";
     }
 
-    function GetXML() {
+    function GetXML()
+    {
         if (count($this->stack) != 0)
             die('XML Error: No matching closing tag found for " ' . array_pop($this->stack) . '"');
         else
@@ -1592,7 +1650,8 @@ define('MAX_DIGITAL_DESC', 1024);
  * to the google checkout sandbox or production environment
  * Refer demo/cartdemo.php for different use case scenarios for this code
  */
-class MspCart {
+class MspCart
+{
 
     var $merchant_id;
     var $merchant_key;
@@ -1678,7 +1737,8 @@ class MspCart {
      *                         , as of now values can be 'USD' or 'GBP'.
      *                         defaults to 'USD'
      */
-    function __construct($id = '', $key = '', $server_type = "sandbox", $currency = "EUR") {
+    function __construct($id = '', $key = '', $server_type = "sandbox", $currency = "EUR")
+    {
         $this->merchant_id = $id;
         $this->merchant_key = $key;
         $this->currency = $currency;
@@ -1711,7 +1771,8 @@ class MspCart {
      * 
      * @return void
      */
-    function SetCartExpiration($cart_expire) {
+    function SetCartExpiration($cart_expire)
+    {
         $this->cart_expiration = $cart_expire;
     }
 
@@ -1729,7 +1790,8 @@ class MspCart {
      * 
      * @return void
      */
-    function SetMerchantPrivateData($data) {
+    function SetMerchantPrivateData($data)
+    {
         $this->merchant_private_data = $data;
     }
 
@@ -1741,7 +1803,8 @@ class MspCart {
      * @param string $url the merchant's site edit cart url
      * @return void
      */
-    function SetEditCartUrl($url) {
+    function SetEditCartUrl($url)
+    {
         $this->edit_cart_url = $url;
     }
 
@@ -1754,7 +1817,8 @@ class MspCart {
      * @param string $url the merchant's site continue shopping url
      * @return void
      */
-    function SetContinueShoppingUrl($url) {
+    function SetContinueShoppingUrl($url)
+    {
         $this->continue_shopping_url = $url;
     }
 
@@ -1770,7 +1834,8 @@ class MspCart {
      *                  defaults to false.
      * @return void
      */
-    function SetRequestBuyerPhone($req) {
+    function SetRequestBuyerPhone($req)
+    {
         $this->request_buyer_phone = $this->_GetBooleanValue($req, "false");
     }
 
@@ -1789,7 +1854,8 @@ class MspCart {
      *                         defaults to false.
      * @return void
      */
-    function SetMerchantCalculations($url, $tax_option = "false", $coupons = "false", $gift_cert = "false") {
+    function SetMerchantCalculations($url, $tax_option = "false", $coupons = "false", $gift_cert = "false")
+    {
         $this->merchant_calculations_url = $url;
         $this->merchant_calculated_tax = $this->_GetBooleanValue($tax_option, "false");
         $this->accept_merchant_coupons = $this->_GetBooleanValue($coupons, "false");
@@ -1806,7 +1872,8 @@ class MspCart {
      * 
      * @return void
      */
-    function AddItem($google_item) {
+    function AddItem($google_item)
+    {
         $this->item_arr[] = $google_item;
     }
 
@@ -1820,7 +1887,8 @@ class MspCart {
      * 
      * @return void
      */
-    function AddShipping($ship) {
+    function AddShipping($ship)
+    {
         $this->shipping_arr[] = $ship;
     }
 
@@ -1834,7 +1902,8 @@ class MspCart {
      * 
      * @return void
      */
-    function AddDefaultTaxRules($rules) {
+    function AddDefaultTaxRules($rules)
+    {
         $this->default_tax_table = true;
         $this->default_tax_rules_arr[] = $rules;
     }
@@ -1850,7 +1919,8 @@ class MspCart {
      * 
      * @return void
      */
-    function AddAlternateTaxTables($tax) {
+    function AddAlternateTaxTables($tax)
+    {
         $this->alternate_tax_tables_arr[] = $tax;
     }
 
@@ -1867,7 +1937,8 @@ class MspCart {
      * 
      * @return void
      */
-    function AddRoundingPolicy($mode, $rule) {
+    function AddRoundingPolicy($mode, $rule)
+    {
         switch ($mode) {
             case "UP":
             case "DOWN":
@@ -1900,7 +1971,8 @@ class MspCart {
      * 
      * @return void
      */
-    function SetAnalyticsData($data) {
+    function SetAnalyticsData($data)
+    {
         $this->analytics_data = $data;
     }
 
@@ -1913,7 +1985,8 @@ class MspCart {
      * 
      * @return void
      */
-    function AddGoogleAnalyticsTracking($GA_id) {
+    function AddGoogleAnalyticsTracking($GA_id)
+    {
         $this->googleAnalytics_id = $GA_id;
     }
 
@@ -1944,7 +2017,8 @@ class MspCart {
      *                             'shipping-country-code')
      * More info http://code.google.com/apis/checkout/developer/checkout_pixel_tracking.html#googleCheckout_tag_url-parameter
      */
-    function AddThirdPartyTracking($url, $tracking_param_types = array()) {
+    function AddThirdPartyTracking($url, $tracking_param_types = array())
+    {
         $this->thirdPartyTackingUrl = $url;
         $this->thirdPartyTackingParams = $tracking_param_types;
     }
@@ -1954,7 +2028,8 @@ class MspCart {
      * 
      * @return string the cart's xml
      */
-    function GetXML() {
+    function GetXML()
+    {
         $xml_data = new msp_gc_XmlBuilder();
         $xml_data->xml = '';
 
@@ -2485,7 +2560,8 @@ class MspCart {
      * 
      * @return void
      */
-    function SetButtonVariant($variant) {
+    function SetButtonVariant($variant)
+    {
         switch ($variant) {
             case false:
                 $this->variant = "disabled";
@@ -2508,7 +2584,8 @@ class MspCart {
      * @return array with the returned http status code (200 if OK) in index 0 
      *               and the redirect url returned by the server in index 1
      */
-    function CheckoutServer2Server($proxy = array(), $certPath = '') {
+    function CheckoutServer2Server($proxy = array(), $certPath = '')
+    {
         ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . '.');
         require_once('library/googlerequest.php');
         $GRequest = new GoogleRequest($this->merchant_id, $this->merchant_key, $this->server_url == "https://checkout.google.com/" ?
@@ -2542,7 +2619,8 @@ class MspCart {
      * 
      * @return string the button's html
      */
-    function CheckoutServer2ServerButton($url, $size = "large", $variant = true, $loc = "en_US", $showtext = true, $style = "trans") {
+    function CheckoutServer2ServerButton($url, $size = "large", $variant = true, $loc = "en_US", $showtext = true, $style = "trans")
+    {
 
         switch (strtolower($size)) {
             case "medium":
@@ -2631,7 +2709,8 @@ class MspCart {
      * 
      * @return string the button's html
      */
-    function CheckoutButtonCode($size = "large", $variant = true, $loc = "en_US", $showtext = true, $style = "trans") {
+    function CheckoutButtonCode($size = "large", $variant = true, $loc = "en_US", $showtext = true, $style = "trans")
+    {
 
         switch (strtolower($size)) {
             case "medium":
@@ -2716,7 +2795,8 @@ class MspCart {
 
     //Code for generating Checkout button 
     //@param $variant will be ignored if SetButtonVariant() was used before
-    function CheckoutButtonNowCode($size = "large", $variant = true, $loc = "en_US", $showtext = true, $style = "trans") {
+    function CheckoutButtonNowCode($size = "large", $variant = true, $loc = "en_US", $showtext = true, $style = "trans")
+    {
 
         switch (strtolower($size)) {
             case "small":
@@ -2815,7 +2895,8 @@ class MspCart {
      * 
      * @return string the button's html
      */
-    function CheckoutHTMLButtonCode($size = "large", $variant = true, $loc = "en_US", $showtext = true, $style = "trans") {
+    function CheckoutHTMLButtonCode($size = "large", $variant = true, $loc = "en_US", $showtext = true, $style = "trans")
+    {
 
         switch (strtolower($size)) {
             case "medium":
@@ -2906,7 +2987,8 @@ class MspCart {
     /**
      * @access private
      */
-    function xml2html($data, $path = '', &$rta) {
+    function xml2html($data, $path = '', &$rta)
+    {
 //      global $multiple_tags,$ignore_tags;
         //    $arr = gc_get_arr_result($data);  
         foreach ($data as $tag_name => $tag) {
@@ -2939,14 +3021,16 @@ class MspCart {
     /**
      * @access private
      */
-    function is_associative_array($var) {
+    function is_associative_array($var)
+    {
         return is_array($var) && !is_numeric(implode('', array_keys($var)));
     }
 
     /**
      * @access private
      */
-    function isChildOf($path = '', $parents = array()) {
+    function isChildOf($path = '', $parents = array())
+    {
         $intersect = array_intersect(explode('.', $path), $parents);
         return !empty($intersect);
     }
@@ -2960,7 +3044,8 @@ class MspCart {
      * 
      * @return string the logo's html
      */
-    function CheckoutAcceptanceLogo($type = 1) {
+    function CheckoutAcceptanceLogo($type = 1)
+    {
         switch ($type) {
             case 2:
                 return '<link rel="stylesheet" href="https://checkout.google.com/' .
@@ -3002,7 +3087,8 @@ class MspCart {
      * @param string $data the cart's xml
      * @return string the cart's signature (in binary format)
      */
-    function CalcHmacSha1($data) {
+    function CalcHmacSha1($data)
+    {
         $key = $this->merchant_key;
         $blocksize = 64;
         $hashfunc = 'sha1';
@@ -3028,7 +3114,8 @@ class MspCart {
     /**
      * @access private
      */
-    function _GetBooleanValue($value, $default) {
+    function _GetBooleanValue($value, $default)
+    {
         switch (strtolower($value)) {
             case "true":
                 return "true";
@@ -3047,7 +3134,8 @@ class MspCart {
     /**
      * @access private
      */
-    function _SetBooleanValue($string, $value, $default) {
+    function _SetBooleanValue($string, $value, $default)
+    {
         $value = strtolower($value);
         if ($value == "true" || $value == "false")
             eval('$this->' . $string . '="' . $value . '";');
@@ -3065,16 +3153,19 @@ class MspCart {
  * 
  * GC tag: {@link http://code.google.com/apis/checkout/developer/index.html#tag_merchant-private-data <merchant-private-data>}
  */
-class MspMerchantPrivate {
+class MspMerchantPrivate
+{
 
     var $data;
     var $type = "Abstract";
 
-    function __construct() {
+    function __construct()
+    {
         
     }
 
-    function AddMerchantPrivateToXML(&$xml_data) {
+    function AddMerchantPrivateToXML(&$xml_data)
+    {
         if (is_array($this->data)) {
             $xml_data->Push($this->type);
             $this->_recursiveAdd($xml_data, $this->data);
@@ -3087,7 +3178,8 @@ class MspMerchantPrivate {
     /**
      * @access private
      */
-    function _recursiveAdd(&$xml_data, $data) {
+    function _recursiveAdd(&$xml_data, $data)
+    {
         foreach ($data as $name => $value) {
             if (is_array($value)) {
                 $xml_data->Push($name);
@@ -3106,7 +3198,8 @@ class MspMerchantPrivate {
  * 
  * GC tag: {@link http://code.google.com/apis/checkout/developer/index.html#tag_merchant-private-data <merchant-private-data>}
  */
-class MspMerchantPrivateData extends MspMerchantPrivate {
+class MspMerchantPrivateData extends MspMerchantPrivate
+{
 
     /**
      * @param mixed $data a string with the data that will go in the 
@@ -3123,7 +3216,8 @@ class MspMerchantPrivateData extends MspMerchantPrivate {
      *                      </stuff>
      *                    </my-order-id>
      */
-    function __construct($data = array()) {
+    function __construct($data = array())
+    {
         $this->data = $data;
         $this->type = 'merchant-private-data';
     }
@@ -3135,7 +3229,8 @@ class MspMerchantPrivateData extends MspMerchantPrivate {
  * 
  * GC tag: {@link http://code.google.com/apis/checkout/developer/index.html#tag_merchant-private-item-data <merchant-private-data>}
  */
-class MspMerchantPrivateItemData extends MspMerchantPrivate {
+class MspMerchantPrivateItemData extends MspMerchantPrivate
+{
 
     /**
      * @param mixed $data a string with the data that will go in the 
@@ -3152,7 +3247,8 @@ class MspMerchantPrivateItemData extends MspMerchantPrivate {
      *                      </stuff>
      *                    </my-item-id>
      */
-    function __construct($data = array()) {
+    function __construct($data = array())
+    {
         $this->data = $data;
         $this->type = 'merchant-private-item-data';
     }
@@ -3188,7 +3284,8 @@ class MspMerchantPrivateItemData extends MspMerchantPrivate {
  * The private-data and tax-selector for each item can be set in the 
  * constructor call or using individual Set functions
  */
-class MspItem {
+class MspItem
+{
 
     var $item_name;
     var $item_description;
@@ -3219,7 +3316,8 @@ class MspItem {
      * @param double $numeric_weight the weight of the item
      * 
      */
-    function xmlEscape($str) {
+    function xmlEscape($str)
+    {
         return htmlspecialchars($str, ENT_COMPAT, "UTF-8");
     }
 
@@ -3227,7 +3325,8 @@ class MspItem {
      * Returns the string with all XML escaping removed
      */
 
-    function xmlUnescape($str) {
+    function xmlUnescape($str)
+    {
         return html_entity_decode($str, ENT_COMPAT, "UTF-8");
     }
 
@@ -3245,7 +3344,8 @@ class MspItem {
      * @param double $numeric_weight the weight of the item
      * 
      */
-    function __construct($name, $desc, $qty, $price, $item_weight = '', $numeric_weight = '') {
+    function __construct($name, $desc, $qty, $price, $item_weight = '', $numeric_weight = '')
+    {
         $this->item_name = $this->xmlEscape($name);
         $this->item_description = $this->xmlEscape($desc);
         $this->unit_price = $price;
@@ -3264,7 +3364,8 @@ class MspItem {
         }
     }
 
-    function SetMerchantPrivateItemData($private_data) {
+    function SetMerchantPrivateItemData($private_data)
+    {
         $this->merchant_private_item_data = $private_data;
     }
 
@@ -3280,7 +3381,8 @@ class MspItem {
      * 
      * @return void
      */
-    function SetMerchantItemId($item_id) {
+    function SetMerchantItemId($item_id)
+    {
         $this->merchant_item_id = $item_id;
     }
 
@@ -3295,7 +3397,8 @@ class MspItem {
      * 
      * @return void
      */
-    function SetTaxTableSelector($tax_selector) {
+    function SetTaxTableSelector($tax_selector)
+    {
         $this->tax_table_selector = (string) $tax_selector;
     }
 
@@ -3312,7 +3415,8 @@ class MspItem {
      * 
      * @return void
      */
-    function SetEmailDigitalDelivery($email_delivery = 'false') {
+    function SetEmailDigitalDelivery($email_delivery = 'false')
+    {
         $this->digital_url = '';
         $this->digital_key = '';
         $this->digital_description = '';
@@ -3335,7 +3439,8 @@ class MspItem {
      * 
      * @return void
      */
-    function SetURLDigitalContent($digital_url, $digital_key, $digital_description) {
+    function SetURLDigitalContent($digital_url, $digital_key, $digital_description)
+    {
         $this->digital_url = $digital_url;
         $this->digital_key = $digital_key;
         $this->digital_description = $digital_description;
@@ -3374,7 +3479,8 @@ class MspItem {
  * {@link http://code.google.com/apis/checkout/developer/index.html#shipping_xsd}
  *  
  */
-class MspFlatRateShipping {
+class MspFlatRateShipping
+{
 
     var $price;
     var $name;
@@ -3385,7 +3491,8 @@ class MspFlatRateShipping {
      * @param string $name a name for the shipping
      * @param double $price the price for this shipping
      */
-    function __construct($name, $price) {
+    function __construct($name, $price)
+    {
         $this->name = $name;
         $this->price = $price;
     }
@@ -3395,7 +3502,8 @@ class MspFlatRateShipping {
      * 
      * @param GoogleShippingFilters $restrictions the shipping restrictions
      */
-    function AddShippingRestrictions($restrictions) {
+    function AddShippingRestrictions($restrictions)
+    {
         $this->shipping_restrictions = $restrictions;
     }
 
@@ -3420,7 +3528,8 @@ class MspFlatRateShipping {
  * More info:
  * {@link http://code.google.com/apis/checkout/developer/index.html#tag_address-filters}
  */
-class MspShippingFilters {
+class MspShippingFilters
+{
 
     var $allow_us_po_box = true;
     var $allowed_restrictions = false;
@@ -3437,7 +3546,8 @@ class MspShippingFilters {
     var $excluded_state_areas_arr;
     var $excluded_zip_patterns_arr;
 
-    function __construct() {
+    function __construct()
+    {
         $this->allowed_country_codes_arr = array();
         $this->allowed_postal_patterns_arr = array();
         $this->allowed_state_areas_arr = array();
@@ -3455,7 +3565,8 @@ class MspShippingFilters {
      * @param bool $allow_us_po_box whether to allow delivery to PO boxes in US,
      * defaults to true
      */
-    function SetAllowUsPoBox($allow_us_po_box = true) {
+    function SetAllowUsPoBox($allow_us_po_box = true)
+    {
         $this->allow_us_po_box = $allow_us_po_box;
     }
 
@@ -3466,7 +3577,8 @@ class MspShippingFilters {
      * 
      * @param bool $world_area Set worldwide allowed shipping, defaults to true
      */
-    function SetAllowedWorldArea($world_area = true) {
+    function SetAllowedWorldArea($world_area = true)
+    {
         $this->allowed_restrictions = true;
         $this->allowed_world_area = $world_area;
     }
@@ -3481,7 +3593,8 @@ class MspShippingFilters {
      * @param string $postal_pattern Pattern that matches the postal areas to
      * be allowed, as defined in {@link http://code.google.com/apis/checkout/developer/index.html#tag_postal-code-pattern}
      */
-    function AddAllowedPostalArea($country_code, $postal_pattern = "") {
+    function AddAllowedPostalArea($country_code, $postal_pattern = "")
+    {
         $this->allowed_restrictions = true;
         $this->allowed_country_codes_arr[] = $country_code;
         $this->allowed_postal_patterns_arr[] = $postal_pattern;
@@ -3496,7 +3609,8 @@ class MspShippingFilters {
      * "FULL_50_STATES" or "ALL"
      * 
      */
-    function SetAllowedCountryArea($country_area) {
+    function SetAllowedCountryArea($country_area)
+    {
         switch ($country_area) {
             case "CONTINENTAL_48":
             case "FULL_50_STATES":
@@ -3517,7 +3631,8 @@ class MspShippingFilters {
      * 
      * @param array $areas Areas to be allowed
      */
-    function SetAllowedStateAreas($areas) {
+    function SetAllowedStateAreas($areas)
+    {
         $this->allowed_restrictions = true;
         $this->allowed_state_areas_arr = $areas;
     }
@@ -3529,7 +3644,8 @@ class MspShippingFilters {
      * 
      * @param string $area Area to be allowed
      */
-    function AddAllowedStateArea($area) {
+    function AddAllowedStateArea($area)
+    {
         $this->allowed_restrictions = true;
         $this->allowed_state_areas_arr[] = $area;
     }
@@ -3541,7 +3657,8 @@ class MspShippingFilters {
      * 
      * @param array $zips
      */
-    function SetAllowedZipPatterns($zips) {
+    function SetAllowedZipPatterns($zips)
+    {
         $this->allowed_restrictions = true;
         $this->allowed_zip_patterns_arr = $zips;
     }
@@ -3553,7 +3670,8 @@ class MspShippingFilters {
      * 
      * @param string 
      */
-    function AddAllowedZipPattern($zip) {
+    function AddAllowedZipPattern($zip)
+    {
         $this->allowed_restrictions = true;
         $this->allowed_zip_patterns_arr[] = $zip;
     }
@@ -3563,7 +3681,8 @@ class MspShippingFilters {
      * 
      * @see AddAllowedPostalArea
      */
-    function AddExcludedPostalArea($country_code, $postal_pattern = "") {
+    function AddExcludedPostalArea($country_code, $postal_pattern = "")
+    {
         $this->excluded_restrictions = true;
         $this->excluded_country_codes_arr[] = $country_code;
         $this->excluded_postal_patterns_arr[] = $postal_pattern;
@@ -3574,7 +3693,8 @@ class MspShippingFilters {
      * 
      * @see SetAllowedStateAreas
      */
-    function SetExcludedStateAreas($areas) {
+    function SetExcludedStateAreas($areas)
+    {
         $this->excluded_restrictions = true;
         $this->excluded_state_areas_arr = $areas;
     }
@@ -3584,7 +3704,8 @@ class MspShippingFilters {
      * 
      * @see AddAllowedStateArea
      */
-    function AddExcludedStateArea($area) {
+    function AddExcludedStateArea($area)
+    {
         $this->excluded_restrictions = true;
         $this->excluded_state_areas_arr[] = $area;
     }
@@ -3594,7 +3715,8 @@ class MspShippingFilters {
      * 
      * @see SetAllowedZipPatterns
      */
-    function SetExcludedZipPatternsStateAreas($zips) {
+    function SetExcludedZipPatternsStateAreas($zips)
+    {
         $this->excluded_restrictions = true;
         $this->excluded_zip_patterns_arr = $zips;
     }
@@ -3604,7 +3726,8 @@ class MspShippingFilters {
      * 
      * @see AddExcludedZipPattern
      */
-    function SetAllowedZipPatternsStateArea($zip) {
+    function SetAllowedZipPatternsStateArea($zip)
+    {
         $this->excluded_restrictions = true;
         $this->excluded_zip_patterns_arr[] = $zip;
     }
@@ -3614,7 +3737,8 @@ class MspShippingFilters {
      * 
      * @see SetAllowedCountryArea
      */
-    function SetExcludedCountryArea($country_area) {
+    function SetExcludedCountryArea($country_area)
+    {
         switch ($country_area) {
             case "CONTINENTAL_48":
             case "FULL_50_STATES":
@@ -3637,7 +3761,8 @@ class MspShippingFilters {
  * 
  * GC tag: {@link http://code.google.com/apis/checkout/developer/index.html#tag_pickup} <pickup>
  */
-class MspPickUp {
+class MspPickUp
+{
 
     var $price;
     var $name;
@@ -3648,7 +3773,8 @@ class MspPickUp {
      * @param string $name the name of this shipping option
      * @param double $price the handling cost (if there is one)
      */
-    function __construct($name, $price, $provider = '') {
+    function __construct($name, $price, $provider = '')
+    {
         $this->price = $price;
         $this->name = $name;
         $this->provider = $provider;
@@ -3684,7 +3810,8 @@ class MspPickUp {
  * 
  * @abstract
  */
-class MspTaxRule {
+class MspTaxRule
+{
 
     var $tax_rate;
     var $world_area = false;
@@ -3694,34 +3821,40 @@ class MspTaxRule {
     var $zip_patterns_arr;
     var $country_area;
 
-    function __construct() {
+    function __construct()
+    {
         
     }
 
-    function SetWorldArea($world_area = true) {
+    function SetWorldArea($world_area = true)
+    {
         $this->world_area = $world_area;
     }
 
-    function AddPostalArea($country_code, $postal_pattern = "") {
+    function AddPostalArea($country_code, $postal_pattern = "")
+    {
         $this->country_codes_arr[] = $country_code;
         $this->postal_patterns_arr[] = $postal_pattern;
     }
 
-    function SetStateAreas($areas) {
+    function SetStateAreas($areas)
+    {
         if (is_array($areas))
             $this->state_areas_arr = $areas;
         else
             $this->state_areas_arr = array($areas);
     }
 
-    function SetZipPatterns($zips) {
+    function SetZipPatterns($zips)
+    {
         if (is_array($zips))
             $this->zip_patterns_arr = $zips;
         else
             $this->zip_patterns_arr = array($zips);
     }
 
-    function SetCountryArea($country_area) {
+    function SetCountryArea($country_area)
+    {
         switch ($country_area) {
             case "CONTINENTAL_48":
             case "FULL_50_STATES":
@@ -3741,11 +3874,13 @@ class MspTaxRule {
  * 
  * GC tag: {@link http://code.google.com/apis/checkout/developer/index.html#tag_default-tax-rule <default-tax-rule>}
  */
-class MspDefaultTaxRule extends MspTaxRule {
+class MspDefaultTaxRule extends MspTaxRule
+{
 
     var $shipping_taxed = false;
 
-    function __construct($tax_rate, $shipping_taxed = "false") {
+    function __construct($tax_rate, $shipping_taxed = "false")
+    {
         $this->tax_rate = $tax_rate;
         $this->shipping_taxed = $shipping_taxed;
 
@@ -3762,9 +3897,11 @@ class MspDefaultTaxRule extends MspTaxRule {
  * 
  * GC tag: {@link http://code.google.com/apis/checkout/developer/index.html#tag_alternate-tax-rule <alternate-tax-rule>}
  */
-class MspAlternateTaxRule extends MspTaxRule {
+class MspAlternateTaxRule extends MspTaxRule
+{
 
-    function __construct($tax_rate) {
+    function __construct($tax_rate)
+    {
         $this->tax_rate = $tax_rate;
 
         $this->country_codes_arr = array();
@@ -3780,13 +3917,15 @@ class MspAlternateTaxRule extends MspTaxRule {
  * 
  * GC tag: {@link http://code.google.com/apis/checkout/developer/index.html#tag_alternate-tax-table <alternate-tax-table>}
  */
-class MspAlternateTaxTable {
+class MspAlternateTaxTable
+{
 
     var $name;
     var $tax_rules_arr;
     var $standalone;
 
-    function __construct($name = "", $standalone = "false") {
+    function __construct($name = "", $standalone = "false")
+    {
         if ($name != "") {
             $this->name = $name;
             $this->tax_rules_arr = array();
@@ -3794,26 +3933,31 @@ class MspAlternateTaxTable {
         }
     }
 
-    function AddAlternateTaxRules($rules) {
+    function AddAlternateTaxRules($rules)
+    {
         $this->tax_rules_arr[] = $rules;
     }
 
 }
 
-class MspCustomFields {
+class MspCustomFields
+{
 
     var $fields = array();
     var $fields_xml_extra = '';
 
-    function AddField($field) {
+    function AddField($field)
+    {
         $this->fields[] = $field;
     }
 
-    function SetRaw($xml) {
+    function SetRaw($xml)
+    {
         $this->fields_xml_extra = $xml;
     }
 
-    function GetXml() {
+    function GetXml()
+    {
         $xml_data = new msp_gc_XmlBuilder();
         $xml_data->xml = '';
 
@@ -3921,7 +4065,8 @@ class MspCustomFields {
         return '<custom-fields>' . $xml_data->GetXML() . $this->fields_xml_extra . '</custom-fields>';
     }
 
-    function _GetXmlLocalized(&$xml_data, $field, $value) {
+    function _GetXmlLocalized(&$xml_data, $field, $value)
+    {
         if (is_array($value)) {
             foreach ($value as $lang => $text) {
                 $xml_data->Element($field, $text, array('xml:lang' => $lang));
@@ -3933,7 +4078,8 @@ class MspCustomFields {
 
 }
 
-class MspCustomField {
+class MspCustomField
+{
 
     var $standardField = null;
     var $name = null;
@@ -3948,25 +4094,30 @@ class MspCustomField {
     var $descriptionRight = array();
     var $descriptionBottom = array();
 
-    function __construct($name = null, $type = null, $label = null) {
+    function __construct($name = null, $type = null, $label = null)
+    {
         $this->name = $name;
         $this->type = $type;
         $this->label = $label;
     }
 
-    function AddOption($value, $label) {
+    function AddOption($value, $label)
+    {
         $this->options[] = new MspCustomFieldOption($value, $label);
     }
 
-    function AddValidation($validation) {
+    function AddValidation($validation)
+    {
         $this->validation[] = $validation;
     }
 
-    function AddRestrictions($filter) {
+    function AddRestrictions($filter)
+    {
         $this->filter = $filter;
     }
 
-    function SetStandardField($name, $optional = false) {
+    function SetStandardField($name, $optional = false)
+    {
         $this->standardField = $name;
         if ($optional) {
             $this->AddValidation(new MspCustomFieldValidation('regex', ' '));
@@ -3975,25 +4126,29 @@ class MspCustomField {
 
 }
 
-class MspCustomFieldOption {
+class MspCustomFieldOption
+{
 
     var $value;
     var $label;
 
-    function __construct($value, $label) {
+    function __construct($value, $label)
+    {
         $this->value = $value;
         $this->label = $label;
     }
 
 }
 
-class MspCustomFieldValidation {
+class MspCustomFieldValidation
+{
 
     var $type;
     var $data;
     var $error;
 
-    function __construct($type, $data, $error) {
+    function __construct($type, $data, $error)
+    {
         $this->type = $type;
         $this->data = $data;
         $this->error = $error;
@@ -4001,21 +4156,25 @@ class MspCustomFieldValidation {
 
 }
 
-class MspCustomFieldFilter {
+class MspCustomFieldFilter
+{
 
     var $allowed_country_codes_arr;
     var $excluded_country_codes_arr;
 
-    function __construct() {
+    function __construct()
+    {
         $this->allowed_country_codes_arr = array();
         $this->excluded_country_codes_arr = array();
     }
 
-    function AddAllowedPostalArea($country_code) {
+    function AddAllowedPostalArea($country_code)
+    {
         $this->allowed_country_codes_arr[] = $country_code;
     }
 
-    function AddExcludedPostalArea($country_code) {
+    function AddExcludedPostalArea($country_code)
+    {
         $this->excluded_country_codes_arr[] = $country_code;
     }
 

@@ -7,7 +7,8 @@
  */
 require_once(Mage::getBaseDir('lib') . DS . 'multisafepay' . DS . 'MultiSafepay.combined.php');
 
-class MultiSafepay_Msp_Model_Base extends Varien_Object {
+class MultiSafepay_Msp_Model_Base extends Varien_Object
+{
 
     protected $_config;
     protected $_order = null;
@@ -33,8 +34,12 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
         'KLARNA' => 'msp_klarna',
         'MISTERCASH' => 'msp_mistercash',
         'VISA' => 'msp_visa',
+        'PSAFECARD' => 'msp_paysafecard',
         'EPS' => 'msp_eps',
         'FERBUY' => 'msp_ferbuy',
+        'ING' => 'msp_ing',
+        'KBC' => 'msp_kbc',
+        'BELFIUS' => 'msp_belfius',
         'MASTERCARD' => 'msp_mastercard',
         'BANKTRANS' => 'msp_banktransfer',
         'MAESTRO' => 'msp_maestro',
@@ -45,7 +50,7 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
         'BABYGIFTCARD' => 'msp_babygiftcard',
         'BOEKENBON' => 'msp_boekenbon',
         'EROTIEKBON' => 'msp_erotiekbon',
-        'GIVEACARD' => 'msp_giveacard',
+        'GIVACARD' => 'msp_givacard',
         'PARFUMNL' => 'msp_parfumnl',
         'PARFUMCADEAUKAART' => 'msp_parfumcadeaukaart',
         'DEGROTESPEELGOEDWINKEL' => 'msp_degrotespeelgoedwinkel',
@@ -68,7 +73,8 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
     /**
      * Set the config object of the Base
      */
-    public function setConfigObject($config) {
+    public function setConfigObject($config)
+    {
         $this->_config = $config;
         return $this;
     }
@@ -77,7 +83,8 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
      * @param $name string
      * @return bool|string
      */
-    public function getConfigData($name) {
+    public function getConfigData($name)
+    {
         if (isset($this->_config[$name])) {
             return $this->_config[$name];
         }
@@ -88,15 +95,18 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
     /**
      * Logging functions
      */
-    public function isDebug() {
+    public function isDebug()
+    {
         return $this->getConfigData('debug');
     }
 
-    public function setLogId($id = null) {
+    public function setLogId($id = null)
+    {
         $this->_logId = $id;
     }
 
-    public function log() {
+    public function log()
+    {
         $argv = func_get_args();
         $data = array_shift($argv);
 
@@ -122,7 +132,8 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
     /**
      * Returns an instance of de Api and set some standard settings
      */
-    public function getApi() {
+    public function getApi()
+    {
         if ($this->api) {
             return $this->api;
         }
@@ -147,7 +158,8 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
     /**
      * Returns an instance of de Payafter Api and set some standard settings
      */
-    public function getPayAfterApi($order) {
+    public function getPayAfterApi($order)
+    {
         if ($this->api) {
             return $this->api;
         }
@@ -177,7 +189,8 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
     }
 
     //set api based on gateway settings
-    public function getGatewaysApi($order, $gateway_code) {
+    public function getGatewaysApi($order, $gateway_code)
+    {
         if ($this->api) {
             return $this->api;
         }
@@ -209,7 +222,8 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
     /**
      * Update an order according to the specified MultiSafepay status
      */
-    public function updateStatus($order, $mspStatus, $mspDetails = array()) {
+    public function updateStatus($order, $mspStatus, $mspDetails = array())
+    {
         $orderSaved = false;
         $statusInitialized = $this->getConfigData("initialized_status");
         $statusBanktransferInitialized = $this->getConfigData("initialized_banktransfer_status");
@@ -624,7 +638,8 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
     /**
      * Check if a certain MultiSafepay status is already in the order history (to prevent doubles)
      */
-    public function isStatusInHistory($order, $mspStatus) {
+    public function isStatusInHistory($order, $mspStatus)
+    {
         $history = $order->getAllStatusHistory();
         foreach ($history as $status) {
             if (strpos($status->getComment(), 'Status: <strong>' . $mspStatus . '</strong>') !== false) {
@@ -637,7 +652,8 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
     /**
      * Check if a certain MultiSafepay status is already in the order history (to prevent doubles)
      */
-    public function isCancellationFinal($order, $mspStatus) {
+    public function isCancellationFinal($order, $mspStatus)
+    {
         $history = $order->getAllStatusHistory();
 
         foreach ($history as $status) {
@@ -651,7 +667,8 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
     /**
      * Get the current Magento version (as integer, 1.4.x.x => 14)
      */
-    private function getMagentoVersion() {
+    private function getMagentoVersion()
+    {
         $version = Mage::getVersion();
         $arr = explode('.', $version);
         return $arr[0] . $arr[1];
@@ -660,7 +677,8 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
     /**
      *  Create invoice for order
      */
-    protected function createInvoice(Mage_Sales_Model_Order $order) {
+    protected function createInvoice(Mage_Sales_Model_Order $order)
+    {
 
         if ($order->getState() == Mage_Sales_Model_Order::STATE_NEW) {
             try {
@@ -682,11 +700,11 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
 
                 $payment = $order->getPayment();
 
-                /*$transaction = $payment->getTransaction($this->mspDetails['ewallet']['id']);
-                if (is_object($transaction)) {
-                    $transaction->setAdditionalInformation(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS, $this->transdetails);
-                    $transaction->save();
-                }*/
+                /* $transaction = $payment->getTransaction($this->mspDetails['ewallet']['id']);
+                  if (is_object($transaction)) {
+                  $transaction->setAdditionalInformation(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS, $this->transdetails);
+                  $transaction->save();
+                  } */
 
                 if ($this->_config["updatetransaction"]) {
                     $invoiceId = $invoice->getIncrementId();
@@ -735,7 +753,8 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
     /**
      *  Get lock file
      */
-    protected function _getLockFile() {
+    protected function _getLockFile()
+    {
         if ($this->_lockFile === null) {
             $varDir = Mage::getConfig()->getVarDir('locks');
             $this->lockFilename = $varDir . DS . $this->_lockCode . '_' . $this->_lockId . '.lock';
@@ -752,18 +771,21 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
     /**
      *  Set some lock vars
      */
-    public function setLockId($id = null) {
+    public function setLockId($id = null)
+    {
         $this->_lockId = $id;
     }
 
-    public function setLockCode($code = null) {
+    public function setLockCode($code = null)
+    {
         $this->_lockCode = $code;
     }
 
     /**
      *  Create lock
      */
-    public function lock() {
+    public function lock()
+    {
         $this->_isLocked = true;
         flock($this->_getLockFile($this->_lockId), LOCK_EX | LOCK_NB);
 
@@ -773,14 +795,16 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
     /**
      *  Prevent deletion of lockfile
      */
-    public function preventLockDelete() {
+    public function preventLockDelete()
+    {
         $this->_lockFile = null;
     }
 
     /**
      *  Unlock
      */
-    public function unlock() {
+    public function unlock()
+    {
         $this->_isLocked = false;
         flock($this->_getLockFile($this->_lockId), LOCK_UN);
 
@@ -790,7 +814,8 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
     /**
      *  Check if locked
      */
-    public function isLocked() {
+    public function isLocked()
+    {
         if ($this->_isLocked !== null) {
             return $this->_isLocked;
         } else {
@@ -806,7 +831,8 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
     /**
      *  Destroy lock file on destuct
      */
-    public function __destruct() {
+    public function __destruct()
+    {
         if ($this->_lockFile) {
             fclose($this->_lockFile);
             unlink($this->lockFilename);

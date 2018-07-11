@@ -5,7 +5,8 @@
  * @category MultiSafepay
  * @package  MultiSafepay_Msp
  */
-class MultiSafepay_Msp_Model_Observer_Order extends MultiSafepay_Msp_Model_Observer_Abstract {
+class MultiSafepay_Msp_Model_Observer_Order extends MultiSafepay_Msp_Model_Observer_Abstract
+{
 
     const MSP_GENERAL_CODE = 'msp';
     const MSP_FASTCHECKOUT_CODE = 'mspcheckout';
@@ -24,9 +25,13 @@ class MultiSafepay_Msp_Model_Observer_Order extends MultiSafepay_Msp_Model_Obser
         //'msp_einvoice', for now we dont allow payafter manual transaction requests
         'msp_mistercash',
         'msp_visa',
+        'msp_paysafecard',
         'msp_eps',
         'msp_ferbuy',
         'msp_mastercard',
+        'msp_ing',
+        'msp_kbc',
+        'msp_belfius',
         'msp_banktransfer',
         'msp_maestro',
         'msp_paypal',
@@ -35,7 +40,7 @@ class MultiSafepay_Msp_Model_Observer_Order extends MultiSafepay_Msp_Model_Obser
         'msp_babygiftcard',
         'msp_boekenbon',
         'msp_erotiekbon',
-        'msp_giveacard',
+        'msp_givacard',
         'msp_parfumnl',
         'msp_parfumcadeaukaart',
         'msp_degrotespeelgoedwinkel',
@@ -57,7 +62,8 @@ class MultiSafepay_Msp_Model_Observer_Order extends MultiSafepay_Msp_Model_Obser
         'msp_beautyandwellness',
     );
 
-    public function sales_order_place_after(Varien_Event_Observer $observer) {
+    public function sales_order_place_after(Varien_Event_Observer $observer)
+    {
 
         if (!Mage::app()->getStore()->isAdmin()) {
             return $this;
@@ -71,9 +77,9 @@ class MultiSafepay_Msp_Model_Observer_Order extends MultiSafepay_Msp_Model_Obser
         /** @var $order Mage_Sales_Model_Order */
         $order = $observer->getEvent()->getOrder();
 
-		if($order->getEditIncrement()){
-		    return true;
-	    }
+        if ($order->getEditIncrement()) {
+            return true;
+        }
 
 
         /** @var $payment Mage_Payment_Model_Method_Abstract */
@@ -121,18 +127,13 @@ class MultiSafepay_Msp_Model_Observer_Order extends MultiSafepay_Msp_Model_Obser
 
         $api = Mage::getModel('msp/api_paylink');
         $configMain = Mage::getStoreConfig('msp/settings', $order->getStoreId());
-        
-        if(!$config['paylink_create']){
-	        return $this;
+
+        if (!$config['paylink_create']) {
+            return $this;
         }
-        
+
         if (!$api->isPaymentLinkCreated($order)) {
             if ($payment->getCode() == self::MSP_GENERAL_PAD_CODE || $payment->getCode() == self::MSP_GENERAL_KLARNA_CODE || $payment->getCode() == self::MSP_GENERAL_EINVOICE_CODE) {
-
-			
-
-
-
                 $api->test = ($config['test_api_pad'] == 'test');
                 $suffix = '';
 
@@ -144,7 +145,7 @@ class MultiSafepay_Msp_Model_Observer_Order extends MultiSafepay_Msp_Model_Obser
                 $api->merchant['site_id'] = $config['site_id_pad' . $suffix];
                 $api->merchant['security_code'] = $config['secure_code_pad' . $suffix];
                 $api->merchant['api_key'] = $configMain['api_key'];
-                $api->transaction['id'] = $configMain['daysactive'];
+                
                 $api->debug = $configMain['debug'];
             } else {
                 $api->test = ($config['test_api'] == 'test');
@@ -152,17 +153,18 @@ class MultiSafepay_Msp_Model_Observer_Order extends MultiSafepay_Msp_Model_Obser
                 $api->merchant['site_id'] = $config['site_id'];
                 $api->merchant['security_code'] = $config['secure_code'];
                 $api->merchant['api_key'] = $config['api_key'];
-                $api->transaction['id'] = $configMain['daysactive'];
                 $api->debug = $config['debug'];
             }
             $api->transaction['gateway_reset'] = $configMain['gateway_reset'];
+
+            
             if ($payment->getCode() == self::MSP_FASTCHECKOUT_CODE) {
                 $api->transaction['id'] = $order->getQuoteId();
             } else {
                 $api->transaction['id'] = $order->getIncrementId();
             }
 
-            $api->transaction['amount'] = $order->getGrandTotal() * 100;
+            $api->transaction['amount'] = round($order->getGrandTotal() * 100);
             $currency = $order->getOrderCurrency();
             $currencyCode = $currency->getCurrencyCode();
 

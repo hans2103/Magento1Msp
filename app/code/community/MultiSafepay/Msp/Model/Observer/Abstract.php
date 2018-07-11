@@ -5,12 +5,14 @@
  * @category MultiSafepay
  * @package  MultiSafepay_Msp
  */
-class MultiSafepay_Msp_Model_Observer_Abstract extends MultiSafepay_Msp_Model_Abstract {
+class MultiSafepay_Msp_Model_Observer_Abstract extends MultiSafepay_Msp_Model_Abstract
+{
 
     protected $_order;
     protected $_bilingInfo;
 
-    protected function _construct() {
+    protected function _construct()
+    {
         $this->_loadLastOrder();
         $this->_setOrderBillingInfo();
     }
@@ -21,14 +23,16 @@ class MultiSafepay_Msp_Model_Observer_Abstract extends MultiSafepay_Msp_Model_Ab
      * 
      * @param unknown_type $observer
      */
-    protected function _isChosenMethod($observer) {
+    protected function _isChosenMethod($observer)
+    {
         return (bool) $observer->getOrder()->getPayment()->getMethod() === $this->_code;
     }
 
     /**
      * @return array
      */
-    protected function _getAllActivePaymentMethods($storeId) {
+    protected function _getAllActivePaymentMethods($storeId)
+    {
         $code = array();
         $payments = Mage::getSingleton('payment/config')->getActiveMethods($storeId);
 

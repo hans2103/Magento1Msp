@@ -1,17 +1,21 @@
 <?php
+
 require_once dirname(__FILE__) . "/Core.php";
-class Object_Issuers extends Object_Core {
 
-  public $success;
-  public $data;
+class Object_Issuers extends Object_Core
+{
 
-  public function get($endpoint = 'issuers', $type = 'ideal', $body = array(), $query_string = false) {
+    public $success;
+    public $data;
 
-    $result = parent::get($endpoint, $type, $body, $query_string);
-    $this->success = $result->success;
-    $this->data = $result->data;
+    public function get($endpoint = 'issuers', $type = 'ideal', $body = array(), $query_string = false)
+    {
 
-    return $this->data;
-  }
+        $result = parent::get($endpoint, $type, $body, $query_string);
+        $this->success = $result->success;
+        $this->data = $result->data;
+
+        return $this->data;
+    }
 
 }

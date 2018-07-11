@@ -1,8 +1,10 @@
 <?php
 
-class MultiSafepay_Msp_Model_Servicecost_Observer {
+class MultiSafepay_Msp_Model_Servicecost_Observer
+{
 
-    public function invoiceSaveAfter(Varien_Event_Observer $observer) {
+    public function invoiceSaveAfter(Varien_Event_Observer $observer)
+    {
         $invoice = $observer->getEvent()->getInvoice();
         if ($invoice->getServicecost()) {
             $order = $invoice->getOrder();
@@ -14,7 +16,8 @@ class MultiSafepay_Msp_Model_Servicecost_Observer {
         return $this;
     }
 
-    public function creditmemoSaveAfter(Varien_Event_Observer $observer) {
+    public function creditmemoSaveAfter(Varien_Event_Observer $observer)
+    {
         $creditmemo = $observer->getEvent()->getCreditmemo();
         if ($creditmemo->getServicecost()) {
             $order = $creditmemo->getOrder();
