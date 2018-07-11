@@ -9,6 +9,6 @@ class MultiSafepay_Msp_Model_Gateway_Vvvgiftcard extends MultiSafepay_Msp_Model_
 
     protected $_code = "msp_vvvgiftcard";
     public $_model = "vvvgiftcard";
-    public $_gateway = "VVVGIFTCARD";
+    public $_gateway = "VVVBON";
 
 }

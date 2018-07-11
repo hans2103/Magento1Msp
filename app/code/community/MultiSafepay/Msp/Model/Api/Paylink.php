@@ -49,6 +49,8 @@ class MultiSafepay_Msp_Model_Api_Paylink {
         //'msp_einvoice', for now we dont allow einvoice manual transaction requests
         'msp_mistercash' => 'MISTERCASH',
         'msp_visa' => 'VISA',
+        'msp_eps' => 'EPS',
+        'msp_ferbuy' => 'FERBUY',
         'msp_mastercard' => 'MASTERCARD',
         'msp_banktransfer' => 'BANKTRANS',
         'msp_maestro' => 'MAESTRO',

@@ -29,7 +29,7 @@
 "Company name cannot be empty","Maak bedrijfsnaam veld verplicht"
 "This will enable the Table Rates method configured at Shipping Methods -> Table Rates","Dit schakeld de Table Rates verzendmethode in zoals ingesteld bij Verzendmethoden -> Table rates"
 "Allowed Currency", "Toegestane valuta"
-"Allow currency conversion to Euro", "Sta valuta converie naar Euro toe"
+"Allow currency conversion to Euro", "Sta valuta conversie naar Euro toe"
 "If store currency is not allowed by settings. Used for each gateway.", "Wanneer de winkel valuta niet is toegestaan voor de gekozen betaalmethoden dan vindt er een conversie plaats naar Euro"
 "New order mail", "Nieuwe order email"
 "E-mail invoice to customer", "Email de factuur naar de consument"

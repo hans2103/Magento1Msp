@@ -35,12 +35,15 @@ class MultiSafepay_Msp_Model_Gateway_Einvoice extends MultiSafepay_Msp_Model_Gat
     );
     public $gateways = array(
         'msp_ideal',
+        'msp_creditcard',
         'msp_dotpay',
         'msp_payafter',
         'msp_einvoice',
         'msp_klarna',
         'msp_mistercash',
         'msp_visa',
+        'msp_eps',
+        'msp_ferbuy',
         'msp_mastercard',
         'msp_banktransfer',
         'msp_maestro',
@@ -66,6 +69,9 @@ class MultiSafepay_Msp_Model_Gateway_Einvoice extends MultiSafepay_Msp_Model_Gat
                 $availableByIP = false;
             }
         }
+        
+        
+        
 
 
 
@@ -80,6 +86,8 @@ class MultiSafepay_Msp_Model_Gateway_Einvoice extends MultiSafepay_Msp_Model_Gat
             $currencies = explode(',', Mage::getStoreConfig('msp_giftcards/' . $this->_code . '/allowed_currency'));
             $isAllowConvert = Mage::getStoreConfigFlag('msp/settings/allow_convert_currency');
         }
+        
+        
 
 
         if ($isAllowConvert) {
@@ -91,8 +99,19 @@ class MultiSafepay_Msp_Model_Gateway_Einvoice extends MultiSafepay_Msp_Model_Gat
                 $availableByCurrency = false;
             }
         }
+        $isavailablebygroup= true;
+        $group_id = 0; // If not logged in, customer group id is 0
+        if (Mage::getSingleton('customer/session')->isLoggedIn()) { // If logged in, set customer group id
+            $group_id = Mage::getSingleton('customer/session')->getCustomer()->getGroupId();
+        }
+        $option = trim(Mage::getStoreConfig($this->_configCode . '/' . $this->_code . '/specificgroups'));
+        $specificgroups = explode(",", $option);
+        // If customer group is not in available groups and config option is not empty, disable this gateway
+        if (!in_array($group_id, $specificgroups) && $option !== "") {
+            $isavailablebygroup = false;
+        }
 
-        $this->_canUseCheckout = $availableByIP && $availableByCurrency;
+        $this->_canUseCheckout = $availableByIP && $availableByCurrency && $isavailablebygroup;
     }
 
     public function getOrderPlaceRedirectUrl() {

@@ -26,12 +26,15 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
     protected $_paid;
     public $methodMap = array(
         'IDEAL' => 'msp_ideal',
+        'CREDITCARD' => 'msp_creditcard',
         'DOTPAY' => 'msp_dotpay',
         'PAYAFTER' => 'msp_payafter',
         'EINVOICE' => 'msp_einvoice',
         'KLARNA' => 'msp_klarna',
         'MISTERCASH' => 'msp_mistercash',
         'VISA' => 'msp_visa',
+        'EPS' => 'msp_eps',
+        'FERBUY' => 'msp_ferbuy',
         'MASTERCARD' => 'msp_mastercard',
         'BANKTRANS' => 'msp_banktransfer',
         'MAESTRO' => 'msp_maestro',
