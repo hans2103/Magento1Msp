@@ -16,6 +16,7 @@ app/design/frontend/base/default/template/msp/link.phtml            app/design/f
 app/design/frontend/base/default/template/msp/default.phtml            app/design/frontend/base/default/template/msp/default.phtml
 app/design/frontend/base/default/template/msp/idealissuers.phtml            app/design/frontend/base/default/template/msp/idealissuers.phtml
 app/design/frontend/base/default/template/msp/linkText.phtml            app/design/frontend/base/default/template/msp/linkText.phtml
+app/design/frontend/base/default/template/msp/einvoice.phtml            app/design/frontend/base/default/template/msp/einvoice.phtml
 app/design/frontend/base/default/template/msp/bno.phtml            app/design/frontend/base/default/template/msp/bno.phtml
 app/design/frontend/base/default/template/msp/agreements.phtml            app/design/frontend/base/default/template/msp/agreements.phtml
 app/design/frontend/base/default/template/msp/klarna.phtml            app/design/frontend/base/default/template/msp/klarna.phtml
@@ -31,6 +32,7 @@ media/msp/it/msp_visa.png            media/msp/it/msp_visa.png
 media/msp/it/Thumbs.db            media/msp/it/Thumbs.db
 media/msp/it/msp_directebanking.png            media/msp/it/msp_directebanking.png
 media/msp/it/msp_ebon.png            media/msp/it/msp_ebon.png
+media/msp/it/msp_einvoice.png            media/msp/it/msp_einvoice.png
 media/msp/it/msp_degrotespeelgoedwinkel.png            media/msp/it/msp_degrotespeelgoedwinkel.png
 media/msp/it/msp_giropay.png            media/msp/it/msp_giropay.png
 media/msp/it/msp_mistercash.png            media/msp/it/msp_mistercash.png
@@ -42,6 +44,7 @@ media/msp/it/msp_parfumcadeaukaart.png            media/msp/it/msp_parfumcadeauk
 media/msp/it/msp_klarna.png            media/msp/it/msp_klarna.png
 media/msp/it/msp_fashiongiftcard.png            media/msp/it/msp_fashiongiftcard.png
 media/msp/it/msp_amex.png            media/msp/it/msp_amex.png
+media/msp/it/msp_dotpay.png            media/msp/it/msp_dotpay.png
 media/msp/it/msp_maestro.png            media/msp/it/msp_maestro.png
 media/msp/it/msp_beautyandwellness.png            media/msp/it/msp_beautyandwellness.png
 media/msp/it/msp_giveacard.png            media/msp/it/msp_giveacard.png
@@ -65,6 +68,7 @@ media/msp/nl/msp_visa.png            media/msp/nl/msp_visa.png
 media/msp/nl/Thumbs.db            media/msp/nl/Thumbs.db
 media/msp/nl/msp_directebanking.png            media/msp/nl/msp_directebanking.png
 media/msp/nl/msp_ebon.png            media/msp/nl/msp_ebon.png
+media/msp/nl/msp_einvoice.png            media/msp/nl/msp_einvoice.png
 media/msp/nl/msp_degrotespeelgoedwinkel.png            media/msp/nl/msp_degrotespeelgoedwinkel.png
 media/msp/nl/msp_giropay.png            media/msp/nl/msp_giropay.png
 media/msp/nl/msp_mistercash.png            media/msp/nl/msp_mistercash.png
@@ -76,6 +80,7 @@ media/msp/nl/msp_parfumcadeaukaart.png            media/msp/nl/msp_parfumcadeauk
 media/msp/nl/msp_klarna.png            media/msp/nl/msp_klarna.png
 media/msp/nl/msp_fashiongiftcard.png            media/msp/nl/msp_fashiongiftcard.png
 media/msp/nl/msp_amex.png            media/msp/nl/msp_amex.png
+media/msp/nl/msp_dotpay.png            media/msp/nl/msp_dotpay.png
 media/msp/nl/msp_maestro.png            media/msp/nl/msp_maestro.png
 media/msp/nl/msp_beautyandwellness.png            media/msp/nl/msp_beautyandwellness.png
 media/msp/nl/msp_giveacard.png            media/msp/nl/msp_giveacard.png
@@ -99,6 +104,7 @@ media/msp/de/msp_visa.png            media/msp/de/msp_visa.png
 media/msp/de/Thumbs.db            media/msp/de/Thumbs.db
 media/msp/de/msp_directebanking.png            media/msp/de/msp_directebanking.png
 media/msp/de/msp_ebon.png            media/msp/de/msp_ebon.png
+media/msp/de/msp_einvoice.png            media/msp/de/msp_einvoice.png
 media/msp/de/msp_degrotespeelgoedwinkel.png            media/msp/de/msp_degrotespeelgoedwinkel.png
 media/msp/de/msp_giropay.png            media/msp/de/msp_giropay.png
 media/msp/de/msp_mistercash.png            media/msp/de/msp_mistercash.png
@@ -110,6 +116,7 @@ media/msp/de/msp_parfumcadeaukaart.png            media/msp/de/msp_parfumcadeauk
 media/msp/de/msp_klarna.png            media/msp/de/msp_klarna.png
 media/msp/de/msp_fashiongiftcard.png            media/msp/de/msp_fashiongiftcard.png
 media/msp/de/msp_amex.png            media/msp/de/msp_amex.png
+media/msp/de/msp_dotpay.png            media/msp/de/msp_dotpay.png
 media/msp/de/msp_maestro.png            media/msp/de/msp_maestro.png
 media/msp/de/msp_beautyandwellness.png            media/msp/de/msp_beautyandwellness.png
 media/msp/de/msp_giveacard.png            media/msp/de/msp_giveacard.png
@@ -133,6 +140,7 @@ media/msp/fr/msp_visa.png            media/msp/fr/msp_visa.png
 media/msp/fr/Thumbs.db            media/msp/fr/Thumbs.db
 media/msp/fr/msp_directebanking.png            media/msp/fr/msp_directebanking.png
 media/msp/fr/msp_ebon.png            media/msp/fr/msp_ebon.png
+media/msp/fr/msp_einvoice.png            media/msp/fr/msp_einvoice.png
 media/msp/fr/msp_degrotespeelgoedwinkel.png            media/msp/fr/msp_degrotespeelgoedwinkel.png
 media/msp/fr/msp_giropay.png            media/msp/fr/msp_giropay.png
 media/msp/fr/msp_mistercash.png            media/msp/fr/msp_mistercash.png
@@ -144,6 +152,7 @@ media/msp/fr/msp_parfumcadeaukaart.png            media/msp/fr/msp_parfumcadeauk
 media/msp/fr/msp_klarna.png            media/msp/fr/msp_klarna.png
 media/msp/fr/msp_fashiongiftcard.png            media/msp/fr/msp_fashiongiftcard.png
 media/msp/fr/msp_amex.png            media/msp/fr/msp_amex.png
+media/msp/fr/msp_dotpay.png            media/msp/fr/msp_dotpay.png
 media/msp/fr/msp_maestro.png            media/msp/fr/msp_maestro.png
 media/msp/fr/msp_beautyandwellness.png            media/msp/fr/msp_beautyandwellness.png
 media/msp/fr/msp_giveacard.png            media/msp/fr/msp_giveacard.png
@@ -167,6 +176,7 @@ media/msp/es/msp_visa.png            media/msp/es/msp_visa.png
 media/msp/es/Thumbs.db            media/msp/es/Thumbs.db
 media/msp/es/msp_directebanking.png            media/msp/es/msp_directebanking.png
 media/msp/es/msp_ebon.png            media/msp/es/msp_ebon.png
+media/msp/es/msp_einvoice.png            media/msp/es/msp_einvoice.png
 media/msp/es/msp_degrotespeelgoedwinkel.png            media/msp/es/msp_degrotespeelgoedwinkel.png
 media/msp/es/msp_giropay.png            media/msp/es/msp_giropay.png
 media/msp/es/msp_mistercash.png            media/msp/es/msp_mistercash.png
@@ -178,6 +188,7 @@ media/msp/es/msp_parfumcadeaukaart.png            media/msp/es/msp_parfumcadeauk
 media/msp/es/msp_klarna.png            media/msp/es/msp_klarna.png
 media/msp/es/msp_fashiongiftcard.png            media/msp/es/msp_fashiongiftcard.png
 media/msp/es/msp_amex.png            media/msp/es/msp_amex.png
+media/msp/es/msp_dotpay.png            media/msp/es/msp_dotpay.png
 media/msp/es/msp_maestro.png            media/msp/es/msp_maestro.png
 media/msp/es/msp_beautyandwellness.png            media/msp/es/msp_beautyandwellness.png
 media/msp/es/msp_giveacard.png            media/msp/es/msp_giveacard.png
@@ -201,6 +212,7 @@ media/msp/en/msp_visa.png            media/msp/en/msp_visa.png
 media/msp/en/Thumbs.db            media/msp/en/Thumbs.db
 media/msp/en/msp_directebanking.png            media/msp/en/msp_directebanking.png
 media/msp/en/msp_ebon.png            media/msp/en/msp_ebon.png
+media/msp/en/msp_einvoice.png            media/msp/en/msp_einvoice.png
 media/msp/en/msp_degrotespeelgoedwinkel.png            media/msp/en/msp_degrotespeelgoedwinkel.png
 media/msp/en/msp_giropay.png            media/msp/en/msp_giropay.png
 media/msp/en/msp_mistercash.png            media/msp/en/msp_mistercash.png
@@ -212,6 +224,7 @@ media/msp/en/msp_parfumcadeaukaart.png            media/msp/en/msp_parfumcadeauk
 media/msp/en/msp_klarna.png            media/msp/en/msp_klarna.png
 media/msp/en/msp_fashiongiftcard.png            media/msp/en/msp_fashiongiftcard.png
 media/msp/en/msp_amex.png            media/msp/en/msp_amex.png
+media/msp/en/msp_dotpay.png            media/msp/en/msp_dotpay.png
 media/msp/en/msp_maestro.png            media/msp/en/msp_maestro.png
 media/msp/en/msp_beautyandwellness.png            media/msp/en/msp_beautyandwellness.png
 media/msp/en/msp_giveacard.png            media/msp/en/msp_giveacard.png
@@ -237,6 +250,7 @@ skin/adminhtml/default/default/css/MultiSafepay/config.css            skin/admin
 skin/adminhtml/default/default/images/msp/nl/msp_visa.png            skin/adminhtml/default/default/images/msp/nl/msp_visa.png
 skin/adminhtml/default/default/images/msp/nl/msp_directebanking.png            skin/adminhtml/default/default/images/msp/nl/msp_directebanking.png
 skin/adminhtml/default/default/images/msp/nl/msp_ebon.png            skin/adminhtml/default/default/images/msp/nl/msp_ebon.png
+skin/adminhtml/default/default/images/msp/nl/msp_einvoice.png            skin/adminhtml/default/default/images/msp/nl/msp_einvoice.png
 skin/adminhtml/default/default/images/msp/nl/msp_degrotespeelgoedwinkel.png            skin/adminhtml/default/default/images/msp/nl/msp_degrotespeelgoedwinkel.png
 skin/adminhtml/default/default/images/msp/nl/msp_giropay.png            skin/adminhtml/default/default/images/msp/nl/msp_giropay.png
 skin/adminhtml/default/default/images/msp/nl/msp_mistercash.png            skin/adminhtml/default/default/images/msp/nl/msp_mistercash.png
@@ -248,6 +262,7 @@ skin/adminhtml/default/default/images/msp/nl/msp_parfumcadeaukaart.png          
 skin/adminhtml/default/default/images/msp/nl/msp_klarna.png            skin/adminhtml/default/default/images/msp/nl/msp_klarna.png
 skin/adminhtml/default/default/images/msp/nl/msp_fashiongiftcard.png            skin/adminhtml/default/default/images/msp/nl/msp_fashiongiftcard.png
 skin/adminhtml/default/default/images/msp/nl/msp_amex.png            skin/adminhtml/default/default/images/msp/nl/msp_amex.png
+skin/adminhtml/default/default/images/msp/nl/msp_dotpay.png            skin/adminhtml/default/default/images/msp/nl/msp_dotpay.png
 skin/adminhtml/default/default/images/msp/nl/msp_maestro.png            skin/adminhtml/default/default/images/msp/nl/msp_maestro.png
 skin/adminhtml/default/default/images/msp/nl/msp_beautyandwellness.png            skin/adminhtml/default/default/images/msp/nl/msp_beautyandwellness.png
 skin/adminhtml/default/default/images/msp/nl/msp_giveacard.png            skin/adminhtml/default/default/images/msp/nl/msp_giveacard.png
