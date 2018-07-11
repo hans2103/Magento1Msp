@@ -37,6 +37,7 @@ class Mage_Msp_StandardController extends Mage_Core_Controller_Front_Action
 			return "gateway_" . $model;
 		}
 	}
+	
 
 	/**
 	* Payment redirect -> start transaction
@@ -45,12 +46,10 @@ class Mage_Msp_StandardController extends Mage_Core_Controller_Front_Action
 	{
 		$this->getOnepage()->getQuote()->setIsActive(true);
 		$this->getOnepage()->getQuote()->save();
+
 		$paymentModel = Mage::getSingleton("msp/" . $this->getGatewayModel());
 		$paymentModel->setParams($this->getRequest()->getParams());
-    
-		// transaction request
 		$paymentLink = $paymentModel->startTransaction();
-		
 		// redirect
 		header("Location: " . $paymentLink);
 		exit();
@@ -149,7 +148,7 @@ class Mage_Msp_StandardController extends Mage_Core_Controller_Front_Action
 	{
 		$orderId  = $this->getRequest()->getQuery('transactionid');
 		$initial  = ($this->getRequest()->getQuery('type') == 'initial') ? true : false;
-		
+			unset($_SESSION['bankid']);
 		// Check if this is a fastcheckout notification and redirect
         if((!$initial) && ($this->isFCONotification($orderId))) 
 		{

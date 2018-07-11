@@ -7,14 +7,14 @@ class Mage_Msp_Model_Payment extends Varien_Object
 	protected $_config;
 	protected $_gateway;
 	protected $_issuer;
+	protected $_idealissuer;
 	protected $_notification_url;
 	protected $_cancel_url;
 	protected $_return_url;
 	protected $_order = null;
 	public $base;
 	public $api;
-
-
+	
 	public $pay_factor = 1;
 
 	/**
@@ -39,7 +39,11 @@ class Mage_Msp_Model_Payment extends Varien_Object
 	{
 		$this->_gateway = $gateway;
 	}
-
+	
+	public function setIdealIssuer($idealissuer){
+		$this->_idealissuer = $idealissuer;
+	}
+	
 	public function setIssuer($issuer)
 	{
 		$this->_issuer = $issuer;
@@ -134,6 +138,7 @@ class Mage_Msp_Model_Payment extends Varien_Object
 		return Mage::getSingleton("checkout/session");
 	}
 
+	
 
 	/**
 	* Get the gateway list
@@ -189,7 +194,7 @@ class Mage_Msp_Model_Payment extends Varien_Object
 
 		// order id
 		$orderId = $this->getCheckout()->getLastRealOrderId();
-
+		
 		// addresses
 		$billing  = $this->getOrder()->getBillingAddress();
 		$shipping = $this->getOrder()->getShippingAddress();
@@ -238,12 +243,31 @@ class Mage_Msp_Model_Payment extends Varien_Object
 		$api->transaction['items']         = $items;
 		$api->transaction['gateway']       = $this->_gateway;
 		$api->transaction['issuer']        = $this->_issuer;
-
-		// send
 		
-	//	print_r($api);exit;
-		$url = $api->startTransaction();
-
+		
+		if($this->_gateway == 'IDEAL' && isset($_SESSION['bankid'])){
+			$api->extravars					= 	$_SESSION['bankid'];
+			unset($_SESSION['bankid']);
+			$url 							= 	$api->startDirectXMLTransaction();
+		}elseif($this->_gateway == 'BANKTRANS')
+		{
+			$api->customer['accountid']				= 	$_SESSION['accountid'];
+			$api->customer['accountholdername']		=	$_SESSION['accountholdername'];
+			$api->customer['accountholdercity'] 	= 	$_SESSION['accountholdercity'];
+			$api->customer['accountholdercountry']	= 	$_SESSION['accountholdercountry'];
+			unset($_SESSION['accountid']);
+			unset($_SESSION['accountholdername']);
+			unset($_SESSION['accountholdercity']);
+			unset($_SESSION['accountholdercountry']);
+			
+			//print_r($api);exit;
+			$data =$api->startDirectBankTransfer();
+			$url = Mage::getUrl("checkout/onepage/success?utm_nooverride=1", array("_secure" => true));
+		}else
+		{
+			$url 							= 	$api->startTransaction();
+		}
+	
 		$this->getBase($orderId)->log($api->request_xml);
 		$this->getBase($orderId)->log($api->reply_xml);
 
@@ -277,8 +301,6 @@ class Mage_Msp_Model_Payment extends Varien_Object
 				$this->getOrder()->sendNewOrderEmail();
 			}
 		}
-		
-		
 		return $url;
 	}
 

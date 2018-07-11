@@ -1,8 +1,8 @@
 <fieldset class="form-list">
-    <ul id="payment_form_<?php echo $this->getMethodCode() ?>" style="display:none">
+    <ul id="payment_form_<?php echo $this->getMethodCode() ?>" style="">
 	<?php foreach ($this->getPaymentOptions() as $_code => $_option): ?>
         <li>
-          <input style="float: left" id="msp_ideal_<?php echo $_code ?>" value="<?php echo $_code ?>" type="radio" name="payment[msp_idealissuer]" title="<?php echo $this->__($_option['description']) ?>" class="radio"/>
+          <input style="float: left" id="msp_ideal_<?php echo $_code ?>" value="<?php echo $_code ?>" type="radio" name="payment[issuer]" title="<?php echo $this->__($_option['description']) ?>" class="radio"/>
           <label for="msp_ideal_<?php echo $_code ?>"><?php echo $this->__($_option['description']) ?></label>
         </li>
 	<?php endforeach; ?>

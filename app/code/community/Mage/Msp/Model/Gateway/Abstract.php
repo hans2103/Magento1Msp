@@ -1,5 +1,5 @@
 <?php
-
+require_once(Mage::getBaseDir('lib').DS.'multisafepay'.DS.'MultiSafepay.combined.php');
 abstract class Mage_Msp_Model_Gateway_Abstract extends Mage_Payment_Model_Method_Abstract
 {
 	protected $_module = "msp";   // config root (msp or payment)
@@ -7,6 +7,7 @@ abstract class Mage_Msp_Model_Gateway_Abstract extends Mage_Payment_Model_Method
 	protected $_code;             // payment method code
 	protected $_model;            // payment model
 	protected $_gateway;          // msp 'gateway'
+	protected $_idealissuer;	  // ideal issuer
 	protected $_params;
 	protected $_loadSettingsConfig = true; // load 'settings' before payment config
 	protected $_loadGatewayConfig  = true; 
@@ -16,6 +17,9 @@ abstract class Mage_Msp_Model_Gateway_Abstract extends Mage_Payment_Model_Method
 
 	public $payment;
 
+	
+	
+	
 	// For 1.3.2.4
 	public function isAvailable($quote=null)
 	{
@@ -27,7 +31,7 @@ abstract class Mage_Msp_Model_Gateway_Abstract extends Mage_Payment_Model_Method
 		// Magento tries to set the order from payment/, instead of our msp/
 		$this->sort_order = $this->getConfigData('sort_order');
 	}
-	//
+	
 	
 	/**
 	* Append the current model to the URL
@@ -85,7 +89,7 @@ abstract class Mage_Msp_Model_Gateway_Abstract extends Mage_Payment_Model_Method
 		$payment->setReturnUrl($this->getReturnUrl());
 		$payment->setCancelUrl($this->getCancelUrl());
 		$payment->setGateway($this->getGateway());
-
+		$payment->setIdealIssuer($this->getIdealIssuer());
 		return $payment;
 	}
 	
@@ -111,6 +115,46 @@ abstract class Mage_Msp_Model_Gateway_Abstract extends Mage_Payment_Model_Method
 		return $payment->notification($id);
 	}
 	
+	public function getIdealIssuersHTML(){
+		$configSettings = array();
+		if ($this->_loadSettingsConfig)
+		{
+			$configSettings = Mage::getStoreConfig($this->_settings . "/settings", $storeId);
+		}
+		
+		$idealselect = 'test';
+		$msp 							= 	new MultiSafepay();
+		
+		if($configSettings['test_api'] == 'test'){
+			$msp->test                    	= true;
+		}else{
+			$msp->test                    	= false;
+		}
+		
+		$msp->merchant['account_id']  	= $configSettings['account_id'];
+		$msp->merchant['site_id']     	= $configSettings['site_id'];
+		$msp->merchant['site_code']   	= $configSettings['secure_code'];
+		
+		$iDealIssuers = $msp->getIdealIssuers();
+		
+		$idealselect = '<select name="payment[msp_idealissuer]" id="issuerselect">';
+		
+		foreach($iDealIssuers['issuers'] as $issuer)
+		{
+			$idealselect .= '<option value="'.$issuer['code']['VALUE'].'">'.$issuer['description']['VALUE'].'</option>';
+		}
+		$idealselect .= '</select>';
+		
+		if($configSettings['test_api'] == 'test'){
+			return $iDealIssuers['issuers'];
+		}else{
+			//print_r($iDealIssuers['issuers']);
+			
+			return $iDealIssuers['issuers']['issuer'];
+		}
+		
+		//return $iDealIssuers;
+	}
 	
 	/**
 	* Notification URL of the model
@@ -142,6 +186,10 @@ abstract class Mage_Msp_Model_Gateway_Abstract extends Mage_Payment_Model_Method
 	public function getGateway()
 	{
 		return $this->_gateway;
+	}
+	
+	public function getIdealIssuer(){
+		return $this->_idealissuer;
 	}
   
 	/**

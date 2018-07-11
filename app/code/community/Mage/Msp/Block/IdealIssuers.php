@@ -12,16 +12,11 @@ class Mage_Msp_Block_IdealIssuers extends Mage_Payment_Block_Form
         }
     }
  
-    public function getPaymentOptions()
-    {
-        $msp = Mage::getSingleton("msp/gateway_ideal");
-        $base = $msp->getBase();
-        $options = $base->getGateways();
-        
-        if (!isset($options['IDEAL']['issuers']))
-        {
-			return array();
-        }
-        return $options['IDEAL']['issuers'];
-    }
+	
+	public function getIdealIssuers(){
+		$msp = Mage::getSingleton("msp/gateway_ideal");
+        $base = $msp->getIdealIssuers();
+		return $base;
+	}
+	
 }

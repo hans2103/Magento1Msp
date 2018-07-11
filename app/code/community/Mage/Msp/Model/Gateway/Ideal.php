@@ -8,28 +8,38 @@ class Mage_Msp_Model_Gateway_Ideal extends Mage_Msp_Model_Gateway_Abstract
 	
 	protected $_formBlockType = 'msp/idealIssuers';  
 
-	public function setParams($params)
-	{
-		if (isset($params['issuer']))
-		{
-			$this->_issuer = preg_replace("|[^a-zA-Z]+|", "", $params['issuer']);
-		}
-	}
-
 	public function assignData($data)
 	{
-		if (!($data instanceof Varien_Object)) 
-		{
+		if ( !($data instanceof Varien_Object) ) {
 			$data = new Varien_Object($data);
 		}
-
-		$this->_issuer = preg_replace("|[^a-zA-Z]+|", "", $data->getMspIdealissuer());
+			//Mage::register('bank_id', 'wasdfasdfatf');
+			foreach($data as $key => $value)
+			{
+				if($key == '_data'){
+					foreach($value as $index => $val)
+					{
+					$string .= $index.' - '. $val.'<br />';
+						if($index == 'bankid'){
+							$bank_id = $val;
+						}	
+					}
+				}
+			}
+			if(strlen(Mage::registry('bank_id')) == 0)
+			{
+				Mage::register('bank_id', $bank_id );
+			}
+	
+			$_SESSION['bankid'] = $bank_id;
+			
 		return $this;
 	}
+
 	
 	public function getOrderPlaceRedirectUrl() 
 	{
-		return $this->getModelUrl("msp/standard/redirect/issuer/" . $this->_issuer);
+		return $this->getModelUrl("msp/standard/redirect/issuer/" . $this->_issuer );
 	}
 	
 	public function getPayment($storeId = null) 
@@ -37,5 +47,11 @@ class Mage_Msp_Model_Gateway_Ideal extends Mage_Msp_Model_Gateway_Abstract
 		$payment = parent::getPayment($storeId);
 		$payment->setIssuer($this->_issuer);
 		return $payment;
+	}
+	
+	public function getIdealIssuers()
+	{
+		$idealissuers = parent::getIdealIssuersHTML($storeId);
+		return $idealissuers;
 	}
 }
