@@ -18,8 +18,6 @@ abstract class Mage_Msp_Model_Gateway_Abstract extends Mage_Payment_Model_Method
 	public $payment;
 
 	
-	
-	
 	// For 1.3.2.4
 	public function isAvailable($quote=null)
 	{
@@ -122,7 +120,7 @@ abstract class Mage_Msp_Model_Gateway_Abstract extends Mage_Payment_Model_Method
 			$configSettings = Mage::getStoreConfig($this->_settings . "/settings", $storeId);
 		}
 		
-		$idealselect = 'test';
+		//$idealselect = 'test';
 		$msp 							= 	new MultiSafepay();
 		
 		if($configSettings['test_api'] == 'test'){
@@ -136,24 +134,12 @@ abstract class Mage_Msp_Model_Gateway_Abstract extends Mage_Payment_Model_Method
 		$msp->merchant['site_code']   	= $configSettings['secure_code'];
 		
 		$iDealIssuers = $msp->getIdealIssuers();
-		
-		$idealselect = '<select name="payment[msp_idealissuer]" id="issuerselect">';
-		
-		foreach($iDealIssuers['issuers'] as $issuer)
-		{
-			$idealselect .= '<option value="'.$issuer['code']['VALUE'].'">'.$issuer['description']['VALUE'].'</option>';
-		}
-		$idealselect .= '</select>';
-		
+
 		if($configSettings['test_api'] == 'test'){
 			return $iDealIssuers['issuers'];
 		}else{
-			//print_r($iDealIssuers['issuers']);
-			
 			return $iDealIssuers['issuers']['issuer'];
 		}
-		
-		//return $iDealIssuers;
 	}
 	
 	/**

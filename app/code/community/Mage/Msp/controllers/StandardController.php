@@ -44,8 +44,9 @@ class Mage_Msp_StandardController extends Mage_Core_Controller_Front_Action
 	*/
 	public function redirectAction() 
 	{
-		$this->getOnepage()->getQuote()->setIsActive(true);
-		$this->getOnepage()->getQuote()->save();
+		//TEST -> Saving the quote could be the cause of slow redirect to MSP. Can we keep the cart and save the quote after a transaction and speed up the processing?
+		//$this->getOnepage()->getQuote()->setIsActive(true);
+		//$this->getOnepage()->getQuote()->save();
 
 		$paymentModel = Mage::getSingleton("msp/" . $this->getGatewayModel());
 		$paymentModel->setParams($this->getRequest()->getParams());

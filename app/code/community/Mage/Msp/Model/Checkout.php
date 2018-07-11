@@ -29,6 +29,9 @@ class Mage_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
 		return false;
 	}
   
+/*	
+	TEST: Disabled this because we don't need this one and in some situations prevents an invoice to be created within Magento.
+
 	public function invoiceNotification(Varien_Event_Observer $observer) 
 	{
 		// Get invoice & order Id
@@ -87,7 +90,7 @@ class Mage_Msp_Model_Checkout extends Mage_Payment_Model_Method_Abstract
 			$base->log( "Error " . $api->error_code . ": " . $api->error );
 			exit();
 		}
-	}
+	}*/
   
 	// need this for 1.3.x.x, or it will always be true
 	public function isAvailable($quote = null)
