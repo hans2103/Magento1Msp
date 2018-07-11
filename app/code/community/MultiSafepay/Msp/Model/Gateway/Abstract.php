@@ -375,9 +375,39 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
         $refunded_servicecost = $data['servicecost'];
 
 
-        if ($refunded_servicecost != $order->getServicecost()) {
-            $amount = $amount - $order->getServicecost() + $refunded_servicecost;
+
+		/**	
+		*
+        */
+
+		$gateway_data = $order->getPayment()->getData();
+        $gateway = strtoupper(str_replace("msp_", '', $payment->getCode()));
+
+
+      
+
+        // currency check
+        $isAllowConvert = Mage::getStoreConfigFlag('msp/settings/allow_convert_currency');
+        
+        $currencies = explode(',', Mage::getStoreConfig('msp_gateways/' . strtolower($payment->getCode()) . '/allowed_currency'));
+        $canUseCurrentCurrency = in_array(Mage::app()->getStore()->getCurrentCurrencyCode(), $currencies);
+
+        $currentCurrencyCode = $order->getOrderCurrencyCode();
+        $baseCurrencyCode = $order->getGlobalCurrencyCode();
+        
+		
+		if($isAllowConvert){
+			$amount2 = $amount;
+			$currency = $baseCurrencyCode;
+        }else{
+	       $amount2 = $this->_convertCurrency($amount, $baseCurrencyCode, $currentCurrencyCode);
+	       $currency =$currentCurrencyCode;
         }
+           
+
+       /* if ($refunded_servicecost != $order->getServicecost()) {
+            $amount = $amount - $order->getServicecost() + $refunded_servicecost;
+        }*/
 
 
         switch ($payment->getCode()) {
@@ -439,7 +469,7 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
                 $config['api_key'] = $config['api_key_pad'];
             }
         }
-        
+
 
         // build request
         $mapi = new MultiSafepay();
@@ -449,13 +479,15 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
         $mapi->merchant['site_code'] = $config['secure_code'];
         $mapi->merchant['api_key'] = $config['api_key'];
         $mapi->transaction['id'] = $order->getIncrementId();
-        $mapi->transaction['amount'] = $amount * 100; //$order->getGrandTotal() * 100;
-        $mapi->transaction['currency'] = Mage::app()->getStore()->getCurrentCurrencyCode();
+        $mapi->transaction['amount'] = $amount2 * 100; //$order->getGrandTotal() * 100;
+        $mapi->transaction['currency'] = $currency;
         $mapi->signature = sha1($config['site_id'] . $config['secure_code'] . $mapi->transaction['id']);
 
+        Mage::log($mapi, null, 'MultiSafepay-Refunds.log');
 
         $response = $mapi->refundTransaction();
 
+        Mage::log($response, null, 'MultiSafepay-Refunds.log');
 
         if ($mapi->error) {
             Mage::getSingleton('adminhtml/session')->addError($mapi->error_code . ' - ' . $mapi->error);
@@ -465,5 +497,28 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
         }
         return $this;
     }
+    
+     protected function _convertCurrency($amount, $currentCurrencyCode, $targetCurrencyCode) {
+        if ($currentCurrencyCode == $targetCurrencyCode) {
+            return $amount;
+        }
+
+        $currentCurrency = Mage::getModel('directory/currency')->load($currentCurrencyCode);
+        $rateCurrentToTarget = $currentCurrency->getAnyRate($targetCurrencyCode);
+
+        if ($rateCurrentToTarget === false) {
+            Mage::throwException(Mage::helper("msp")->__("Imposible convert %s to %s", $currentCurrencyCode, $targetCurrencyCode));
+        }
+
+        //Disabled check, fixes PLGMAG-10. Magento seems to not to update USD->EUR rate in db, resulting in wrong conversions. Now we calculate the rate manually and and don't trust Magento stored rate.
+        // if (strlen((string) $rateCurrentToTarget) < 12) { 
+        $revertCheckingCode = Mage::getModel('directory/currency')->load($targetCurrencyCode);
+        $revertCheckingRate = $revertCheckingCode->getAnyRate($currentCurrencyCode);
+        $rateCurrentToTarget = 1 / $revertCheckingRate;
+        //}
+
+        return round($amount * $rateCurrentToTarget, 2);
+    }
+
 
 }

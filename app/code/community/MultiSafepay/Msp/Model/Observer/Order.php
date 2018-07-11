@@ -115,14 +115,14 @@ class MultiSafepay_Msp_Model_Observer_Order extends MultiSafepay_Msp_Model_Obser
         $config = Mage::getStoreConfig($settingsPathPrefix, $order->getStoreId());
 
         $api = Mage::getModel('msp/api_paylink');
-		$configMain = Mage::getStoreConfig('msp/settings', $order->getStoreId());
+        $configMain = Mage::getStoreConfig('msp/settings', $order->getStoreId());
         if (!$api->isPaymentLinkCreated($order)) {
             if ($payment->getCode() == self::MSP_GENERAL_PAD_CODE || $payment->getCode() == self::MSP_GENERAL_KLARNA_CODE || $payment->getCode() == self::MSP_GENERAL_EINVOICE_CODE) {
-              
-           
+
+
                 $api->test = ($config['test_api_pad'] == 'test');
                 $suffix = '';
-				
+
                 if ($api->test) {
                     $suffix = '_test';
                 }
@@ -142,7 +142,7 @@ class MultiSafepay_Msp_Model_Observer_Order extends MultiSafepay_Msp_Model_Obser
                 $api->transaction['id'] = $configMain['daysactive'];
                 $api->debug = $config['debug'];
             }
-			$api->transaction['gateway_reset'] = $configMain['gateway_reset'];
+            $api->transaction['gateway_reset'] = $configMain['gateway_reset'];
             if ($payment->getCode() == self::MSP_FASTCHECKOUT_CODE) {
                 $api->transaction['id'] = $order->getQuoteId();
             } else {
@@ -155,7 +155,7 @@ class MultiSafepay_Msp_Model_Observer_Order extends MultiSafepay_Msp_Model_Obser
 
 
             $api->transaction['currency'] = $currencyCode;
-            
+
 
 
             $response = $api->getPaymentLink($order);

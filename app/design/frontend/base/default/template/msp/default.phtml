@@ -10,6 +10,7 @@
 $methods = $this->getMethods();
 $oneMethod = count($methods) <= 1;
 $lang_code = 'en';
+$locale = explode('_', Mage::app()->getLocale()->getLocale());
 if (is_array($locale) && isset($locale[0])) {
     $lang_code = strtolower($locale[0]);
 }

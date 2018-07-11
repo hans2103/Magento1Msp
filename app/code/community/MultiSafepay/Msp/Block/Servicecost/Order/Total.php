@@ -51,7 +51,7 @@ class MultiSafepay_Msp_Block_Servicecost_Order_Total extends Mage_Core_Block_Tem
             $this->getParentBlock()->addTotal(new Varien_Object(array(
                 'code' => 'servicecost',
                 'strong' => false,
-                'label' => Mage::helper('msp')->getFeeLabel($code).' (incl Tax)',
+                'label' => Mage::helper('msp')->getFeeLabel($code) . ' (incl Tax)',
                 'value' => $source instanceof Mage_Sales_Model_Order_Creditmemo ? - $value : $value
             )));
         }

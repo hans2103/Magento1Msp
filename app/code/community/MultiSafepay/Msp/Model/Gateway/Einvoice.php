@@ -10,7 +10,7 @@ class MultiSafepay_Msp_Model_Gateway_Einvoice extends MultiSafepay_Msp_Model_Gat
     protected $_code = "msp_einvoice";
     public $_model = "einvoice";
     public $_gateway = "EINVOICE";
-   // protected $_formBlockType = 'msp/einvoice';
+    // protected $_formBlockType = 'msp/einvoice';
     protected $_canUseCheckout = true;
     public $giftcards = array(
         'msp_webgift',
@@ -107,8 +107,8 @@ class MultiSafepay_Msp_Model_Gateway_Einvoice extends MultiSafepay_Msp_Model_Gat
         } else {
             $accountnumber = '';
         }
-        
-        
+
+
         if (isset($_POST['payment']['phonenumber'])) {
             $phonenumber = $_POST['payment']['phonenumber'];
         } else {
@@ -117,9 +117,9 @@ class MultiSafepay_Msp_Model_Gateway_Einvoice extends MultiSafepay_Msp_Model_Gat
 
         $url = $this->getModelUrl("msp/standard/redirect/issuer/" . $this->_issuer);
         if (!strpos($url, "?"))
-            $url .= '?birthday=' . $birthday . '&accountnumber=' . $accountnumber. '&phonenumber=' . $phonenumber;
+            $url .= '?birthday=' . $birthday . '&accountnumber=' . $accountnumber . '&phonenumber=' . $phonenumber;
         else
-            $url .= '&birthday=' . $birthday . '&accountnumber=' . $accountnumber. '&phonenumber=' . $phonenumber;
+            $url .= '&birthday=' . $birthday . '&accountnumber=' . $accountnumber . '&phonenumber=' . $phonenumber;
         return $url;
     }
 
