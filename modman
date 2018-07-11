@@ -70,6 +70,7 @@ media/msp/it/msp_creditcard.png            media/msp/it/msp_creditcard.png
 media/msp/it/msp_boekenbon.png            media/msp/it/msp_boekenbon.png
 media/msp/it/msp_babygiftcard.png            media/msp/it/msp_babygiftcard.png
 media/msp/it/msp_podium.png            media/msp/it/msp_podium.png
+media/msp/it/msp_alipay.png            media/msp/it/msp_alipay.png
 media/msp/it/msp_banktransfer.png            media/msp/it/msp_banktransfer.png
 media/msp/it/button.png            media/msp/it/button.png
 media/msp/it/msp_paysafecard.png            media/msp/it/msp_paysafecard.png
@@ -127,6 +128,7 @@ media/msp/nl/msp_creditcard.png            media/msp/nl/msp_creditcard.png
 media/msp/nl/msp_boekenbon.png            media/msp/nl/msp_boekenbon.png
 media/msp/nl/msp_babygiftcard.png            media/msp/nl/msp_babygiftcard.png
 media/msp/nl/msp_podium.png            media/msp/nl/msp_podium.png
+media/msp/nl/msp_alipay.png            media/msp/nl/msp_alipay.png
 media/msp/nl/msp_banktransfer.png            media/msp/nl/msp_banktransfer.png
 media/msp/nl/button.png            media/msp/nl/button.png
 media/msp/nl/msp_paysafecard.png            media/msp/nl/msp_paysafecard.png
@@ -169,6 +171,7 @@ media/msp/de/msp_creditcard.png            media/msp/de/msp_creditcard.png
 media/msp/de/msp_boekenbon.png            media/msp/de/msp_boekenbon.png
 media/msp/de/msp_babygiftcard.png            media/msp/de/msp_babygiftcard.png
 media/msp/de/msp_podium.png            media/msp/de/msp_podium.png
+media/msp/de/msp_alipay.png            media/msp/de/msp_alipay.png
 media/msp/de/msp_banktransfer.png            media/msp/de/msp_banktransfer.png
 media/msp/de/button.png            media/msp/de/button.png
 media/msp/de/msp_paysafecard.png            media/msp/de/msp_paysafecard.png
@@ -211,6 +214,7 @@ media/msp/fr/msp_creditcard.png            media/msp/fr/msp_creditcard.png
 media/msp/fr/msp_boekenbon.png            media/msp/fr/msp_boekenbon.png
 media/msp/fr/msp_babygiftcard.png            media/msp/fr/msp_babygiftcard.png
 media/msp/fr/msp_podium.png            media/msp/fr/msp_podium.png
+media/msp/fr/msp_alipay.png            media/msp/fr/msp_alipay.png
 media/msp/fr/msp_banktransfer.png            media/msp/fr/msp_banktransfer.png
 media/msp/fr/button.png            media/msp/fr/button.png
 media/msp/fr/msp_paysafecard.png            media/msp/fr/msp_paysafecard.png
@@ -253,6 +257,7 @@ media/msp/es/msp_creditcard.png            media/msp/es/msp_creditcard.png
 media/msp/es/msp_boekenbon.png            media/msp/es/msp_boekenbon.png
 media/msp/es/msp_babygiftcard.png            media/msp/es/msp_babygiftcard.png
 media/msp/es/msp_podium.png            media/msp/es/msp_podium.png
+media/msp/es/msp_alipay.png            media/msp/es/msp_alipay.png
 media/msp/es/msp_banktransfer.png            media/msp/es/msp_banktransfer.png
 media/msp/es/button.png            media/msp/es/button.png
 media/msp/es/msp_paysafecard.png            media/msp/es/msp_paysafecard.png
@@ -295,6 +300,7 @@ media/msp/en/msp_creditcard.png            media/msp/en/msp_creditcard.png
 media/msp/en/msp_boekenbon.png            media/msp/en/msp_boekenbon.png
 media/msp/en/msp_babygiftcard.png            media/msp/en/msp_babygiftcard.png
 media/msp/en/msp_podium.png            media/msp/en/msp_podium.png
+media/msp/en/msp_alipay.png            media/msp/en/msp_alipay.png
 media/msp/en/msp_banktransfer.png            media/msp/en/msp_banktransfer.png
 media/msp/en/button.png            media/msp/en/button.png
 media/msp/en/msp_paysafecard.png            media/msp/en/msp_paysafecard.png
@@ -340,6 +346,7 @@ skin/adminhtml/default/default/images/msp/nl/msp_creditcard.png            skin/
 skin/adminhtml/default/default/images/msp/nl/msp_boekenbon.png            skin/adminhtml/default/default/images/msp/nl/msp_boekenbon.png
 skin/adminhtml/default/default/images/msp/nl/msp_babygiftcard.png            skin/adminhtml/default/default/images/msp/nl/msp_babygiftcard.png
 skin/adminhtml/default/default/images/msp/nl/msp_podium.png            skin/adminhtml/default/default/images/msp/nl/msp_podium.png
+skin/adminhtml/default/default/images/msp/nl/msp_alipay.png            skin/adminhtml/default/default/images/msp/nl/msp_alipay.png
 skin/adminhtml/default/default/images/msp/nl/msp_banktransfer.png            skin/adminhtml/default/default/images/msp/nl/msp_banktransfer.png
 skin/adminhtml/default/default/images/msp/nl/button.png            skin/adminhtml/default/default/images/msp/nl/button.png
 skin/adminhtml/default/default/images/msp/nl/msp_paysafecard.png            skin/adminhtml/default/default/images/msp/nl/msp_paysafecard.png
