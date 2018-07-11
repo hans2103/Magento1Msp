@@ -20,6 +20,7 @@ app/design/frontend/base/default/template/msp/bno.phtml            app/design/fr
 app/design/frontend/base/default/template/msp/agreements.phtml            app/design/frontend/base/default/template/msp/agreements.phtml
 app/design/frontend/base/default/template/msp/klarna.phtml            app/design/frontend/base/default/template/msp/klarna.phtml
 app/design/adminhtml/default/default/layout/msp.xml            app/design/adminhtml/default/default/layout/msp.xml
+app/design/adminhtml/default/default/template/msp/servicecost/order/creditmemo/create/totals/adjustments.phtml            app/design/adminhtml/default/default/template/msp/servicecost/order/creditmemo/create/totals/adjustments.phtml
 app/design/adminhtml/default/default/template/msp/idealissuers.phtml            app/design/adminhtml/default/default/template/msp/idealissuers.phtml
 app/design/adminhtml/default/default/template/msp/gateways.phtml            app/design/adminhtml/default/default/template/msp/gateways.phtml
 # lib
