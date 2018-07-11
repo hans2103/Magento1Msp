@@ -96,10 +96,8 @@ class MultiSafepay_Msp_Helper_Data extends Mage_Core_Helper_Abstract
         $statuses = array('cancelled', 'expired', 'declined', 'void');
 
         if (Mage::getStoreConfig('payment/msp/keep_cart', $storeId) ||
-                Mage::getStoreConfig('msp/settings/keep_cart', $storeId) ||
-                $gatewayMethod == 'msp_payafter' ||
-                $gatewayMethod == 'msp_einvoice' ||
-                $gatewayMethod == 'msp_klarna') {
+            Mage::getStoreConfig('msp/settings/keep_cart', $storeId) ||
+            in_array ($gatewayMethod, array ('msp_payafter', 'msp_einvoice', 'msp_klarna', 'msp_afterpay')) ) {
 
             $needRestore = true;
         }

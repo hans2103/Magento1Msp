@@ -74,7 +74,7 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
 
         $paymentModel->setParams($this->getRequest()->getParams());
 
-        if ($selected_gateway != 'PAYAFTER' && $selected_gateway != 'KLARNA' && $selected_gateway != 'EINVOICE') {
+        if ( !in_array ($selected_gateway, array ('PAYAFTER', 'KLARNA', 'EINVOICE', 'AFTERPAY'))) {
             $paymentLink = $paymentModel->startTransaction();
         } else {
             $paymentLink = $paymentModel->startPayAfterTransaction();
@@ -177,7 +177,9 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
                 Mage::getStoreConfig('msp/settings/keep_cart', $quote->getStoreId()) ||
                 $quote->getPayment()->getMethod() == 'msp_payafter' ||
                 $quote->getPayment()->getMethod() == 'msp_einvoice' ||
-                $quote->getPayment()->getMethod() == 'msp_klarna') {
+                $quote->getPayment()->getMethod() == 'msp_klarna'   ||
+                $quote->getPayment()->getMethod() == 'msp_afterpay'
+            ) {
 
             if ($quoteId = $checkout->getLastQuoteId()) {
                 $quote = Mage::getModel('sales/quote')->load($quoteId);
@@ -346,7 +348,7 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
 
             if ($offset == null) {
                 echo '{
-                        "success": false, 
+                        "success": false,
                         "data": {
                             "error_code": "QW-4003",
                             "error": "Offset not set."
@@ -360,7 +362,7 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
 
             if ($limit == null) {
                 echo '{
-                        "success": false, 
+                        "success": false,
                         "data": {
                             "error_code": "QW-4004",
                             "error": "Limit not set."
@@ -865,7 +867,7 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
 
             if ($product->getTypeId() == "bundle" || $product->getTypeId() == "downloadable") {
                 echo '{
-                        "success": false, 
+                        "success": false,
                         "data": {
                             "error_code": "QW-4005",
                             "error": "Product type not supported."
@@ -1281,7 +1283,7 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
 
     function getCategoryTree($recursionLevel, $storeId = 1)
     {
-        $parent = 0; //Mage::app()->getStore()->getRootCategoryId();    
+        $parent = 0; //Mage::app()->getStore()->getRootCategoryId();
         $tree = Mage::getResourceModel('catalog/category_tree');
         /* @var $tree Mage_Catalog_Model_Resource_Category_Tree */
 
@@ -1406,7 +1408,7 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
         $stock = '';
         if (empty($product_id) && empty($variant_id)) {
             echo '{
-                        "success": false, 
+                        "success": false,
                         "data": {
                             "error_code": "QW-4002",
                             "error": "Product ID not set."
@@ -2008,7 +2010,7 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
          */
 
 
-        //Get tax calculation method 
+        //Get tax calculation method
         switch (Mage::getStoreConfig('tax/calculation/algorithm', Mage::app()->getStore()->getId())) {
             case Mage_Tax_Model_Calculation::CALC_UNIT_BASE:
                 $tax_calculation = 'unit';
@@ -2267,7 +2269,7 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
             $this->getResponse()->setHeader('X-Feed-Version', '1.0', true);
             $this->getResponse()->setHeader('Shop-Type', 'Magento', true);
             $this->getResponse()->setHeader('Shop-Version', Mage::getVersion(), true);
-            $this->getResponse()->setHeader('Plugin-Version', '2.4.0', true);
+            $this->getResponse()->setHeader('Plugin-Version', '2.4.1', true);
 
             if ($token !== $auth[1] and round($timestamp - $auth[0]) > 10) {
                 $keys_match = false;
@@ -2281,7 +2283,7 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
 
         if (!$config["allow_fcofeed"]) {
             $error = '{
-                "success": false, 
+                "success": false,
                 "data": {
                     "error_code": "QW-2000",
                     "error": "You are not allowed to request the product feed."
@@ -2299,7 +2301,7 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
             $identifier = $this->getRequest()->getQuery('identifier');
             if ($identifier == null) {
                 $error = '{
-                    "success": false, 
+                    "success": false,
                     "data": {
                         "error_code": "QW-1000",
                         "error": "Identifier not set."
@@ -2320,7 +2322,7 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
                         $json = $this->getProductsFeed();
                     } catch (Exception $e) {
                         $error = '{
-                        "success": false, 
+                        "success": false,
                         "data": {
                             "error_code": "QW-4000",
                             "error": "Error generating product feed."
@@ -2338,7 +2340,7 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
                         $json = $this->getTotalProductsFeed();
                     } catch (Exception $e) {
                         $error = '{
-                        "success": false, 
+                        "success": false,
                         "data": {
                             "error_code": "QW-4001",
                             "error": "Error requesting product totals count."
@@ -2356,7 +2358,7 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
                         $json = $this->getCategoriesFeed();
                     } catch (Exception $e) {
                         $error = '{
-                        "success": false, 
+                        "success": false,
                         "data": {
                             "error_code": "QW-6000",
                             "error": "Error generating category data feed."
@@ -2374,7 +2376,7 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
                         $json = $this->getStockFeed();
                     } catch (Exception $e) {
                         $error = '{
-                        "success": false, 
+                        "success": false,
                         "data": {
                             "error_code": "QW-7000",
                             "error": "Error generating stock data feed."
@@ -2389,7 +2391,7 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
                     break;
                 case "tax":
                     $error = '{
-                        "success": false, 
+                        "success": false,
                         "data": {
                             "error_code": "QW-9000",
                             "error": "Deprecated request."
@@ -2406,7 +2408,7 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
                         $json = $this->getShippingFeed();
                     } catch (Exception $e) {
                         $error = '{
-                        "success": false, 
+                        "success": false,
                         "data": {
                             "error_code": "QW-8000",
                             "error": "Error generating shipping data feed."
@@ -2421,7 +2423,7 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
                     break;
                 case "languages":
                     $error = '{
-                        "success": false, 
+                        "success": false,
                         "data": {
                             "error_code": "QW-9000",
                             "error": "Deprecated request."
@@ -2435,7 +2437,7 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
                     break;
                 case "countries":
                     $error = '{
-                        "success": false, 
+                        "success": false,
                         "data": {
                             "error_code": "QW-9000",
                             "error": "Deprecated request."
@@ -2449,7 +2451,7 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
                     break;
                 case "metadata":
                     $error = '{
-                        "success": false, 
+                        "success": false,
                         "data": {
                             "error_code": "QW-9000",
                             "error": "Deprecated request."
@@ -2466,7 +2468,7 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
                         $json = $this->getStoresFeed();
                     } catch (Exception $e) {
                         $error = '{
-                        "success": false, 
+                        "success": false,
                         "data": {
                             "error_code": "QW-5000",
                             "error": "Error generating shop data feed."
@@ -2486,7 +2488,7 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
             //$this->getResponse()->setBody($json);
         } else {
             $error = '{
-                    "success": false, 
+                    "success": false,
                     "data": {
                         "error_code": "QW-3000",
                         "error": "Signature error."

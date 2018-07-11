@@ -12,10 +12,13 @@ class MultiSafepay_Msp_Model_Observer_Shipment extends MultiSafepay_Msp_Model_Ob
         'msp_payafter',
         'msp_einvoice',
         'msp_klarna',
+        'msp_betaalplan',
+        'msp_afterpay',
     );
 
     public function sales_order_shipment_save_after(Varien_Event_Observer $observer)
     {
+
         /** @var $event Varien_Event */
         $event = $observer->getEvent();
 
@@ -30,17 +33,18 @@ class MultiSafepay_Msp_Model_Observer_Shipment extends MultiSafepay_Msp_Model_Ob
             return $this;
         }
 
-
-
         /** @var $payment Mage_Payment_Model_Method_Abstract */
         $payment = $order->getPayment()->getMethodInstance();
 
         // check payment method is from MultiSafepayment
+
+
         if (!in_array($payment->getCode(), $this->availablePaymentMethodCodes)) {
             return $this;
         }
 
         // check order's payment method  is enabled now
+
         if (!in_array($payment->getCode(), $this->_getAllActivePaymentMethods($order->getStoreId()))) {
             return $this;
         }
@@ -53,23 +57,31 @@ class MultiSafepay_Msp_Model_Observer_Shipment extends MultiSafepay_Msp_Model_Ob
         /** @var $base MultiSafepay_Msp_Model_Base */
         $base = $checkout->getBase($order->getId());
 
-        $configPayAfter = Mage::getStoreConfig('msp_gateways/' . $order->getPayment()->getMethodInstance()->getCode(), $order->getStoreId());
-        $configGateway = Mage::getStoreConfig('msp/settings', $order->getStoreId());
+        $configGateway  = Mage::getStoreConfig('msp/settings', $order->getStoreId());
 
         /** @var $api MultiSafepay_Msp_Model_Api_Shipment */
         $api = Mage::getSingleton('msp/api_shipment');
 
-        $suffix = '';
-        if ($configPayAfter['test_api_pad'] == 'test') {
-            $suffix = '_test';
+        if ( in_array ($payment->getCode(), array ( 'msp_payafter', 'msp_einvoice', 'msp_klarna'))){
+
+            $settings = Mage::getStoreConfig('msp_gateways/' . $order->getPayment()->getMethodInstance()->getCode(), $order->getStoreId());
+
+            $api->test = ($settings['test_api_pad'] === 'test');
+
+            $suffix = $api->test ? '_test' : '';
+
+            $api->merchant['account_id'] = $settings['account_id_pad' . $suffix];
+            $api->merchant['site_id']    = $settings['site_id_pad' . $suffix];
+            $api->merchant['site_code']  = $settings['secure_code_pad' . $suffix];
+
+        }else{
+            $api->test = ($configGateway['test_api'] === 'test');
+            $api->merchant['account_id'] = $configGateway['account_id'];
+            $api->merchant['site_id']    = $configGateway['site_id'];
+            $api->merchant['site_code']  = $configGateway['secure_code'];
         }
 
-        $api->test = ($configPayAfter['test_api_pad'] == 'test');
         $api->debug = $configGateway['debug'];
-
-        $api->merchant['account_id'] = $configPayAfter['account_id_pad' . $suffix];
-        $api->merchant['site_id'] = $configPayAfter['site_id_pad' . $suffix];
-        $api->merchant['site_code'] = $configPayAfter['secure_code_pad' . $suffix];
 
         $api->transaction['id'] = $order->getIncrementId();
         $api->transaction['invoice_id'] = $invoiceId;

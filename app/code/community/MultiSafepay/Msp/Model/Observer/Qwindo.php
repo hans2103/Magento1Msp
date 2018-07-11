@@ -337,6 +337,10 @@ class MultiSafepay_Msp_Model_Observer_Qwindo extends MultiSafepay_Msp_Model_Obse
                     }
                 }
 
+                if(!isset($product_child)) {
+                    return $this;
+                }
+
                 /**
                  * Get child product tax rule. We need to set this as the main product is of type grouped and does not have this value.
                  * */

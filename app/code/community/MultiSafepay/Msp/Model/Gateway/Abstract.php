@@ -32,6 +32,7 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
     const MSP_GENERAL_CODE = 'msp';
     const MSP_FASTCHECKOUT_CODE = 'mspcheckout';
     const MSP_GENERAL_PAD_CODE = 'msp_payafter';
+    const MSP_GENERAL_AFTERPAY_CODE = 'msp_afterpay';
     const MSP_GENERAL_KLARNA_CODE = 'msp_klarna';
     const MSP_GENERAL_EINVOICE_CODE = 'msp_einvoice';
     const MSP_GATEWAYS_CODE_PREFIX = 'msp_';
@@ -86,6 +87,9 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
         'msp_gezondheidsbon',
         'msp_fashioncheque',
         'msp_fashiongiftcard',
+        'msp_betaalplan',
+        'msp_trustly',
+        'msp_afterpay',
     );
     public $giftcards = array(
         'msp_webgift',
@@ -133,9 +137,12 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
         'msp_idealqr',
         'msp_amex',
         'msp_alipay',
+        'msp_betaalplan',
         /* Start Paysafecard */
-        'msp_paysafecard'
+        'msp_paysafecard',
             /* End Paysafecard */
+        'msp_trustly',
+        'msp_afterpay',
     );
 
     public function __construct()
@@ -455,7 +462,7 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
         $config = Mage::getStoreConfig($settingsPathPrefix, $order->getStoreId());
 
         // use refund by Credit Memo is enabled
-        $pathCreditMemoIsEnabled = (($payment->getCode() == self::MSP_GENERAL_PAD_CODE || $payment->getCode() == self::MSP_GENERAL_KLARNA_CODE || $payment->getCode() == self::MSP_GENERAL_EINVOICE_CODE)) ? 'msp/settings' : $settingsPathPrefix;
+        $pathCreditMemoIsEnabled = (($payment->getCode() == self::MSP_GENERAL_PAD_CODE || $payment->getCode() == self::MSP_GENERAL_KLARNA_CODE || $payment->getCode() == self::MSP_GENERAL_EINVOICE_CODE || $payment->getCode() == self::MSP_GENERAL_AFTERPAY_CODE)) ? 'msp/settings' : $settingsPathPrefix;
         if (!Mage::getStoreConfigFlag($pathCreditMemoIsEnabled . '/use_refund_credit_memo', $order->getStoreId())) {
             Mage::getSingleton('adminhtml/session')->addNotice(Mage::helper('msp')->__('Refund has not been send to MultiSafepay. You need to refund manually at MultiSafepay. Please check if the creditmemo option is configured within the MultiSafepay payment methods configuration!'));
             return $this;
@@ -484,8 +491,8 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
             }
         }
 
-        //This is a PAD/Klarna/Einvoice refund so we need to update the checkout data. We will be using the JSON API instead
-        if ($payment->getCode() == self::MSP_GENERAL_PAD_CODE || $payment->getCode() == self::MSP_GENERAL_KLARNA_CODE || $payment->getCode() == self::MSP_GENERAL_EINVOICE_CODE) {
+        //This is a PAD/Klarna/Einvoice/afterpay refund so we need to update the checkout data. We will be using the JSON API instead
+        if ($payment->getCode() == self::MSP_GENERAL_PAD_CODE || $payment->getCode() == self::MSP_GENERAL_KLARNA_CODE || $payment->getCode() == self::MSP_GENERAL_EINVOICE_CODE || $payment->getCode() == self::MSP_GENERAL_AFTERPAY_CODE) {
             if ($config['test_api'] == 'test') {
                 $mspurl = 'https://testapi.multisafepay.com/v1/json/';
             } else {

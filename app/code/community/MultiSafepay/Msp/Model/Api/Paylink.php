@@ -46,13 +46,14 @@ class MultiSafepay_Msp_Model_Api_Paylink
         'msp' => '',
         'msp_ideal' => 'IDEAL',
         'msp_dotpay' => 'DOTPAY',
+        //'msp_afterpay', for now we dont allow afterpay manual transaction requests
         //'msp_payafter', for now we dont allow payafter manual transaction requests
         //'msp_einvoice', for now we dont allow einvoice manual transaction requests
         'msp_mistercash' => 'MISTERCASH',
         'msp_visa' => 'VISA',
         'msp_paysafecard => PSAFECARD',
         'msp_eps' => 'EPS',
-        'msp_ing' => 'ING',
+        'msp_ing' => 'INGHOME',
         'msp_kbc' => 'KBC',
         'msp_belfius' => 'Belfius',
         'msp_idealqr' => 'IDEALQR',
@@ -86,6 +87,8 @@ class MultiSafepay_Msp_Model_Api_Paylink
         'msp_vvvgiftcard',
         'msp_sportenfit',
         'msp_beautyandwellness',
+        'msp_betaalplan' => 'SANTANDER',
+        'msp_trustly' => 'TRUSTLY',
     );
 
     /**

@@ -59,6 +59,9 @@ class MultiSafepay_Msp_Model_Gateway_Klarna extends MultiSafepay_Msp_Model_Gatew
         'msp_directdebit',
         'msp_amex',
         'msp_alipay',
+        'msp_betaalplan',
+        'msp_trustly',
+        'msp_afterpay',
     );
 
     public function __construct()
