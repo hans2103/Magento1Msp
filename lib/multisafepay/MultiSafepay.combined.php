@@ -43,7 +43,7 @@ class MultiSafepay {
         'user_agent' => '',
         'referrer' => '',
         'bankaccount' => '',
-        'gender'    => '',
+        'gender' => '',
         'birthday' => ''
     );
     // customer-delivery data
@@ -1187,10 +1187,9 @@ class MultiSafepay {
      * Returns the string escaped for use in XML documents
      */
 
-    function xmlEscape($str) 
-   {
-   return htmlspecialchars($str, ENT_COMPAT, "UTF-8");
-   }
+    function xmlEscape($str) {
+        return htmlspecialchars($str, ENT_COMPAT, "UTF-8");
+    }
 
     /*
      * Returns the string with all XML escaping removed
@@ -2239,7 +2238,7 @@ class MspCart {
 
                 $xml_data->Pop($ship->type);
             } else if ($ship->type == "pickup") {
-                $xml_data->Push('pickup', array('name' => $ship->name, 'provider'=> $ship->provider));
+                $xml_data->Push('pickup', array('name' => $ship->name, 'provider' => $ship->provider));
                 $xml_data->Element('price', $ship->price, array('currency' => $this->currency));
                 $xml_data->Pop('pickup');
             }
@@ -3218,10 +3217,9 @@ class MspItem {
      * @param double $numeric_weight the weight of the item
      * 
      */
-    function xmlEscape($str) 
-   {
-   return htmlspecialchars($str, ENT_COMPAT, "UTF-8");
-   }
+    function xmlEscape($str) {
+        return htmlspecialchars($str, ENT_COMPAT, "UTF-8");
+    }
 
     /*
      * Returns the string with all XML escaping removed

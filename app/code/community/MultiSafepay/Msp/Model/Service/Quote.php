@@ -23,6 +23,7 @@ class MultiSafepay_Msp_Model_Service_Quote extends Mage_Sales_Model_Service_Quot
         'msp_babygiftcard',
         'msp_boekenbon',
         'msp_erotiekbon',
+        'msp_giveacard',
         'msp_parfumnl',
         'msp_parfumcadeaukaart',
         'msp_degrotespeelgoedwinkel',

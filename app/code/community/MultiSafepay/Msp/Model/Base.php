@@ -23,6 +23,43 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
     public $invoiceSaved = null;
     public $transdetails;
     public $mspDetails;
+    protected $_paid;
+    
+    public $methodMap = array(
+        'IDEAL' =>'msp_ideal',
+        'PAYAFTER'=>'msp_payafter',
+        'KLARNA'=>'msp_klarna',
+        'MISTERCASH'=>'msp_mistercash',
+        'VISA'=> 'msp_visa',
+        'MASTERCARD'=>'msp_mastercard',
+        'msp_banktransfer',
+        'MAESTRO'=>'msp_maestro',
+        'MAESTRO'=>'msp_paypal',
+        'AMEX'=>'msp_amex',
+        'WEBGIFT'=>'msp_webgift',
+        'EBON'=>'msp_ebon',
+        'BABYGIFTCARD'=>'msp_babygiftcard',
+        'BOEKENBON'=>'msp_boekenbon',
+        'EROTIEKBON'=>'msp_erotiekbon',
+        'GIVEACARD'=>'msp_giveacard',
+        'PARFUMNL'=>'msp_parfumnl',
+        'PARFUMCADEAUKAART'=>'msp_parfumcadeaukaart',
+        'DEGROTESPEELGOEDWINKEL'=>'msp_degrotespeelgoedwinkel',
+        'GIROPAY'=>'msp_giropay',
+        'MULTISAFEPAY'=>'msp_multisafepay',
+        'DIRECTBANK'=>'msp_directebanking',
+        'DIRDEB'=>'msp_directdebit',
+        'YOURGIFT'=>'msp_yourgift',
+        'WIJNCADEAU'=>'msp_wijncadeau',
+        'LIEF'=>'msp_lief',
+        'GEZONDHEIDSBON'=>'msp_gezondheidsbon',
+        'FASHIONCHEQUE'=>'msp_fashioncheque',
+        'FASHIONGIFTCARD'=>'msp_fashiongiftcard',
+        'PODIUM'=>'msp_podium',
+        'VVVGIFTCARD'=>'msp_vvvgiftcard',
+        'SPORTENFIT'=> 'msp_sportenfit',
+        'BEAUTYANDWELLNESS'=>'msp_beautyandwellness',
+    );
 
     /**
      * Set the config object of the Base
@@ -186,6 +223,10 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
         if ($creditmemo_enabled && ($mspStatus == 'refunded' || $mspStatus == 'partial_refunded')) {
             return true;
         }
+        
+        $usedMethod = $this->methodMap[$mspDetails['paymentdetails']['type']];
+        
+     
 
         /**
          *    Create the transaction details array
@@ -258,16 +299,23 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
             $order->setTotalPaid($details['order-total']['total']);
             $order->save();
         }
+        
+        
+
 
         $complete = false;
         $cancel = false;
         $newState = null;
         $newStatus = true; // makes Magento use the default status belonging to state
         $statusMessage = '';
-
+		$this->_paid = $details['transaction']['amount']/100;
 
         //If the order already has in invoice than it was paid for using another method? So if our transaction expires we shouldn't update it to cancelled because it was already invoiced.
         if ($order->hasInvoices() && $mspStatus == 'expired') {
+            return true;
+        }
+        
+        if(($usedMethod == 'PAYAFTER' || $usedMethod == 'KLARNA') && ($mspStatus == 'cancelled' || $mspStatus == 'void')){
             return true;
         }
 
@@ -298,6 +346,20 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
                     $transaction->setAdditionalInformation(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS, $this->transdetails);
                     $transaction->save();
                 }
+
+                
+                if($usedMethod != $payment->Method){
+	                $payment->setMethod($usedMethod);
+					$payment->save();
+                }
+                
+                
+                if(round($order->getGrandTotal(),2) != $this->_paid && $mspDetails['ewallet']['fastcheckout'] !='YES'){
+	            	$newState = Mage_Sales_Model_Order::STATE_PAYMENT_REVIEW;
+					$newStatus = Mage_Sales_Model_Order::STATE_PAYMENT_REVIEW;
+					$statusMessage = Mage::helper("msp")->__("Payment received for an amount that is not equal to the order total amount. Please verify the paid amount!");
+                }
+
                 break;
             case "uncleared":
                 $newState = Mage_Sales_Model_Order::STATE_NEW;
@@ -403,20 +465,20 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
 
             $products = $order->getAllItems();
 
-            if(Mage::getStoreConfigFlag('cataloginventory/options/can_subtract')){
-				$products = $order->getAllItems();
-				
-				foreach ($products as $itemId => $product) {
-					$id = $product->getProductId();
-					$stock_obj = Mage::getModel('cataloginventory/stock_item')->loadByProduct($id);
-					$stockData = $stock_obj->getData();
+            if (Mage::getStoreConfigFlag('cataloginventory/options/can_subtract')) {
+                $products = $order->getAllItems();
 
-					$new = $stockData['qty'] - $product->getQtyOrdered();
-					$stockData['qty'] = $new;
-					$stock_obj->setData($stockData);
-					$stock_obj->save();
-				}
-			}
+                foreach ($products as $itemId => $product) {
+                    $id = $product->getProductId();
+                    $stock_obj = Mage::getModel('cataloginventory/stock_item')->loadByProduct($id);
+                    $stockData = $stock_obj->getData();
+
+                    $new = $stockData['qty'] - $product->getQtyOrdered();
+                    $stockData['qty'] = $new;
+                    $stock_obj->setData($stockData);
+                    $stock_obj->save();
+                }
+            }
 
             $order->setBaseDiscountCanceled(0)
                     ->setBaseShippingCanceled(0)
@@ -443,8 +505,9 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
                 $is_already_invoiced = true;
             } else {
                 $is_already_invoiced = false;
+                
 
-                if ($complete && $autocreateInvoice) {
+                if ($complete && $autocreateInvoice && $this->_paid == round($order->getBaseGrandTotal(), 2)) {
                     $payment = $order->getPayment();
                     $payment->setTransactionId($mspDetails['ewallet']['id']);
                     $transaction = $payment->addTransaction('capture', null, false, $statusMessage);
@@ -462,8 +525,8 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
                     $transaction->setIsClosed(1);
                     $transaction->setAdditionalInformation(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS, $transdetails);
                     $transaction->save();
-                    $payment->setAmount($order->getGrandTotal());
-                    $order->setTotalPaid($order->getGrandTotal());
+                    $payment->setAmount($this->_paid);
+                    $order->setTotalPaid($this->_paid);
                 }
             }
 
@@ -487,6 +550,8 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
                 if ($send_update_email) {
                     $order->sendOrderUpdateEmail(true);
                 }
+
+
                 //$this->createInvoice($order);// Validate this function with 1.7.0.2 and lower
             } else {
                 // add status to history if it's not there
@@ -502,7 +567,7 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
 
             if ($order->getCanSendNewEmailFlag()) {
                 if ($send_order_email == 'after_payment') {
-                    if (!$order->getEmailSent() && (ucfirst($order->getState()) == ucfirst(Mage_Sales_Model_Order::STATE_PROCESSING))) {
+                    if (!$order->getEmailSent() && ((ucfirst($order->getState()) == ucfirst(Mage_Sales_Model_Order::STATE_PROCESSING)) || (ucfirst($order->getState()) == ucfirst(Mage_Sales_Model_Order::STATE_COMPLETE)))) {
                         $order->sendNewOrderEmail();
                         $order->setEmailSent(true);
                         $order->save();
@@ -529,11 +594,18 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object {
                 }
             }
 
+            if ($mspStatus == 'completed' && $mspDetails['paymentdetails']['type'] == 'KLARNA') {
+                $order->addStatusToHistory($order->getStatus(), Mage::helper("msp")->__("Klarna Reservation number: ") . $mspDetails['paymentdetails']['externaltransactionid']);
+            }
+
             // save order if we haven't already
             if (!$orderSaved) {
                 $order->save();
             }
         }
+
+
+
         // success
         return true;
     }

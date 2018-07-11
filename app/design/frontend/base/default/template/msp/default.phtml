@@ -11,13 +11,12 @@ $methods = $this->getMethods();
 $oneMethod = count($methods) <= 1;
 $lang_code = 'en';
 if (is_array($locale) && isset($locale[0])) {
-     $lang_code = strtolower($locale[0]);
+    $lang_code = strtolower($locale[0]);
 }
-
 ?>
 <?php if (empty($methods)): ?>
     <dt>
-    <?php //echo $this->__('No Payment Methods') ?>
+    <?php //echo $this->__('No Payment Methods')  ?>
     </dt>
 <?php else: ?>
     <?php foreach ($methods as $_method): ?>
@@ -34,54 +33,54 @@ if (is_array($locale) && isset($locale[0])) {
 
         <?php if ($_code == 'msp_fastcheckout') { ?>
             <dd>
-                <a class="msp_checkout_link" href="<?php echo Mage::getUrl("msp/checkout/redirect") ?>">
-                    <img src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA) . 'msp' . DS.$lang_code.DS. 'button.png' ?>" style="margin-left: -0px;"/>
-                </a>
-                <script type="text/javascript">
-                    element1 = document.getElementById('p_method_msp_fastcheckout');
-                    element1.style.display = 'none';
-                </script>
+              <a class="msp_checkout_link" href="<?php echo Mage::getUrl("msp/checkout/redirect") ?>">
+                <img src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA) . 'msp' . DS . $lang_code . DS . 'button.png' ?>" style="margin-left: -0px;"/>
+              </a>
+              <script type="text/javascript">
+                  element1 = document.getElementById('p_method_msp_fastcheckout');
+                  element1.style.display = 'none';
+              </script>
             </dd>
         <?php } elseif ($_code != 'msp_ideal' && $_code != 'msp') { ?>
             <?php if ($instruction = Mage::getStoreConfig('msp_gateways/' . $_code . '/instructions')) { ?>
                 <dd>
-                    <ul  class="form-list" id="payment_form_<?php echo $_code ?>" style="display: none;">
-                        <li>
-                            <?php echo $instruction ?>
-                        </li>
-                    </ul>
+                  <ul  class="form-list" id="payment_form_<?php echo $_code ?>" style="display: none;">
+                    <li>
+                      <?php echo $instruction ?>
+                    </li>
+                  </ul>
                 </dd>
             <?php } elseif ($html = $this->getPaymentMethodFormHtml($_method)) { ?>
                 <dd>
-                    <?php echo $html; ?>
+                  <?php echo $html; ?>
                 </dd>
             <?php } ?>
         <?php } elseif ($_code == 'msp_ideal' && Mage::getStoreConfig('msp_gateways/' . $_code . '/bank_select')) { ?>
             <dd>
-                <ul class="5 form-list" id="payment_form_<?php echo $_code ?>" style="display: none;">
-                    <li>
-                        <?php $_banks = $_method->getIdealIssuers(); ?>
-                        <select id="<?php echo $_code ?>_bank" name="payment[<?php echo $_code ?>_bank]" class="input-text validate-text required-entry">
-                            <option value=""><?php echo $this->__('Selecteer een bank...') ?></option>
-                            <?php foreach ($_banks as $bank) { ?>
-                                <option value="<?php echo $bank['code']['VALUE'] ?>"><?php echo $bank['description']['VALUE'] ?></option>
-                            <?php } ?>
-                        </select>
-                    </li>
-                </ul>
+              <ul class="5 form-list" id="payment_form_<?php echo $_code ?>" style="display: none;">
+                <li>
+                  <?php $_banks = $_method->getIdealIssuers(); ?>
+                  <select id="<?php echo $_code ?>_bank" name="payment[<?php echo $_code ?>_bank]" class="input-text validate-text required-entry">
+                    <option value=""><?php echo $this->__('Selecteer een bank...') ?></option>
+                    <?php foreach ($_banks as $bank) { ?>
+                        <option value="<?php echo $bank['code']['VALUE'] ?>"><?php echo $bank['description']['VALUE'] ?></option>
+                    <?php } ?>
+                  </select>
+                </li>
+              </ul>
             </dd>
         <?php } elseif ($_code == 'msp_banktransfer') { ?>
             <dd>
-                <ul class="form-list" id="payment_form_<?php echo $_code ?>" style="display: none;">
-                    <li>
-                        <?php if ($_code == 'msp_banktransfer') { ?>
-                            <input name='payment[accountid]'            value=""   id="accountid"/>            <label for="accountid"            style="width:200px!important;">Rekeningnummer:</label><br />
-                            <input name='payment[accountholdername]'    value=""   id="accountholdername"/>    <label for="accountholdername"    style="width:200px!important;">Naam rekeninghouder:</label><br />
-                            <input name='payment[accountholdercity]'    value=""   id="accountholdercity"/>    <label for="accountholdercity"    style="width:200px!important;">Plaats Bank:</label><br />
-                            <input name='payment[accountholdercountry]' value="NL" id="accountholdercountry"/> <label for="accountholdercountry" style="width:200px!important;">Landcode bank:</label><br />
-                        <?php } ?>
-                    </li>
-                </ul>
+              <ul class="form-list" id="payment_form_<?php echo $_code ?>" style="display: none;">
+                <li>
+                  <?php if ($_code == 'msp_banktransfer') { ?>
+                      <input name='payment[accountid]'            value=""   id="accountid"/>            <label for="accountid"            style="width:200px!important;">Rekeningnummer:</label><br />
+                      <input name='payment[accountholdername]'    value=""   id="accountholdername"/>    <label for="accountholdername"    style="width:200px!important;">Naam rekeninghouder:</label><br />
+                      <input name='payment[accountholdercity]'    value=""   id="accountholdercity"/>    <label for="accountholdercity"    style="width:200px!important;">Plaats Bank:</label><br />
+                      <input name='payment[accountholdercountry]' value="NL" id="accountholdercountry"/> <label for="accountholdercountry" style="width:200px!important;">Landcode bank:</label><br />
+                  <?php } ?>
+                </li>
+              </ul>
             </dd>
         <?php } else { ?>
             <?php $instruction = '' ?>
@@ -92,11 +91,11 @@ if (is_array($locale) && isset($locale[0])) {
             <?php } ?>
             <?php if ($instruction): ?>
                 <dd>
-                    <ul class="form-list" id="payment_form_<?php echo $_code ?>" style="display: none;">
-                        <li>
-                            <?php echo $instruction ?>
-                        </li>
-                    </ul>
+                  <ul class="form-list" id="payment_form_<?php echo $_code ?>" style="display: none;">
+                    <li>
+                      <?php echo $instruction ?>
+                    </li>
+                  </ul>
                 </dd>
             <?php endif ?>
         <?php } ?>

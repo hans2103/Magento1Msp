@@ -10,4 +10,5 @@ class MultiSafepay_Msp_Model_Gateway_Fastcheckout extends MultiSafepay_Msp_Model
     protected $_code = "msp_fastcheckout";
     public $_model = "fastcheckout";
     public $_gateway = "FASTCHECKOUT";
+
 }
