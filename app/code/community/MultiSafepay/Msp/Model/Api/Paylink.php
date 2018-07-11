@@ -27,6 +27,7 @@ class MultiSafepay_Msp_Model_Api_Paylink
         'id' => '',
         'currency' => '',
         'amount' => '',
+        'days_active' => '',
         "gateway_reset"
     );
     public $signature;
@@ -72,7 +73,8 @@ class MultiSafepay_Msp_Model_Api_Paylink
         'msp_multisafepay' => 'WALLET',
         'msp_directebanking' => 'DIRECTBANK',
         'msp_directdebit' => 'DIRDEB',
-        'msp_amex'=> 'AMEX',
+        'msp_amex' => 'AMEX',
+        'msp_alipay' => 'ALIPAY',
         'msp_yourgift',
         'msp_wijncadeau',
         'msp_lief',
@@ -156,7 +158,8 @@ class MultiSafepay_Msp_Model_Api_Paylink
             $mapi->transaction['gateway'] = $this->availablePaymentMethodCodes[$pm_code];
         }
         $mapi->transaction['items'] = $items;
-        
+        $mapi->transaction['daysactive'] = $this->transaction['days_active'];
+
         $url = $mapi->startTransaction();
 
         if ($mapi->error) {

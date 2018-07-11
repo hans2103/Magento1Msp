@@ -17,6 +17,18 @@ class Object_Core
         return $this->result;
     }
 
+    public function delete($body, $endpoint = 'orders')
+    {
+        $this->result = $this->processRequest('DELETE', $endpoint, $body);
+        return $this->result;
+    }
+
+    public function put($body, $endpoint = 'orders')
+    {
+        $this->result = $this->processRequest('PUT', $endpoint, $body);
+        return $this->result;
+    }
+
     public function patch($body, $endpoint = '')
     {
         $this->result = $this->processRequest('PATCH', $endpoint, $body);

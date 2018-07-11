@@ -1,6 +1,7 @@
 <?php
 
 require_once dirname(__FILE__) . "/Object/Orders.php";
+require_once dirname(__FILE__) . "/Object/Qwindo.php";
 require_once dirname(__FILE__) . "/Object/Issuers.php";
 require_once dirname(__FILE__) . "/Object/Gateways.php";
 require_once dirname(__FILE__) . "/Object/Affiliates.php";
@@ -9,6 +10,7 @@ class Client
 {
 
     public $orders;
+    public $qwindo;
     public $issuers;
     public $transactions;
     public $gateways;
@@ -19,10 +21,12 @@ class Client
     public $request;
     public $response;
     public $debug;
+    public $auth;
 
     public function __construct()
     {
         $this->orders = new Object_Orders($this);
+        $this->qwindo = new Object_Qwindo($this);
         $this->issuers = new Object_Issuers($this);
         $this->gateways = new Object_Gateways($this);
         $this->affiliates = new Object_Affiliates($this);
@@ -55,17 +59,28 @@ class Client
 
     public function processAPIRequest($http_method, $api_method, $http_body = NULL)
     {
-        if (empty($this->api_key)) {
-            throw new Exception("Please configure your MultiSafepay API Key.");
+
+        if ($api_method != 'qwindo') {
+            if (empty($this->api_key)) {
+                throw new Exception("Please configure your MultiSafepay API Key.");
+            }
+            $url = $this->api_url . $api_method;
+            $request_headers = array(
+                "Accept: application/json",
+                "api_key:" . $this->api_key,
+            );
+        } else {
+            $url = $this->api_url;
+            $request_headers = array(
+                "Accept: application/json",
+                "Auth:" . $this->auth,
+            );
         }
 
-        $url = $this->api_url . $api_method;
+
         $ch = curl_init($url);
 
-        $request_headers = array(
-            "Accept: application/json",
-            "api_key:" . $this->api_key,
-        );
+        //echo $url;exit;
 
         if ($http_body !== NULL) {
             $request_headers[] = "Content-Type: application/json";
@@ -88,17 +103,27 @@ class Client
         curl_setopt($ch, CURLOPT_HTTPHEADER, $request_headers);
 
         $body = curl_exec($ch);
+        $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
+
+        if ($api_method == 'qwindo') {
+            if ($httpcode == "401") {
+                throw new Exception("Qwindo authorization failed, please check your Qwindo key and Hash ID. Data not updated at Qwindo.");
+            }
+        }
         if ($this->debug) {
             $this->request = $http_body;
             $this->response = $body;
         }
 
+
         if (curl_errno($ch)) {
-            throw new Exception("Unable to communicatie with the MultiSafepay payment server (" . curl_errno($ch) . "): " . curl_error($ch) . ".");
+            if ($api_method != 'qwindo') {
+
+                throw new Exception("Unable to communicate with the MultiSafepay payment server (" . curl_errno($ch) . "): " . curl_error($ch) . ".");
+            }
         }
 
-        curl_close($ch);
         return $body;
     }
 

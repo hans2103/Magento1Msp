@@ -206,8 +206,6 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
      */
     public function isFCONotification($transId)
     {
-        //Mage::log("Checking if FCO notification...", null, "multisafepay.log");
-
         /** @var $quote Mage_Sales_Model_Quote */
         $quote = Mage::getModel('sales/quote')->load($transId);
 
@@ -218,9 +216,7 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
 
         $config = Mage::getStoreConfig('mspcheckout/settings', $storeId);
 
-        if (isset($config['account_id']) && isset($config['test_api']) &&
-                isset($config['site_id']) && isset($config['secure_code'])) {
-
+        if (isset($config['account_id']) && isset($config['test_api']) && isset($config['site_id']) && isset($config['secure_code'])) {
             $msp = new MultiSafepay();
             $msp->test = ($config["test_api"] == 'test');
             $msp->merchant['account_id'] = $config["account_id"];
@@ -249,6 +245,10 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
      */
     public function notificationAction($return = false)
     {
+        if (isset($headers['Content-Type']) && $headers['Content-Type'] == 'application/json') {
+            echo 'JSON data received on wrong endpoint';
+            exit;
+        }
         $orderId = $this->getRequest()->getQuery('transactionid');
         $initial = ($this->getRequest()->getQuery('type') == 'initial') ? true : false;
         $transactionid = $this->getRequest()->getQuery('transactionid');
@@ -277,10 +277,8 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
 
                     if ($initial) {
                         $returnUrl = Mage::getUrl("msp/checkout/return", array("_secure" => true)) . '?transactionid=' . $transactionid;
-
                         $storeId = Mage::getModel('sales/quote')->load($transactionid)->getStoreId();
                         $storeName = Mage::app()->getGroup($storeId)->getName();
-
                         // display return message
                         echo 'Return to <a href="' . $returnUrl . '?transactionid=' . $orderId . '">' . $storeName . '</a>';
                     } else {
@@ -295,13 +293,11 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
             }
         }
         $paymentModel = Mage::getSingleton("msp/" . $this->getGatewayModel());
-
         $done = $paymentModel->notification($orderId, $initial);
 
         if (!$return) {
             if ($initial) {
                 $returnUrl = $paymentModel->getReturnUrl();
-
                 $order = Mage::getSingleton('sales/order')->loadByIncrementId($orderId);
                 $storename = $order->getStoreGroupName();
 
@@ -320,233 +316,864 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
     }
 
     /*
+     * 	Function that generates a Json total products response
+     */
+
+    public function getTotalProductsFeed()
+    {
+        $store = Mage::app()->getStore();
+        $store_id = $store->getId();
+        $collection = Mage::getResourceModel('catalog/product_collection')->addAttributeToFilter('status', 1)->addAttributeToFilter('visibility', 4);
+        $collection->addStoreFilter($store_id);
+        $size = $collection->count(); // or $collection->getSize()
+        $return = array("total" => $size);
+        return json_encode($return);
+    }
+
+    /*
      * 	Function that generates a JSON product feed based on productID or CategoryID
      */
 
     public function getProductsFeed()
     {
-        $category_id = $this->getRequest()->getQuery('category_id');
         $product_id = $this->getRequest()->getQuery('product_id');
+        $stores = array();
+        $storeCollection = Mage::getModel('core/store')->getCollection();
 
-        if (empty($category_id) && empty($product_id)) {
-            echo 'Nothing to fetch. Missing product_id or category_id';
-            exit;
-        }
+        if (empty($product_id)) {
 
-        //If category is set then get the products from that category
-        //If category is not set, but product_id is, then get that product
-        if (!empty($category_id)) {
-            $products = Mage::getModel('catalog/category')->load($category_id);
-            $productslist = $products->getProductCollection()->addAttributeToSelect('*')->addAttributeToFilter('status', 1)->addAttributeToFilter('visibility', 4);
+            $offset = $this->getRequest()->getQuery('offset');
+
+            if ($offset == null) {
+                echo '{
+                        "success": false, 
+                        "data": {
+                            "error_code": "QW-4003",
+                            "error": "Offset not set."
+                            }
+                        }'
+                ;
+                exit;
+            }
+
+            $limit = $this->getRequest()->getQuery('limit');
+
+            if ($limit == null) {
+                echo '{
+                        "success": false, 
+                        "data": {
+                            "error_code": "QW-4004",
+                            "error": "Limit not set."
+                            }
+                        }'
+                ;
+                exit;
+            }
+            //Magento uses pages and not offset amount. We calculate the page based on the limit and offset provided
+            if ($offset == 0) {
+                $page = 1;
+            } else {
+                $page = ($offset / $limit) + 1;
+            }
+
+            $store = Mage::app()->getStore();
+            $store_id = $store->getId();
+            $productslist = Mage::getResourceModel('catalog/product_collection')->addAttributeToFilter('status', 1)->addAttributeToFilter('visibility', 4)->setPage($page, $limit)->addStoreFilter($store_id);
             $json = array();
-            $prodIds = $productslist->getAllIds();
 
-            foreach ($prodIds as $productId) {
+            foreach ($productslist as $theproduct) {
+                $productId = $theproduct->getId();
                 $product = Mage::getModel('catalog/product')->load($productId);
                 $maincat = $subcats = '';
                 $cats = $product->getCategoryIds();
-                //$eee = implode(",",$cats);
+                $category_ids = array();
+
                 foreach ($cats as $category_id) {
                     $_cat = Mage::getModel('catalog/category')->load($category_id);
+                    $cattrans = array();
+                    foreach ($storeCollection as $store) {
+                        $store_id = $store->getId();
+                        $language = Mage::getStoreConfig('general/locale/code', $store->getId());
+                        $defaultStoreCategory = Mage::getModel('catalog/category');
+                        $defaultStoreCategory->setStoreId($store_id);
+                        $defaultStoreCategory->load($category_id);
+                        if ($defaultStoreCategory->getName()) {
+                            $cattrans['title'][$language] = $defaultStoreCategory->getName();
+                        }
+                    }
+
+                    $maincat = $cattrans;
                     if ($subcats == '') {
-                        $maincat = $subcats = $_cat->getName();
+                        // $maincat = $subcats = $_cat->getName();
                     } else {
                         $subcats .= ">" . $_cat->getName();
                     }
+
+                    $category_ids[] = $category_id;
                 }
 
                 $product_data = array();
-                $product_data['ProductID'] = $productId;
-                $product_data['ProductName'] = $product->getName();
-                $product_data['SKUnumber'] = $product->getSku();
-                $product_data['Created'] = $product->getCreatedAt();
-                $product_data['Updated'] = $product->getUpdatedAt();
+                $product_data['product_id'] = $productId;
+                $parentIds = null;
+                if ($product->getTypeId() == "simple") {
+                    $parentIds = Mage::getModel('catalog/product_type_grouped')->getParentIdsByChild($product->getId()); // check for grouped product
+                    if (!$parentIds)
+                        $parentIds = Mage::getModel('catalog/product_type_configurable')->getParentIdsByChild($product->getId()); //check for config product
+                }
+
+                /* if (!empty($parentIds)) {
+                  $product_data['parent_product_id'] = $parentIds[0];
+                  } else {
+                  $product_data['parent_product_id'] = null;
+                  } */
+                $product_data['product_name'] = $product->getName();
+                $product_data['sku_number'] = $product->getSku();
+                $product_data['created'] = date("Y-m-d H:i:s", Mage::getModel("core/date")->timestamp($product->getCreatedAt()));
+                $product_data['updated'] = date("Y-m-d H:i:s", Mage::getModel("core/date")->timestamp($product->getUpdatedAt()));
 
                 if ($product->getTypeId() == Mage_Catalog_Model_Product_Type::TYPE_VIRTUAL) {
-                    $product_data['Downloadable'] = true;
+                    $product_data['downloadable'] = true;
                 } else {
-                    $product_data['Downloadable'] = false;
+                    $product_data['downloadable'] = false;
                 }
 
-                if ($product->getFtin()) {
-                    $product_data['FTIN'] = $product->getFtin();
-                    $product_data['UniqueIdentifier'] = true;
+                if ($product->getGtin()) {
+                    $product_data['gtin'] = $product->getGtin();
+                    $product_data['unique_identifier'] = true;
                 } else {
-                    $product_data['UniqueIdentifier'] = false;
+                    $product_data['gtin'] = null;
+                    $product_data['unique_identifier'] = false;
                 }
 
-                $product_data['MPN'] = $product->getMpn();
-                $product_data['Brand'] = $product->getBrand();
-                $product_data['Weight'] = $product->getWeight();
-                $product_data['PrimaryCategory'] = $maincat;
-                $product_data['SecondaryCategory'] = $subcats;
-                $product_data['ProductURL'] = $product->getProductUrl();
-                $product_data['ProductImageURLs'] = array();
+                $product_data['mpn'] = $product->getMpn();
+                $product_data['brand'] = $product->getBrand();
+                $product_data['weight'] = $product->getWeight();
+                $product_data['weight_unit'] = 'kg';
+                if ($maincat) {
+                    $product_data['primary_category'] = $maincat;
+                }
+                $product_data['category_ids'] = $category_ids;
+                //$product_data['secundary_category'] = $subcats;
+                $product_data['product_url'] = $product->getProductUrl();
+                $product_data['product_image_urls'] = array();
 
-                $mainimage = new stdclass();
-                $mainimage->url = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA) . 'catalog/product' . $product->getImage();
-                $mainimage->main = true;
-                $product_data['ProductImageURLs'][] = $mainimage;
-
+                if ($product->getImage()) {
+                    $mainimage = new stdclass();
+                    $mainimage->url = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA) . 'catalog/product' . $product->getImage();
+                    $mainimage->main = true;
+                    $product_data['product_image_urls'][] = $mainimage;
+                }
 
                 foreach ($product->getMediaGalleryImages() as $image) {
                     $subimage = new stdclass();
                     $subimage->url = $image->getUrl();
                     $subimage->main = false;
-                    $product_data['ProductImageURLs'][] = $subimage;
+                    $product_data['product_image_urls'][] = $subimage;
                 }
 
                 //$product_data['ProductImageURL'] = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA) . 'catalog/product' . $product->getImage();
-                $product_data['ShortProductDescription'] = substr(iconv("UTF-8", "UTF-8//IGNORE", $product->getDescription()), 0, 150) . "...";
-                $product_data['LongProductDescription'] = substr(iconv("UTF-8", "UTF-8//IGNORE", $product->getDescription()), 0, 2000);
-                $product_data['SalePrice'] = round($product->getFinalPrice(), 4);
-                $product_data['RetailPrice'] = round($product->getPrice(), 4);
+                foreach ($storeCollection as $store) {
+                    $store_id = $store->getId();
+                    $language = Mage::getStoreConfig('general/locale/code', $store->getId());
+
+                    $productdata = Mage::getModel('catalog/product')->setStoreId($store_id)->load($product_id);
+                    $product_data['short_product_description'][$language] = (substr(iconv("UTF-8", "UTF-8//IGNORE", $productdata->getShortDescription()), 0)) ? substr(iconv("UTF-8", "UTF-8//IGNORE", $productdata->getShortDescription()), 0) : "No short description available";
+                    $product_data['long_product_description'][$language] = (substr(iconv("UTF-8", "UTF-8//IGNORE", $productdata->getDescription()), 0)) ? substr(iconv("UTF-8", "UTF-8//IGNORE", $productdata->getDescription()), 0) : "No description available";
+                }
+                $product_data['sale_price'] = number_format((float) $product->getFinalPrice(), 2, '.', '');
+                $product_data['retail_price'] = number_format((float) $product->getPrice(), 2, '.', '');
+
+                if ($product->getMspCashback()) {
+                    $product_data['cashback'] = $product->getMspCashback();
+                }
                 //$product_data['UniversalProductCode'] = $product->getData('upc'); //need variable
-                $product_data['Currency'] = Mage::app()->getStore()->getCurrentCurrencyCode();
-                $product_data['TaxId'] = $product->getTaxClassId();
+                /**
+                 * Get product tax rule
+                 * */
+                $taxRules = Mage::getModel('tax/sales_order_tax')->getCollection();
+                $taxCalculation = Mage::getModel('tax/calculation');
+                $request = $taxCalculation->getRateRequest(null, null, null, $store);
+                $tax_rule = new stdclass();
+                $rules = array();
 
+                $collection = Mage::getModel('tax/calculation_rule')->getCollection();
+                if ($collection->getSize()) {
+                    $collection->addCustomerTaxClassesToResult()->addProductTaxClassesToResult()->addRatesToResult();
+                }
+                if ($collection->getSize()) {
+                    foreach ($collection as $rule) {
+                        $rule_data = $rule->getData();
+                        if (in_array($product->getTaxClassId(), $rule_data['product_tax_classes'])) {
+                            foreach ($rule_data['tax_rates'] as $key => $rate_id) {
+                                $rate = Mage::getSingleton('tax/calculation_rate')->load($rate_id);
+                                $rate_info = $rate->getData();
+                                $rules[$rate_info['tax_country_id']] = $rate_info['rate'];
+                                $tax_rule->name = $rule_data['code'];
+                            }
+                        }
+                    }
+                };
+
+                $tax_rule->id = $product->getTaxClassId();
+                $tax_rule->rules = $rules;
+                $product_data['tax'] = $tax_rule;
                 $stockItem = Mage::getModel('cataloginventory/stock_item')->loadByProduct($productId);
+                $product_data['stock'] = (INT) $stockItem->getQty();
 
-
-                $product_data['Stock'] = $stockItem->getQty();
-
-                $meta_data = new stdclass();
-                $meta_data->title = $product->getMetaTitle();
-                $meta_data->keyword = $product->getMetaKeyword();
-                $meta_data->description = $product->getMetaDescription();
-
-                $product_data['Metadata'] = $meta_data;
-
-                foreach ($product->getOptions() as $value) {
-                    if (is_object($value)) {
-                        $values = $value->getValues();
-                        foreach ($values as $values) {
-                            $product_data['Options']['CustomOptions'][$value->getTitle()][] = $values->getData();
-                        }
+                $meta_data = array();
+                foreach ($storeCollection as $store) {
+                    $store_id = $store->getId();
+                    $productdata = Mage::getModel('catalog/product')->setStoreId($store_id)->load($productId);
+                    $language = Mage::getStoreConfig('general/locale/code', $store->getId());
+                    if ($productdata->getMetaTitle() && $productdata->getMetaKeyword() && $productdata->getMetaDescription()) {
+                        $meta_data['title'][$language] = $productdata->getMetaTitle();
+                        $meta_data['keyword'][$language] = $productdata->getMetaKeyword();
+                        $meta_data['description'][$language] = $productdata->getMetaDescription();
                     }
                 }
 
+                if (!empty($meta_data)) {
+                    $product_data['metadata'] = $meta_data;
+                }
+
+                $attr = array();
                 $attributes = $product->getAttributes();
-                foreach ($attributes as $attribute) {
-                    if ($attribute->getIsVisibleOnFront()) {
-                        $product_data['Attributes'][$attribute->getAttributeCode()] = array('label' => $attribute->getFrontend()->getLabel($product), 'value' => $attribute->getFrontend()->getValue($product));
-                    }
-                }
+                foreach ($storeCollection as $store) {
+                    $store_id = $store->getId();
+                    Mage::app()->setCurrentStore($store_id);
+                    $language = Mage::getStoreConfig('general/locale/code', $store_id);
 
-                if ($product->isConfigurable()) {
-                    $productAttributeOptions = $product->getTypeInstance(true)->getConfigurableAttributesAsArray($product);
-                    foreach ($productAttributeOptions as $productAttribute) {
-                        foreach ($productAttribute['values'] as $attribute) {
-                            $product_data['Options']['GlobalOptions'][$productAttribute['label']][$attribute['value_index']] = array('Label' => $attribute['store_label'], 'Pricing' => $attribute['pricing_value']);
+                    foreach ($attributes as $attribute) {
+                        if ($attribute->getIsVisibleOnFront()) {
+                            $_condition = $product->getAttributeText($attribute->getAttributeCode());
+                            $_coditionDefault = $product->getResource()->getAttribute($attribute->getAttributeCode())->setStoreId($store_id)->getFrontend()->getValue($product);
+                            $attribute = Mage::getModel('eav/entity_attribute')->load($attribute->getAttributeId());
+                            $langlabels = $attribute->getStoreLabels();
+
+                            if (isset($langlabels[$store_id]) && $_coditionDefault != NULL) {
+                                $attr[$attribute->getAttributeCode()][$language] = array('label' => $langlabels[$store_id], 'value' => $_coditionDefault);
+                            } elseif ($_coditionDefault) {
+                                $attr[$attribute->getAttributeCode()][$language] = array('label' => $attribute->getFrontendLabel(), 'value' => $_coditionDefault);
+                            }
                         }
                     }
                 }
-                $json[] = $product_data;
+
+                if (!empty($attr)) {
+                    $product_data['attributes'] = $attr;
+                }
+                if ($product->isConfigurable()) {
+                    $variants = array();
+                    /*
+                     * GET product variant (options) and add them as variants
+                     */
+                    $collection = Mage::getModel('catalog/product_type_configurable')->getUsedProducts(null, $product);
+                    $childIds = Mage::getModel('catalog/product_type_configurable')->getChildrenIds($product->getId());
+                    if ($collection) {
+                        $processed = array();
+                        foreach ($collection as $childproduct) {
+                            if (!in_array($childproduct->getId(), $processed)) {
+
+                                $product_child = Mage::getModel('catalog/product')->load($childproduct->getId());
+                                $variant = new stdclass();
+
+                                $variant->product_id = $childproduct->getId();
+                                $processed[] = $childproduct->getId();
+                                $variant->sku_number = $childproduct->getSku();
+                                if ($childproduct->getGtin()) {
+                                    $variant->gtin = $childproduct->getGtin();
+                                    $variant->unique_identifier = true;
+                                } else {
+                                    $variant->gtin = null;
+                                    $variant->unique_identifier = false;
+                                }
+                                $product_data['mpn'] = $childproduct->getMpn();
+                                if ($childproduct->getImage()) {
+                                    $mainimage = new stdclass();
+                                    $mainimage->url = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA) . 'catalog/product' . $childproduct->getImage();
+                                    $mainimage->main = true;
+                                    $variant->product_image_urls = array();
+                                    $variant->product_image_urls[] = $mainimage;
+                                }
+                                $childimages = $childproduct->getMediaGalleryImages();
+                                if (!empty($childimages)) {
+                                    foreach ($childproduct->getMediaGalleryImages() as $image) {
+                                        $subimage = new stdclass();
+                                        $subimage->url = $image->getUrl();
+                                        $subimage->main = false;
+                                        $variant->product_image_urls[] = $subimage;
+                                    }
+                                }
+
+                                $stockItem = Mage::getModel('cataloginventory/stock_item')->loadByProduct($childproduct->getId());
+                                $variant->stock = (INT) $stockItem->getQty();
+                                $variant->sale_price = number_format((float) $product->getFinalPrice(), 2, '.', '');
+                                $variant->retail_price = number_format((float) $product->getPrice(), 2, '.', '');
+
+                                if ($product_child->getMspCashback()) {
+                                    $variant->cashback = $product_child->getMspCashback();
+                                }
+
+                                $attrchild = array();
+                                $attributes = $childproduct->getAttributes();
+                                //print_r($attributes);exit;
+                                foreach ($storeCollection as $store) {
+                                    $store_id = $store->getId();
+                                    Mage::app()->setCurrentStore($store_id);
+                                    $language = Mage::getStoreConfig('general/locale/code', $store_id);
+                                    foreach ($attributes as $attribute) {
+                                        if ($attribute->getIsVisibleOnFront()) {
+                                            $_coditionDefault = $childproduct->getResource()->getAttribute($attribute->getAttributeCode())->setStoreId($store_id)->getFrontend()->getValue($childproduct);
+                                            $langlabels = $attribute->getStoreLabels();
+                                            if (isset($langlabels[$store_id]) && $_coditionDefault != NULL) {
+                                                $attrchild[$attribute->getAttributeCode()][$language] = array('label' => $langlabels[$store_id], 'value' => $_coditionDefault);
+                                            } elseif ($_coditionDefault) {
+                                                $attrchild[$attribute->getAttributeCode()][$language] = array('label' => $attribute->getFrontendLabel(), 'value' => $_coditionDefault);
+                                            }
+                                        }
+                                    }
+                                }
+                                if (!empty($attrchild)) {
+                                    $variant->attributes = $attrchild;
+                                }
+                                $variants[] = $variant;
+                            }
+                        }
+                    } else {
+                        $processed = array();
+
+                        foreach ($childIds[0] as $key => $childid) {
+                            $childproduct = Mage::getModel('catalog/product')->load($childid);
+
+                            if (!in_array($childproduct->getId(), $processed)) {
+                                $variant = new stdclass();
+                                $variant->product_id = $childproduct->getId();
+                                $processed[] = $childproduct->getId();
+                                $variant->sku_number = $childproduct->getSku();
+                                if ($childproduct->getGtin()) {
+                                    $variant->gtin = $childproduct->getGtin();
+                                    $variant->unique_identifier = true;
+                                } else {
+                                    $variant->gtin = null;
+                                    $variant->unique_identifier = false;
+                                }
+                                $product_data['mpn'] = $childproduct->getMpn();
+
+                                if ($childproduct->getImage() && $childproduct->getImage() != 'no_selection') {
+                                    $mainimage = new stdclass();
+                                    $mainimage->url = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA) . 'catalog/product' . $childproduct->getImage();
+                                    $mainimage->main = true;
+                                    $variant->product_image_urls = array();
+                                    $variant->product_image_urls[] = $mainimage;
+                                }
+                                $childimages = $childproduct->getMediaGalleryImages();
+                                if (!empty($childimages)) {
+                                    foreach ($childproduct->getMediaGalleryImages() as $image) {
+                                        $subimage = new stdclass();
+                                        $subimage->url = $image->getUrl();
+                                        $subimage->main = false;
+                                        $variant->product_image_urls[] = $subimage;
+                                    }
+                                }
+
+                                $stockItem = Mage::getModel('cataloginventory/stock_item')->loadByProduct($childproduct->getId());
+                                $variant->stock = (INT) $stockItem->getQty();
+                                $variant->sale_price = number_format((float) $product->getFinalPrice(), 2, '.', '');
+                                $variant->retail_price = number_format((float) $product->getPrice(), 2, '.', '');
+
+                                if ($childproduct->getMspCashback()) {
+                                    $variant->cashback = $childproduct->getMspCashback();
+                                }
+
+                                $attrchild = array();
+                                $attributes = $childproduct->getAttributes();
+                                //print_r($attributes);exit;
+                                foreach ($storeCollection as $store) {
+                                    $store_id = $store->getId();
+                                    Mage::app()->setCurrentStore($store_id);
+                                    $language = Mage::getStoreConfig('general/locale/code', $store_id);
+                                    foreach ($attributes as $attribute) {
+                                        if ($attribute->getIsVisibleOnFront()) {
+                                            $_coditionDefault = $childproduct->getResource()->getAttribute($attribute->getAttributeCode())->setStoreId($store_id)->getFrontend()->getValue($childproduct);
+                                            $langlabels = $attribute->getStoreLabels();
+                                            if (isset($langlabels[$store_id]) && $_coditionDefault != NULL) {
+                                                $attrchild[$attribute->getAttributeCode()][$language] = array('label' => $langlabels[$store_id], 'value' => $_coditionDefault);
+                                            } elseif ($_coditionDefault) {
+                                                $attrchild[$attribute->getAttributeCode()][$language] = array('label' => $attribute->getFrontendLabel(), 'value' => $_coditionDefault);
+                                            }
+                                        }
+                                    }
+                                }
+                                if (!empty($attrchild)) {
+                                    $variant->attributes = $attrchild;
+                                }
+                                $variants[] = $variant;
+                            }
+                        }
+                    }
+                    $product_data['variants'] = $variants;
+                }
+
+                $options = $product->getOptions();
+
+                if (!empty($options)) {
+                    foreach ($storeCollection as $store) {
+                        $store_id = $store->getId();
+                        $language = Mage::getStoreConfig('general/locale/code', $store->getId());
+                        $productdata = Mage::getModel('catalog/product')->setStoreId($store_id)->load($productId);
+                        foreach ($productdata->getOptions() as $value) {
+                            if (is_object($value)) {
+                                $optionobjects = $value->getValues();
+                                $values = array();
+                                foreach ($optionobjects as $options) {
+                                    $data = $options->getData();
+                                    $optiondata = new stdclass();
+                                    $optiondata->id = $data['option_type_id'];
+                                    $optiondata->label = $data['title'];
+                                    $optiondata->pricing = $data['price'];
+                                    $optiondata->price_type = $data['price_type'];
+                                    $values[] = $optiondata;
+                                    if (!empty($data['option_type_id'])) {
+                                        $product_data['options']['global_options'][$language][$value->getTitle()] = array(
+                                            'id' => $data['option_id'],
+                                            'type' => 'custom',
+                                            //'label' => $value->getTitle(),
+                                            'values' => $values
+                                        );
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if ($product->getName() != null) {
+                    $json[] = $product_data;
+                }
             }
         } elseif (!empty($product_id)) {
+            $stores = array();
+            $storeCollection = Mage::getModel('core/store')->getCollection();
+
             $json = array();
             $product = Mage::getModel('catalog/product')->load($product_id);
+
             $maincat = $subcats = '';
             $cats = $product->getCategoryIds();
-            //$eee = implode(",",$cats);
+            $category_ids = array();
             foreach ($cats as $category_id) {
                 $_cat = Mage::getModel('catalog/category')->load($category_id);
+                $cattrans = array();
+                foreach ($storeCollection as $store) {
+                    $store_id = $store->getId();
+                    $language = Mage::getStoreConfig('general/locale/code', $store->getId());
+                    $defaultStoreCategory = Mage::getModel('catalog/category');
+                    $defaultStoreCategory->setStoreId($store_id);
+                    $defaultStoreCategory->load($category_id);
+                    if($defaultStoreCategory->getName()){
+                    	$cattrans['title'][$language] = $defaultStoreCategory->getName();
+                    }
+                }
+                $maincat = $cattrans;
                 if ($subcats == '') {
-                    $maincat = $subcats = $_cat->getName();
+                    // $maincat = $subcats = $_cat->getName();
                 } else {
                     $subcats .= ">" . $_cat->getName();
                 }
+
+                $category_ids[] = $category_id;
             }
-
-
 
             $product_data = array();
-            $product_data['ProductID'] = $product_id;
-            $product_data['ProductName'] = $product->getName();
-            $product_data['SKUnumber'] = $product->getSku();
-            $product_data['Created'] = $product->getCreatedAt();
-            $product_data['Updated'] = $product->getUpdatedAt();
+            $product_data['product_id'] = $product_id;
+            $parentIds = null;
+            if ($product->getTypeId() == "simple") {
+                $parentIds = Mage::getModel('catalog/product_type_grouped')->getParentIdsByChild($product->getId()); // check for grouped product
+                if (!$parentIds)
+                    $parentIds = Mage::getModel('catalog/product_type_configurable')->getParentIdsByChild($product->getId()); //check for config product
+            }
+
+            /* if (!empty($parentIds)) {
+              $product_data['parent_product_id'] = $parentIds[0];
+              } else {
+              $product_data['parent_product_id'] = null;
+              } */
+            $product_data['product_name'] = $product->getName();
+            $product_data['sku_number'] = $product->getSku();
+            $product_data['created'] = date("Y-m-d H:i:s", Mage::getModel("core/date")->timestamp($product->getCreatedAt()));
+            $product_data['updated'] = date("Y-m-d H:i:s", Mage::getModel("core/date")->timestamp($product->getUpdatedAt()));
 
             if ($product->getTypeId() == Mage_Catalog_Model_Product_Type::TYPE_VIRTUAL) {
-                $product_data['Downloadable'] = true;
+                $product_data['downloadable'] = true;
             } else {
-                $product_data['Downloadable'] = false;
+                $product_data['downloadable'] = false;
             }
 
-            if ($product->getFtin()) {
-                $product_data['FTIN'] = $product->getFtin();
-                $product_data['UniqueIdentifier'] = true;
+            if ($product->getGtin()) {
+                $product_data['gtin'] = $product->getGtin();
+                $product_data['unique_identifier'] = true;
             } else {
-                $product_data['UniqueIdentifier'] = false;
+                $product_data['gtin'] = null;
+                $product_data['unique_identifier'] = false;
             }
 
-            $product_data['MPN'] = $product->getMpn();
-            $product_data['Brand'] = $product->getBrand();
-            $product_data['Weight'] = $product->getWeight();
-            $product_data['PrimaryCategory'] = $maincat;
-            $product_data['SecondaryCategory'] = $subcats;
-            $product_data['ProductURL'] = $product->getProductUrl();
-            $product_data['ProductImageURLs'] = array();
+            $product_data['mpn'] = $product->getMpn();
+            $product_data['brand'] = $product->getBrand();
+            $product_data['weight'] = $product->getWeight();
+            $product_data['weight_unit'] = 'kg';
+            if ($maincat) {
+                $product_data['primary_category'] = $maincat;
+            }
+            $product_data['category_ids'] = $category_ids;
+            //$product_data['SecondaryCategory'] = $subcats;
+            $product_data['product_url'] = $product->getProductUrl();
+            $product_data['product_image_urls'] = array();
 
-            $mainimage = new stdclass();
-            $mainimage->url = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA) . 'catalog/product' . $product->getImage();
-            $mainimage->main = true;
-            $product_data['ProductImageURLs'][] = $mainimage;
-
+            if ($product->getImage()) {
+                $mainimage = new stdclass();
+                $mainimage->url = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA) . 'catalog/product' . $product->getImage();
+                $mainimage->main = true;
+                $product_data['product_image_urls'][] = $mainimage;
+            }
 
             foreach ($product->getMediaGalleryImages() as $image) {
                 $subimage = new stdclass();
                 $subimage->url = $image->getUrl();
                 $subimage->main = false;
-                $product_data['ProductImageURLs'][] = $subimage;
+                $product_data['product_image_urls'][] = $subimage;
             }
 
-            //$product_data['ProductImageURL'] = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA) . 'catalog/product' . $product->getImage();
-            $product_data['ShortProductDescription'] = substr(iconv("UTF-8", "UTF-8//IGNORE", $product->getDescription()), 0, 150) . "...";
-            $product_data['LongProductDescription'] = substr(iconv("UTF-8", "UTF-8//IGNORE", $product->getDescription()), 0, 2000);
-            $product_data['SalePrice'] = round($product->getFinalPrice(), 4);
-            $product_data['RetailPrice'] = round($product->getPrice(), 4);
+            foreach ($storeCollection as $store) {
+                $store_id = $store->getId();
+                $language = Mage::getStoreConfig('general/locale/code', $store->getId());
+                $productdata = Mage::getModel('catalog/product')->setStoreId($store_id)->load($product_id);
+                $product_data['short_product_description'][$language] = (substr(iconv("UTF-8", "UTF-8//IGNORE", $productdata->getShortDescription()), 0)) ? substr(iconv("UTF-8", "UTF-8//IGNORE", $productdata->getShortDescription()), 0) : "No short description available";
+                $product_data['long_product_description'][$language] = (substr(iconv("UTF-8", "UTF-8//IGNORE", $productdata->getDescription()), 0)) ? substr(iconv("UTF-8", "UTF-8//IGNORE", $productdata->getDescription()), 0) : "No description available";
+            }
+
+            $product_data['sale_price'] = number_format((float) $product->getFinalPrice(), 2, '.', '');
+            $product_data['retail_price'] = number_format((float) $product->getPrice(), 2, '.', '');
+
+            if ($product->getMspCashback()) {
+                $product_data['cashback'] = $product->getMspCashback();
+            }
+
+
             //$product_data['UniversalProductCode'] = $product->getData('upc'); //need variable
-            $product_data['Currency'] = Mage::app()->getStore()->getCurrentCurrencyCode();
-            $product_data['TaxId'] = $product->getTaxClassId();
+
+            /**
+             * Get product tax rule
+             * */
+            $taxRules = Mage::getModel('tax/sales_order_tax')->getCollection();
+            $taxCalculation = Mage::getModel('tax/calculation');
+            $request = $taxCalculation->getRateRequest(null, null, null, $store);
+            $tax_rule = new stdclass();
+            $rules = array();
+
+            $collection = Mage::getModel('tax/calculation_rule')->getCollection();
+            if ($collection->getSize()) {
+                $collection->addCustomerTaxClassesToResult()->addProductTaxClassesToResult()->addRatesToResult();
+            }
+            if ($collection->getSize()) {
+                foreach ($collection as $rule) {
+                    $rule_data = $rule->getData();
+                    if (in_array($product->getTaxClassId(), $rule_data['product_tax_classes'])) {
+                        foreach ($rule_data['tax_rates'] as $key => $rate_id) {
+                            $rate = Mage::getSingleton('tax/calculation_rate')->load($rate_id);
+                            $rate_info = $rate->getData();
+                            $rules[$rate_info['tax_country_id']] = $rate_info['rate'];
+                            $tax_rule->name = $rule_data['code'];
+                        }
+                    }
+                }
+            };
+
+            $tax_rule->id = $product->getTaxClassId();
+            $tax_rule->rules = $rules;
+            $product_data['tax'] = $tax_rule;
 
             $stockItem = Mage::getModel('cataloginventory/stock_item')->loadByProduct($product_id);
+            $product_data['stock'] = (INT) $stockItem->getQty();
 
+            $meta_data = array();
+            foreach ($storeCollection as $store) {
+                $store_id = $store->getId();
+                $productdata = Mage::getModel('catalog/product')->setStoreId($store_id)->load($product_id);
+                $language = Mage::getStoreConfig('general/locale/code', $store->getId());
+                if ($productdata->getMetaTitle() && $productdata->getMetaKeyword() && $productdata->getMetaDescription()) {
+                    $meta_data['title'][$language] = $productdata->getMetaTitle();
+                    $meta_data['keyword'][$language] = $productdata->getMetaKeyword();
+                    $meta_data['description'][$language] = $productdata->getMetaDescription();
+                }
+            }
 
-            $product_data['Stock'] = $stockItem->getQty();
+            if (!empty($meta_data)) {
+                $product_data['metadata'] = $meta_data;
+            }
+            $attr = array();
+            $attributes = $product->getAttributes();
 
-            $meta_data = new stdclass();
-            $meta_data->title = $product->getMetaTitle();
-            $meta_data->keyword = $product->getMetaKeyword();
-            $meta_data->description = $product->getMetaDescription();
-
-            $product_data['Metadata'] = $meta_data;
-
-            foreach ($product->getOptions() as $value) {
-                if (is_object($value)) {
-                    $values = $value->getValues();
-                    foreach ($values as $values) {
-                        $product_data['Options']['CustomOptions'][$value->getTitle()][] = $values->getData();
+            foreach ($storeCollection as $store) {
+                $store_id = $store->getId();
+                Mage::app()->setCurrentStore($store_id);
+                $language = Mage::getStoreConfig('general/locale/code', $store_id);
+                foreach ($attributes as $attribute) {
+                    if ($attribute->getIsVisibleOnFront()) {
+                        $_condition = $product->getAttributeText($attribute->getAttributeCode());
+                        $_coditionDefault = $product->getResource()->getAttribute($attribute->getAttributeCode())->setStoreId($store_id)->getFrontend()->getValue($product);
+                        $attribute = Mage::getModel('eav/entity_attribute')->load($attribute->getAttributeId());
+                        $langlabels = $attribute->getStoreLabels();
+                        if (isset($langlabels[$store_id]) && $_coditionDefault != NULL) {
+                            $attr[$attribute->getAttributeCode()][$language] = array('label' => $langlabels[$store_id], 'value' => $_coditionDefault);
+                        } elseif ($_coditionDefault) {
+                            $attr[$attribute->getAttributeCode()][$language] = array('label' => $attribute->getFrontendLabel(), 'value' => $_coditionDefault);
+                        }
                     }
                 }
             }
-
-            $attributes = $product->getAttributes();
-            foreach ($attributes as $attribute) {
-                if ($attribute->getIsVisibleOnFront()) {
-                    $product_data['Attributes'][$attribute->getAttributeCode()] = array('label' => $attribute->getFrontend()->getLabel($product), 'value' => $attribute->getFrontend()->getValue($product));
-                }
+            if (!empty($attr)) {
+                $product_data['attributes'] = $attr;
             }
 
             if ($product->isConfigurable()) {
-                $productAttributeOptions = $product->getTypeInstance(true)->getConfigurableAttributesAsArray($product);
-                foreach ($productAttributeOptions as $productAttribute) {
-                    foreach ($productAttribute['values'] as $attribute) {
-                        $product_data['Options']['GlobalOptions'][$productAttribute['label']][$attribute['value_index']] = array('Label' => $attribute['store_label'], 'Pricing' => $attribute['pricing_value']);
+                $variants = array();
+                /*
+                 * GET product variant (options) and add them as variants
+                 */
+                $collection = Mage::getModel('catalog/product_type_configurable')->getUsedProducts(null, $product);
+
+                $processed = array();
+
+                foreach ($collection as $childproduct) {
+
+                    if (!in_array($childproduct->getId(), $processed)) {
+
+                        $product_child = Mage::getModel('catalog/product')->load($childproduct->getId());
+
+
+                        $variant = new stdclass();
+                        $variant->product_id = $childproduct->getId();
+                        $processed[] = $childproduct->getId();
+                        $variant->sku_number = $childproduct->getSku();
+                        if ($childproduct->getGtin()) {
+                            $variant->gtin = $childproduct->getGtin();
+                            $variant->unique_identifier = true;
+                        } else {
+                            $variant->gtin = null;
+                            $variant->unique_identifier = false;
+                        }
+                        $product_data['mpn'] = $childproduct->getMpn();
+
+                        if ($childproduct->getImage() && $childproduct->getImage() != 'no_selection') {
+                            $mainimage = new stdclass();
+                            $mainimage->url = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA) . 'catalog/product' . $childproduct->getImage();
+                            $mainimage->main = true;
+                            $variant->product_image_urls = array();
+                            $variant->product_image_urls[] = $mainimage;
+                        }
+
+                        $childimages = $childproduct->getMediaGalleryImages();
+                        if (!empty($childimages)) {
+                            foreach ($childproduct->getMediaGalleryImages() as $image) {
+                                $subimage = new stdclass();
+                                $subimage->url = $image->getUrl();
+                                $subimage->main = false;
+                                $variant->product_image_urls[] = $subimage;
+                            }
+                        }
+                        $stockItem = Mage::getModel('cataloginventory/stock_item')->loadByProduct($childproduct->getId());
+                        $variant->stock = (INT) $stockItem->getQty();
+                        $variant->sale_price = number_format((float) $childproduct->getFinalPrice(), 2, '.', '');
+                        $variant->retail_price = number_format((float) $childproduct->getPrice(), 2, '.', '');
+
+                        if ($product_child->getMspCashback()) {
+                            $variant->cashback = $product_child->getMspCashback();
+                        }
+
+
+                        $attrchild = array();
+                        $attributes = $childproduct->getAttributes();
+                        //print_r($attributes);exit;
+                        foreach ($storeCollection as $store) {
+                            $store_id = $store->getId();
+                            Mage::app()->setCurrentStore($store_id);
+                            $language = Mage::getStoreConfig('general/locale/code', $store_id);
+                            foreach ($attributes as $attribute) {
+                                if ($attribute->getIsVisibleOnFront()) {
+                                    $_coditionDefault = $childproduct->getResource()->getAttribute($attribute->getAttributeCode())->setStoreId($store_id)->getFrontend()->getValue($childproduct);
+                                    $langlabels = $attribute->getStoreLabels();
+                                    if (isset($langlabels[$store_id]) && $_coditionDefault != NULL) {
+                                        $attrchild[$attribute->getAttributeCode()][$language] = array('label' => $langlabels[$store_id], 'value' => $_coditionDefault);
+                                    } elseif ($_coditionDefault) {
+                                        $attrchild[$attribute->getAttributeCode()][$language] = array('label' => $attribute->getFrontendLabel(), 'value' => $_coditionDefault);
+                                    }
+                                }
+                            }
+                        }
+                        if (!empty($attrchild)) {
+                            $variant->attributes = $attrchild;
+                        }
+                        $variants[] = $variant;
+                    }
+                }
+                $product_data['variants'] = $variants;
+            } elseif ($product->getTypeId() == "grouped") {
+                $variants = array();
+                /*
+                 * GET product variant (options) and add them as variants
+                 */
+
+                $collection = Mage::getModel('catalog/product_type_grouped')->getAssociatedProductCollection($product);
+
+                $processed = array();
+                $prices = array();
+                foreach ($collection as $childproduct) {
+
+                    if (!in_array($childproduct->getId(), $processed)) {
+
+                        $product_child = Mage::getModel('catalog/product')->load($childproduct->getId());
+
+                        $variant = new stdclass();
+                        $variant->product_id = $product_child->getId();
+                        $processed[] = $product_child->getId();
+                        $variant->sku_number = $product_child->getSku();
+                        if ($product_child->getGtin()) {
+                            $variant->gtin = $product_child->getGtin();
+                            $variant->unique_identifier = true;
+                        } else {
+                            $variant->gtin = null;
+                            $variant->unique_identifier = false;
+                        }
+                        $product_data['mpn'] = $product_child->getMpn();
+
+                        if ($product_child->getImage() && $product_child->getImage() != 'no_selection') {
+                            $mainimage = new stdclass();
+                            $mainimage->url = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA) . 'catalog/product' . $product_child->getImage();
+                            $mainimage->main = true;
+                            $variant->product_image_urls = array();
+                            $variant->product_image_urls[] = $mainimage;
+                        }
+
+                        $childimages = $product_child->getMediaGalleryImages();
+                        if (!empty($childimages)) {
+                            foreach ($product_child->getMediaGalleryImages() as $image) {
+                                $subimage = new stdclass();
+                                $subimage->url = $image->getUrl();
+                                $subimage->main = false;
+                                $variant->product_image_urls[] = $subimage;
+                            }
+                        }
+                        $stockItem = Mage::getModel('cataloginventory/stock_item')->loadByProduct($product_child->getId());
+                        $variant->stock = (INT) $stockItem->getQty();
+                        $variant->sale_price = number_format((float) $product_child->getFinalPrice(), 2, '.', '');
+                        $variant->retail_price = number_format((float) $product_child->getPrice(), 2, '.', '');
+
+                        if ($product_child->getMspCashback()) {
+                            $variant->cashback = $product_child->getMspCashback();
+                        }
+
+
+
+                        $prices[] = $variant->sale_price;
+
+                        $attrchild = array();
+                        $attributes = $product_child->getAttributes();
+                        //print_r($attributes);exit;
+                        foreach ($storeCollection as $store) {
+                            $store_id = $store->getId();
+                            Mage::app()->setCurrentStore($store_id);
+                            $language = Mage::getStoreConfig('general/locale/code', $store_id);
+                            foreach ($attributes as $attribute) {
+                                if ($attribute->getIsVisibleOnFront()) {
+                                    $_coditionDefault = $product_child->getResource()->getAttribute($attribute->getAttributeCode())->setStoreId($store_id)->getFrontend()->getValue($product_child);
+                                    $langlabels = $attribute->getStoreLabels();
+                                    if (isset($langlabels[$store_id]) && $_coditionDefault != NULL) {
+                                        $attrchild[$attribute->getAttributeCode()][$language] = array('label' => $langlabels[$store_id], 'value' => $_coditionDefault);
+                                    } elseif ($_coditionDefault) {
+                                        $attrchild[$attribute->getAttributeCode()][$language] = array('label' => $attribute->getFrontendLabel(), 'value' => $_coditionDefault);
+                                    }
+                                }
+                            }
+                        }
+                        if (!empty($attrchild)) {
+                            $variant->attributes = $attrchild;
+                        }
+                        $variants[] = $variant;
+                    }
+                }
+
+                /**
+                 * Get child product tax rule. We need to set this as the main product is of type grouped and does not have this value.
+                 * */
+                $taxRules = Mage::getModel('tax/sales_order_tax')->getCollection();
+                $taxCalculation = Mage::getModel('tax/calculation');
+                $request = $taxCalculation->getRateRequest(null, null, null, $store);
+                $tax_rule = new stdclass();
+                $rules = array();
+
+                $collection = Mage::getModel('tax/calculation_rule')->getCollection();
+                if ($collection->getSize()) {
+                    $collection->addCustomerTaxClassesToResult()->addProductTaxClassesToResult()->addRatesToResult();
+                }
+                if ($collection->getSize()) {
+                    foreach ($collection as $rule) {
+                        $rule_data = $rule->getData();
+                        if (in_array($product_child->getTaxClassId(), $rule_data['product_tax_classes'])) {
+                            foreach ($rule_data['tax_rates'] as $key => $rate_id) {
+                                $rate = Mage::getSingleton('tax/calculation_rate')->load($rate_id);
+                                $rate_info = $rate->getData();
+                                $rules[$rate_info['tax_country_id']] = $rate_info['rate'];
+                                $tax_rule->name = $rule_data['code'];
+                            }
+                        }
+                    }
+                };
+
+                $tax_rule->id = $product_child->getTaxClassId();
+                $tax_rule->rules = $rules;
+                $product_data['tax'] = $tax_rule;
+
+
+                $product_data['from_price'] = min($prices);
+                $product_data['variants'] = $variants;
+            }
+
+
+            $options = $product->getOptions();
+
+            if (!empty($options)) {
+                foreach ($storeCollection as $store) {
+                    $store_id = $store->getId();
+                    $language = Mage::getStoreConfig('general/locale/code', $store->getId());
+                    $productdata = Mage::getModel('catalog/product')->setStoreId($store_id)->load($product_id);
+                    foreach ($productdata->getOptions() as $value) {
+                        if (is_object($value)) {
+                            $optionobjects = $value->getValues();
+                            $values = array();
+                            foreach ($optionobjects as $options) {
+                                $data = $options->getData();
+                                $optiondata = new stdclass();
+                                $optiondata->id = $data['option_type_id'];
+                                $optiondata->label = $data['title'];
+                                $optiondata->pricing = $data['price'];
+                                $optiondata->price_type = $data['price_type'];
+                                $values[] = $optiondata;
+
+                                if (!empty($data['option_type_id'])) {
+                                    $product_data['options']['global_options'][$language][$value->getTitle()] = array(
+                                        'id' => $data['option_id'],
+                                        'type' => 'custom',
+                                        //'label' => $value->getTitle(),
+                                        'values' => $values
+                                    );
+                                }
+                            }
+                        }
                     }
                 }
             }
-            $json[] = $product_data;
+            if ($product->getName() != null) {
+                $json[] = $product_data;
+            }
         }
         return json_encode($json);
     }
@@ -557,33 +1184,103 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
 
     public function getCategoriesFeed()
     {
-        $recursionLevel = 10;
-        $parent = Mage::app()->getStore()->getRootCategoryId();
-        $tree = Mage::getResourceModel('catalog/category_tree');
-        $nodes = $tree->loadNode($parent)->loadChildren($recursionLevel)->getChildren();
-        $tree->addCollectionData(null, false, $parent);
-        $categoryTreeData = array();
-        //$categoryTreeData->categories = array();
-        foreach ($nodes as $node) {
-            $categoryTreeData[] = $this->getNodeChildrenData($node);
+        if (!Mage::helper('catalog/category_flat')->isEnabled()) {
+            $recursionLevel = 10;
+            $parent = Mage::app()->getStore()->getRootCategoryId();
+            $tree = Mage::getResourceModel('catalog/category_tree');
+            $nodes = $tree->loadNode($parent)->loadChildren($recursionLevel)->getChildren();
+            $tree->addCollectionData(null, false, $parent);
+            $categoryTreeData = array();
+            $stores = array();
+            $storeCollection = Mage::getModel('core/store')->getCollection();
+
+            foreach ($nodes as $node) {
+                $cattrans = array();
+                //we need to get transalations per view
+                foreach ($storeCollection as $store) {
+                    $store_id = $store->getId();
+                    $language = Mage::getStoreConfig('general/locale/code', $store->getId());
+                    $defaultStoreCategory = Mage::getModel('catalog/category');
+                    $defaultStoreCategory->setStoreId($store_id);
+                    $defaultStoreCategory->load($node->getId());
+                    $cattrans['id'] = $node->getId();
+                    if ($defaultStoreCategory->getName()) {
+                        $cattrans['title'][$language] = $defaultStoreCategory->getName();
+                    }
+
+                    if ($defaultStoreCategory->getMspCashback()) {
+                        $cattrans['cashback'] = $defaultStoreCategory->getMspCashback();
+                    }
+                }
+
+
+                foreach ($node->getChildren() as $child) {
+                    $children = array();
+                    $childs = array();
+
+                    foreach ($storeCollection as $store) {
+                        $store_id = $store->getId();
+                        $language = Mage::getStoreConfig('general/locale/code', $store->getId());
+                        $childCategory = Mage::getModel('catalog/category');
+                        $childCategory->setStoreId($store_id);
+                        $childCategory->load($child->getId());
+                        $children['id'] = $child->getId();
+                        $children['title'][$language] = $childCategory->getName();
+                        if ($childCategory->getMspCashback()) {
+                            $children['cashback'] = $childCategory->getMspCashback();
+                        }
+                    }
+                    $cattrans['children'][] = $children;
+                }
+                $categoryTreeData[] = $cattrans;
+            }
+        } else {
+            $stores = array();
+            $storeCollection = Mage::getModel('core/store')->getCollection();
+            $categoryTreeData = array();
+            $_helper = Mage::helper('catalog/category');
+            $_categories = $_helper->getStoreCategories(false, true, true);
+
+            if (count($_categories) > 0) {
+                foreach ($_categories as $_category) {
+                    $_category = Mage::getModel('catalog/category')->load($_category->getId());
+                    $cattrans = array();
+                    foreach ($storeCollection as $store) {
+                        $store_id = $store->getId();
+                        $language = Mage::getStoreConfig('general/locale/code', $store->getId());
+                        $cattrans['id'] = $_category->getId();
+                        $cattrans['title'][$language] = $_category->getName();
+
+                        if ($_category->getMspCashback()) {
+                            $cattrans['cashback'] = $_category->getMspCashback();
+                        }
+                    }
+
+                    $_subcategories = $_category->getChildrenCategories();
+                    if (count($_subcategories) > 0) {
+                        foreach ($_subcategories as $_subcategory) {
+                            $children = array();
+                            $childs = array();
+
+                            foreach ($storeCollection as $store) {
+                                $store_id = $store->getId();
+                                $language = Mage::getStoreConfig('general/locale/code', $store->getId());
+                                $children['id'] = $_subcategory->getId();
+                                $children['title'][$language] = $_subcategory->getName();
+                                if ($_subcategory->getMspCashback()) {
+                                    $children['cashback'] = $_subcategory->getMspCashback();
+                                }
+                            }
+                            $cattrans['children'][] = $children;
+                        }
+                    }
+                    if (!empty($cattrans)) {
+                        $categoryTreeData[] = $cattrans;
+                    }
+                }
+            }
         }
         return json_encode($categoryTreeData);
-    }
-
-    function getNodeChildrenData(Varien_Data_Tree_Node $node)
-    {
-        $data = array(
-            'title' => $node->getData('name'),
-            'id' => $node->getData('entity_id')
-        );
-
-        foreach ($node->getChildren() as $childNode) {
-            if (!array_key_exists('children', $data)) {
-                $data['children'] = array();
-            }
-            $data['children'][] = $this->getNodeChildrenData($childNode);
-        }
-        return $data;
     }
 
     /*
@@ -592,43 +1289,130 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
 
     public function getStockFeed()
     {
-        $product_id = $this->getRequest()->getQuery('product_id');
-        $stock = array();
-        if (empty($product_id)) {
-            echo 'Nothing to fetch. Missing product_id.';
+        $product_id = null;
+        $variant_id = null;
+
+        if (isset($_GET['product_id'])) {
+            $product_id = $this->getRequest()->getQuery('product_id');
+        }
+
+        if (isset($_GET['variant_id'])) {
+            $variant_id = $this->getRequest()->getQuery('variant_id');
+        }
+
+        $stock = '';
+        if (empty($product_id) && empty($variant_id)) {
+            echo '{
+                        "success": false, 
+                        "data": {
+                            "error_code": "QW-4002",
+                            "error": "Product ID not set."
+                            }
+                        }'
+            ;
+
             exit;
         }
 
-        $stockItem = Mage::getModel('cataloginventory/stock_item')->loadByProduct($product_id);
-        $stockqty = new stdclass();
-        $stockqty->ProductID = $product_id;
-        $stockqty->Stock = $stockItem->getQty();
-        $stock[] = $stockqty;
+        if ($variant_id != null) {
+            $product_id = $variant_id;
+        }
+
+
+        $product = Mage::getModel('catalog/product')->load($product_id);
+        $validproducts = array();
+        if ($product->isConfigurable() && $this->getRequest()->getParam('options')) {
+            $remove = array("[", "]");
+            $options = $this->getRequest()->getParam('options');
+            $dataoptions = str_replace($remove, "", $options);
+            $data = explode(',', $dataoptions);
+
+            $attribute_values = array();
+            $childs = Mage::getResourceSingleton('catalog/product_type_configurable')->getChildrenIds($product_id);
+            $productAttributeOptions = $product->getTypeInstance(true)->getConfigurableAttributesAsArray($product);
+
+            foreach ($productAttributeOptions as $productAttribute) {
+                $attribute_code = $productAttribute['attribute_code'];
+                foreach ($data as $option) {
+                    $attribute_id = $this->strbefore($option, '|');
+                    $attribute_value = $this->strafter($option, '|');
+                    if ($productAttribute['attribute_id'] == $attribute_id) {
+                        $attribute_values[] = $attribute_value;
+                    }
+                }
+
+                foreach ($attribute_values as $att_val) {
+                    foreach ($childs as $child => $value) {
+                        foreach ($value as $productid) {
+                            $childproduct = Mage::getModel('catalog/product')->load($productid);
+                            $data2 = $childproduct->getData();
+                            if (isset($data2[$attribute_code]) && $data2[$attribute_code] == $att_val) {
+                                //if(!in_array($productid, $validproducts)){
+                                //$validproducts[$productid] = $productid;
+                                $stockItem = Mage::getModel('cataloginventory/stock_item')->loadByProduct($productid);
+                                $stockqty = new stdclass();
+                                $stockqty->product_id = $product_id;
+                                $stockqty->stock = (int) $stockItem->getQty();
+                                $stock = $stockqty;
+                                //}
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            $stockItem = Mage::getModel('cataloginventory/stock_item')->loadByProduct($product_id);
+            $stockqty = new stdclass();
+            $stockqty->product_id = $product_id;
+            $stockqty->stock = (int) $stockItem->getQty();
+            $stock = $stockqty;
+        }
         return json_encode($stock);
+    }
+
+    function strafter($string, $substring)
+    {
+        $pos = strpos($string, $substring);
+        if ($pos === false)
+            return $string;
+        else
+            return(substr($string, $pos + strlen($substring)));
+    }
+
+    function strbefore($string, $substring)
+    {
+        $pos = strpos($string, $substring);
+        if ($pos === false)
+            return $string;
+        else
+            return(substr($string, 0, $pos));
     }
 
     /*
      * 	Function that generates a JSON Tax feed.
      */
+    /* public function getTaxFeed() {
+      $taxRules = Mage::getModel('tax/sales_order_tax')->getCollection();
 
-    public function getTaxFeed()
-    {
-        $taxRules = Mage::getModel('tax/sales_order_tax')->getCollection();
+      $alternate=  array();
+      $inRuleSet = array();
+      foreach ($taxRules as $taxRule) {
+      if(!in_array($taxRule->getTitle(), $inRuleSet)){
+      $tax_rule = new stdclass();
+      $tax_rule->id = $taxRule->getTaxId();
+      $code = $taxRule->getCode();
+      $rate = Mage::getModel('tax/calculation_rate')->loadByCode($code);
+      $tax_rule->name = $taxRule->getTitle();
+      $rule = array();
+      $rule[$rate->getTaxCountryId()]=$taxRule->getPercent();
+      $tax_rule->rules = $rule;
+      $alternate[] = $tax_rule;
 
-        $alternate = array();
-        foreach ($taxRules as $taxRule) {
-            $tax_rule = new stdclass();
-            $tax_rule->id = $taxRule->getTaxId();
-            $code = $taxRule->getCode();
-            $rate = $test = Mage::getModel('tax/calculation_rate')->loadByCode($code);
-            $tax_rule->name = $taxRule->getTitle();
-            $rule = array();
-            $rule[$rate->getTaxCountryId()] = $taxRule->getPercent();
-            $tax_rule->rules = $rule;
-            $alternate[] = $tax_rule;
-        }
-        return json_encode($alternate);
-    }
+      $inRuleSet[] =  $taxRule->getTitle();
+      }
+      }
+      return json_encode($alternate);
+      } */
 
     /*
      * 	Function that generates a JSON Shipping feed.
@@ -636,31 +1420,243 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
 
     public function getShippingFeed()
     {
-        //all method
+        if ($this->getRequest()->getParam('amount') && $this->getRequest()->getParam('items_count')) {
+            $specific_request = true;
+        } else {
+            $specific_request = false;
+        }
         $shippingMethods = array();
+
+        //all method
         $carriers = Mage::getStoreConfig('carriers', Mage::app()->getStore()->getId());
-        //$oldcarrierlist= print_r($this->handleShippingRatesNotification());
-        //print_r($carriers);
+
 
         foreach ($carriers as $carrierCode => $carrierConfig) {
             if ($carrierConfig['active']) {
-                if (isset($carrierConfig['price'])) {
-                    $method = new stdclass();
-                    $method->id = $carrierCode;
-                    $method->name = $carrierConfig['name'];
-                    //$method->taxid= null;
-                    $method->price = $carrierConfig['price'];
-                    $method->sort_order = $carrierConfig['sort_order'];
-                    $areas = explode(',', $carrierConfig['specificcountry']);
-                    $method->allowed_areas = array();
-                    foreach ($areas as $area) {
-                        $method->allowed_areas[] = $area;
+                if ($specific_request == false) {
+                    if (isset($carrierConfig['price'])) {
+                        $method = new stdclass();
+                        $method->id = $carrierCode;
+                        $method->type = "flat_rate_shipping";
+                        $method->provider = $carrierCode;
+                        $method->name = $carrierConfig['name'];
+                        $method->price = number_format((float) $carrierConfig['price'], 2, '.', ''); //$carrierConfig['price'];
+                        $areas = explode(',', $carrierConfig['specificcountry']);
+                        $method->allowed_areas = array();
+                        foreach ($areas as $area) {
+                            $method->allowed_areas[] = $area;
+                        }
+                        $shippingMethods[] = $method;
                     }
-                    $shippingMethods[] = $method;
+                } else {
+                    $remove = array('[', ']', '"', ' ');
+                    $options = urldecode($this->getRequest()->getParam('countries'));
+                    $dataoptions = str_replace($remove, "", $options);
+                    $countries = explode(',', $dataoptions);
+
+                    if (isset($carrierConfig['price']) && isset($carrierConfig['name']) && !empty($carrierConfig['name']) && isset($carrierConfig['model']) && $carrierConfig['model'] != "postnl_carrier/postnl") {
+                        $method = new stdclass();
+                        $method->id = $carrierCode;
+                        $method->type = "flat_rate_shipping";
+                        $method->provider = $carrierCode;
+                        $method->name = $carrierConfig['name'];
+                        $price = 0;
+                        if ($carrierConfig['model'] == 'shipping/carrier_flatrate') {
+                            if ($carrierConfig['type'] == 'I') {
+                                $price = $this->getRequest()->getParam('items_count') * $carrierConfig['price'];
+                                $price = number_format((float) $price, 2, '.', ''); //$carrierConfig['price'];
+                            } else {
+                                $price = number_format((float) $carrierConfig['price'], 2, '.', ''); //$carrierConfig['price'];
+                            }
+                        } else {
+                            $price = $carrierConfig['price'];
+                        }
+
+                        $method->price = number_format((float) $price, 2, '.', '');
+
+                        if (!empty($carrierConfig['specificcountry'])) {
+                            $areas = explode(',', $carrierConfig['specificcountry']);
+                            foreach ($areas as $area) {
+                                if (in_array($area, $countries)) {
+                                    $shippingMethods[] = $method;
+                                }
+                            }
+                        } else {
+                            $shippingMethods[] = $method;
+                        }
+                    } elseif ('shipping/carrier_freeshipping' == $carrierConfig['model']) {
+                        $amount = $this->getRequest()->getParam('amount') / 100;
+                        if ($amount >= $carrierConfig['free_shipping_subtotal']) {
+                            $method = new stdclass();
+                            $method->id = $carrierCode;
+                            $method->type = "flat_rate_shipping";
+                            $method->provider = $carrierCode;
+                            $method->name = $carrierConfig['name'];
+                            $method->price = number_format((float) 0, 2, '.', '');
+
+                            if (!empty($carrierConfig['specificcountry'])) {
+                                $areas = explode(',', $carrierConfig['specificcountry']);
+                                foreach ($areas as $area) {
+                                    if (in_array($area, $countries)) {
+                                        $shippingMethods[] = $method;
+                                    }
+                                }
+                            } else {
+                                $shippingMethods[] = $method;
+                            }
+                        }
+                    } elseif ('oss_ossdeliveryoption/carrier' == $carrierConfig['model']) {
+                        $request = Mage::getModel('shipping/rate_request');
+                        $request->setPackageWeight($this->getRequest()->getParam('weight'));
+                        $request->setDestCountryId($countries[0]);
+                        $request->setDestPostcode($this->getRequest()->getParam('zipcode'));
+                        $request->setPackageQty($this->getRequest()->getParam('items_count'));
+                        $request->setPackageValue($this->getRequest()->getParam('amount'));
+                        $ossrates = Mage::getModel('oss_ossdeliveryoption/carrier')->collectRates($request);
+
+                        $rates = $this->getProtectedValue($ossrates, '_rates');
+                        foreach ($rates as $rate) {
+
+                            $method = new stdclass();
+                            $method->id = $rate->getData('carrier');
+                            $method->type = "flat_rate_shipping";
+                            $method->provider = $rate->getData('method');
+                            $method->name = $rate->getData('method_title');
+                            $method->price = number_format((float) $rate->getData('price'), 2, '.', '');
+
+                            if (!empty($carrierConfig['specificcountry'])) {
+                                $areas = explode(',', $carrierConfig['specificcountry']);
+                                foreach ($areas as $area) {
+                                    if (in_array($area, $countries)) {
+                                        $shippingMethods[] = $method;
+                                    }
+                                }
+                            } else {
+                                $shippingMethods[] = $method;
+                            }
+                        }
+                    } elseif ('postnl_carrier/postnl' == $carrierConfig['model']) {
+                        $request = Mage::getModel('shipping/rate_request');
+                        $request->setPackageWeight($this->getRequest()->getParam('weight'));
+                        $request->setFreeMethodWeight($this->getRequest()->getParam('weight'));
+                        $request->setDestCountryId($countries[0]);
+                        $request->setDestPostcode($this->getRequest()->getParam('zipcode'));
+                        $request->setPackageQty($this->getRequest()->getParam('items_count'));
+                        $request->setPackageValue($this->getRequest()->getParam('amount'));
+                        $request->setBaseSubtotalInclTax($this->getRequest()->getParam('amount'));
+                        $request->setWebsiteId(Mage::app()->getWebsite()->getId());
+                        $ossrates = Mage::getModel('postnl_carrier/postnl')->collectRates($request);
+                        $rates = $this->getProtectedValue($ossrates, '_rates');
+                        foreach ($rates as $rate) {
+
+                            $method = new stdclass();
+                            $method->id = $rate->getData('carrier');
+                            $method->type = "flat_rate_shipping";
+                            $method->provider = $rate->getData('method');
+                            $method->name = $rate->getData('method_title');
+                            $method->price = number_format((float) $rate->getData('price'), 2, '.', '');
+
+                            if (!empty($carrierConfig['specificcountry'])) {
+                                $areas = explode(',', $carrierConfig['specificcountry']);
+                                foreach ($areas as $area) {
+                                    if (in_array($area, $countries)) {
+                                        $shippingMethods[] = $method;
+                                    }
+                                }
+                            } else {
+                                $shippingMethods[] = $method;
+                            }
+                        }
+                    }
                 }
             }
         }
+
+
+
+        $checkout = Mage::getModel("msp/checkout");
+        if ($checkout->getSectionConfigData('checkout_custom_fields/fco_postnl')) {
+            $method = new stdclass();
+            $method->id = 'postnl';
+            $method->name = 'Post NL - Pak je gemak';
+            $method->type = "flat_rate_shipping";
+            $method->provider = 'postnl';
+            //$method->taxid= null;
+            $method->price = number_format((float) $checkout->getSectionConfigData('checkout_custom_fields/fco_postnl_amount'), 2, '.', '');
+            /* $method->sort_order = $carrierConfig['sort_order'];
+              $areas = explode(',', $carrierConfig['specificcountry']);
+              $method->allowed_areas = array();
+              foreach($areas as $area){
+              $method->allowed_areas[] =$area;
+              } */
+            $shippingMethods[] = $method;
+        }
+
+
+        if ($specific_request == true) {
+            $websiteId = Mage::app()->getWebsite()->getId();
+            //Table rate based
+            $tablerateColl = Mage::getResourceModel('shipping/carrier_tablerate_collection');
+
+            $active = Mage::getStoreConfig('carriers/tablerate/active', Mage::app()->getStore()->getStoreId());
+            if ($active) {
+                foreach ($tablerateColl as $tablerate) {
+                    $table_data = $tablerate->getData();
+
+                    if ($table_data['condition_name'] == 'package_qty') {
+                        $items_count = $this->getRequest()->getParam('items_count');
+                        if ($items_count >= $table_data['condition_value'] && $websiteId == $table_data['website_id']) {
+                            $rate_price = number_format((float) $table_data['price'], 2, '.', '');
+                        }
+                    } elseif ($table_data['condition_name'] == 'package_value') {
+                        $table_data = $tablerate->getData();
+                        $remove = array('[', ']', '"', ' ');
+                        $options = urldecode($this->getRequest()->getParam('countries'));
+                        $dataoptions = str_replace($remove, "", $options);
+                        $countries = explode(',', $dataoptions);
+                        $country_id = $countries[0];
+
+
+                        if ($country_id == $table_data['dest_country_id'] && $this->getRequest()->getParam('amount') >= $table_data['condition_value'] && $websiteId == $table_data['website_id']) {
+                            $rate_price = number_format((float) $table_data['price'], 2, '.', '');
+                        }
+                    } else {
+                        $item_weight = $this->getRequest()->getParam('weight');
+
+                        if ($item_weight >= $table_data['condition_value'] && $websiteId == $table_data['website_id']) {
+                            $rate_price = number_format((float) $table_data['price'], 2, '.', '');
+                        }
+                    }
+                }
+
+                $method = new stdclass();
+                $method->id = 'tablerate';
+                $method->type = "flat_rate_shipping";
+                $method->provider = 'bestway';
+                $method->name = Mage::getStoreConfig('carriers/tablerate/title', Mage::app()->getStore()->getId());
+                $method->price = $rate_price;
+                $ratecountries = Mage::getStoreConfig('carriers/tablerate/specificcountry', Mage::app()->getStore()->getId());
+                $ratecountcheck = explode(',', $ratecountries);
+                $shippingMethods[] = $method;
+                /* if (!empty($ratecountries)) {
+                  foreach ($ratecountcheck as $area) {
+                  if (in_array($area, $countries)) {
+                  $shippingMethods[] = $method;
+                  }
+                  }
+                  } else {
+                  $shippingMethods[] = $method;
+                  } */
+            }
+        }
         return json_encode($shippingMethods);
+    }
+
+    function getProtectedValue($obj, $name)
+    {
+        $array = (array) $obj;
+        $prefix = chr(0) . '*' . chr(0);
+        return $array[$prefix . $name];
     }
 
     /*
@@ -672,84 +1668,221 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
         $stores = array();
         $languages = array();
         $storeCollection = Mage::getModel('core/store')->getCollection();
-        //foreach($storeCollection as $store)
-        //{
-        $store = Mage::app()->getStore();
+        $desc_array = array();
+        $CurrencyCodes = Mage::getStoreConfig('currency/options/allow', Mage::app()->getStore()->getId());
+        $currencies = explode(',', $CurrencyCodes);
+        $allowed_currencies = array();
+        foreach ($currencies as $key => $currency) {
+            $allowed_currencies[] = $currency;
+        }
+
         $store_data = new stdclass();
-
-        //get languages
-        //$languages[] = Mage::getStoreConfig('general/locale/code', $store->getId());
-        //get allowed countries
-        $allowed = explode(",", Mage::getStoreConfig('general/country/allow'), $store->getId());
-        $countries = array();
-
-        foreach ($allowed as $key => $value) {
-            $countriesdata = explode(",", $value);
-            foreach ($countriesdata as $index => $val) {
-                $countries[] = $val;
+        foreach ($storeCollection as $store) {
+            //$store = Mage::app()->getStore();
+            //get languages
+            //$languages[] = Mage::getStoreConfig('general/locale/code', $store->getId());
+            //get allowed countries
+            $allowed = explode(",", Mage::getStoreConfig('general/country/allow'), Mage::app()->getStore()->getId());
+            $countries = array();
+            foreach ($allowed as $key => $value) {
+                $countriesdata = explode(",", $value);
+                foreach ($countriesdata as $index => $val) {
+                    $countries[] = $val;
+                }
             }
+
+
+
+            /*
+             * Get ship to countries
+             * */
+            $shipto = array();
+            $carriers = Mage::getStoreConfig('carriers', Mage::app()->getStore()->getId());
+            foreach ($carriers as $carrierCode => $carrierConfig) {
+                if ($carrierConfig['active']) {
+                    if (!empty($carrierConfig['specificcountry'])) {
+                        $areas = explode(',', $carrierConfig['specificcountry']);
+                        foreach ($areas as $area) {
+                            if (!in_array($area, $shipto)) {
+                                $shipto[] = $area;
+                            }
+                        }
+                    } else {
+                        $allowed = explode(",", Mage::getStoreConfig('general/country/allow'), Mage::app()->getStore()->getId());
+
+                        foreach ($allowed as $key => $value) {
+                            $countriesdata = explode(",", $value);
+                            foreach ($countriesdata as $index => $val) {
+                                if (!in_array($val, $shipto)) {
+                                    $shipto[] = $val;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            $store_data->shipping_countries = $shipto;
+            $store_data->allowed_countries = $countries;
+
+            //get metadata per languages
+            $metadata[Mage::getStoreConfig('general/locale/code', $store->getId())]['metadata']['title'] = Mage::getStoreConfig('design/head/default_title', $store->getId());
+
+            $keywords = explode(",", Mage::getStoreConfig('design/head/default_keywords', $store->getId()));
+            $keywordsdata = array();
+            foreach ($keywords as $key => $value) {
+                $keywordsdata[] = trim($value);
+            }
+
+            $metadata[Mage::getStoreConfig('general/locale/code', $store->getId())]['metadata']['keywords'] = $keywordsdata;
+            $metadata[Mage::getStoreConfig('general/locale/code', $store->getId())]['metadata']['description'] = Mage::getStoreConfig('design/head/default_description', $store->getId());
+            $metadata[Mage::getStoreConfig('general/locale/code', $store->getId())]['description']['long'] = Mage::getStoreConfig('qwindo/settings/long_store_desc', $store->getId());
+            $metadata[Mage::getStoreConfig('general/locale/code', $store->getId())]['description']['short'] = Mage::getStoreConfig('qwindo/settings/short_store_desc', $store->getId());
+
+
+            $shipping1 = Mage::getStoreConfig('qwindo/shipping/usp1', $store->getId());
+            $shipping2 = Mage::getStoreConfig('qwindo/shipping/usp2', $store->getId());
+            $shipping3 = Mage::getStoreConfig('qwindo/shipping/usp3', $store->getId());
+            $shipping4 = Mage::getStoreConfig('qwindo/shipping/usp4', $store->getId());
+            $shipping5 = Mage::getStoreConfig('qwindo/shipping/usp5', $store->getId());
+            $shipping_usps = array();
+            $i = 1;
+            while ($i < 6) {
+                $shipping_usp = ${'shipping' . $i};
+                if (!empty($shipping_usp)) {
+                    $shipping_usps[] = $shipping_usp;
+                }
+                $metadata[Mage::getStoreConfig('general/locale/code', $store->getId())]['usps']['shipping'] = $shipping_usps;
+                $i++;
+            }
+
+            $global1 = Mage::getStoreConfig('qwindo/global/usp1', $store->getId());
+            $global2 = Mage::getStoreConfig('qwindo/global/usp2', $store->getId());
+            $global3 = Mage::getStoreConfig('qwindo/global/usp3', $store->getId());
+            $global4 = Mage::getStoreConfig('qwindo/global/usp4', $store->getId());
+            $global5 = Mage::getStoreConfig('qwindo/global/usp5', $store->getId());
+            $global_usps = array();
+            $i = 1;
+            while ($i < 6) {
+                $global_usp = ${'global' . $i};
+                if (!empty($global_usp)) {
+                    $global_usps[] = $global_usp;
+                }
+                $metadata[Mage::getStoreConfig('general/locale/code', $store->getId())]['usps']['global'] = $global_usps;
+                $i++;
+            }
+
+            $stock1 = Mage::getStoreConfig('qwindo/stock/usp1', $store->getId());
+            $stock2 = Mage::getStoreConfig('qwindo/stock/usp2', $store->getId());
+            $stock_usps = array();
+            $i = 1;
+            while ($i < 3) {
+                $stock_usp = ${'stock' . $i};
+                if (!empty($stock_usp)) {
+                    $stock_usps[] = $stock_usp;
+                }
+                $metadata[Mage::getStoreConfig('general/locale/code', $store)]['usps']['stock'] = $stock_usps;
+                $i++;
+            }
+
+
+
+
+
+            //Get tax calculation method 
+            switch (Mage::getStoreConfig('tax/calculation/algorithm', Mage::app()->getStore()->getId())) {
+                case Mage_Tax_Model_Calculation::CALC_UNIT_BASE:
+                    $tax_calculation = 'unit';
+                    break;
+                case Mage_Tax_Model_Calculation::CALC_ROW_BASE:
+                    $tax_calculation = 'row';
+                    break;
+                case Mage_Tax_Model_Calculation::CALC_TOTAL_BASE:
+                    $tax_calculation = 'total';
+                    break;
+                default:
+                    $tax_calculation = 'total';
+                    break;
+            }
+
+
+            $store_data->languages = $metadata;
+            $store_data->allowed_currencies = $allowed_currencies;
+            $store_data->stock_updates = Mage::getStoreConfig('qwindo/settings/stock', Mage::app()->getStore()->getId()) ? true : false;
+            $store_data->including_tax = Mage::getStoreConfig('tax/calculation/price_includes_tax', Mage::app()->getStore()->getId()) ? true : false;
+            $store_data->tax_calculation = $tax_calculation; //total,row or unit
+
+            /**
+             * Get Shipping tax rule
+             * */
+            $shipping_tax_id = Mage::getStoreConfig('tax/classes/shipping_tax_class', Mage::app()->getStore()->getId());
+            $taxRules = Mage::getModel('tax/sales_order_tax')->getCollection();
+            $taxCalculation = Mage::getModel('tax/calculation');
+            $request = $taxCalculation->getRateRequest(null, null, null, Mage::app()->getStore());
+            $shipping_tax_id = Mage::getStoreConfig('tax/classes/shipping_tax_class', Mage::app()->getStore()->getId());
+            $tax_rule = new stdclass();
+            $rules = array();
+
+            $collection = Mage::getModel('tax/calculation_rule')->getCollection();
+            if ($collection->getSize()) {
+                $collection->addCustomerTaxClassesToResult()->addProductTaxClassesToResult()->addRatesToResult();
+            }
+            if ($collection->getSize()) {
+                foreach ($collection as $rule) {
+                    $rule_data = $rule->getData();
+                    if (in_array($shipping_tax_id, $rule_data['product_tax_classes'])) {
+
+                        foreach ($rule_data['tax_rates'] as $key => $rate_id) {
+                            $rate = Mage::getSingleton('tax/calculation_rate')->load($rate_id);
+                            $rate_info = $rate->getData();
+
+                            $rules[$rate_info['tax_country_id']] = $rate_info['rate'];
+                        }
+                    }
+                }
+            };
+
+            $tax_rule->id = $shipping_tax_id;
+            $tax_rule->name = 'msp-shipping';
+            $tax_rule->rules = $rules;
+            $store_data->shipping_tax = $tax_rule;
+            $store_data->rounding_policy = 'UP'; //UP, DOWN, CEILING, HALF_UP, HALF_DOWN, HALF_EVEN
+            $store_data->require_shipping = true;
+            $store_data->base_url = $store->getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK);
+            $store_data->logo = Mage::getBaseUrl('media') . 'theme/' . Mage::getStoreConfig('qwindo/settings/store_image', Mage::app()->getStore()->getId());
+            $store_data->order_push_url = Mage::getUrl("msp/checkout/notification", array("_secure" => true)); //$store->getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK).'msp/standard/notification/';
+            $store_data->email = Mage::getStoreConfig('trans_email/ident_support/email', Mage::app()->getStore()->getId());
+            $store_data->contact_phone = Mage::getStoreConfig('general/store_information/phone', Mage::app()->getStore()->getId());
+            $store_data->address = Mage::getStoreConfig('qwindo/address/street', Mage::app()->getStore()->getId());
+            $store_data->housenumber = Mage::getStoreConfig('qwindo/address/housenumber', Mage::app()->getStore()->getId());
+            $store_data->zipcode = Mage::getStoreConfig('qwindo/address/zipcode', Mage::app()->getStore()->getId());
+            $store_data->city = Mage::getStoreConfig('qwindo/address/city', Mage::app()->getStore()->getId());
+            $store_data->country = Mage::getStoreConfig('general/store_information/merchant_country', Mage::app()->getStore()->getId());
+            $store_data->vat_nr = Mage::getStoreConfig('general/store_information/merchant_vat_number', Mage::app()->getStore()->getId());
+            $store_data->coc = Mage::getStoreConfig('qwindo/settings/coc', Mage::app()->getStore()->getId());
+            $store_data->terms_and_conditions = Mage::getStoreConfig('qwindo/settings/terms', Mage::app()->getStore()->getId());
+            $store_data->faq = Mage::getStoreConfig('qwindo/settings/faq', Mage::app()->getStore()->getId());
+            $store_data->open = Mage::getStoreConfig('qwindo/settings/open', Mage::app()->getStore()->getId());
+            $store_data->closed = Mage::getStoreConfig('qwindo/settings/closed', Mage::app()->getStore()->getId());
+            $store_data->days = array(
+                "sunday" => Mage::getStoreConfig('qwindo/settings/sunday', Mage::app()->getStore()->getId()) ? true : false,
+                "monday" => Mage::getStoreConfig('qwindo/settings/monday', Mage::app()->getStore()->getId()) ? true : false,
+                "tuesday" => Mage::getStoreConfig('qwindo/settings/tuesday', Mage::app()->getStore()->getId()) ? true : false,
+                "wednesday" => Mage::getStoreConfig('qwindo/settings/wednesday', Mage::app()->getStore()->getId()) ? true : false,
+                "thursday" => Mage::getStoreConfig('qwindo/settings/thursday', Mage::app()->getStore()->getId()) ? true : false,
+                "friday" => Mage::getStoreConfig('qwindo/settings/friday', Mage::app()->getStore()->getId()) ? true : false,
+                "saturday" => Mage::getStoreConfig('qwindo/settings/saturday', Mage::app()->getStore()->getId()) ? true : false
+            );
+            $store_data->social = array(
+                "facebook" => Mage::getStoreConfig('qwindo/social/facebook', Mage::app()->getStore()->getId()),
+                "twitter" => Mage::getStoreConfig('qwindo/social/twitter', Mage::app()->getStore()->getId()),
+                "linkedin" => Mage::getStoreConfig('qwindo/social/linkedin', Mage::app()->getStore()->getId())
+            );
+            //add store data to feed structure
+            $stores[] = $store_data;
         }
 
-        $store_data->allowed_countries = $countries;
-
-        //get metadata per languages
-        $metadata[Mage::getStoreConfig('general/locale/code', $store->getId())]['title'] = Mage::getStoreConfig('design/head/default_title', $store->getId());
-
-        $keywords = explode(",", Mage::getStoreConfig('design/head/default_keywords', $store->getId()));
-        $keywordsdata = array();
-        foreach ($keywords as $key => $value) {
-            $keywordsdata[] = trim($value);
-        }
-
-        $metadata[Mage::getStoreConfig('general/locale/code', $store->getId())]['keywords'] = $keywordsdata;
-        $metadata[Mage::getStoreConfig('general/locale/code', $store->getId())]['description'] = Mage::getStoreConfig('design/head/default_description', $store->getId());
-
-        $metadata[Mage::getStoreConfig('general/locale/code', $store->getId())]['usps'] = array(
-            "shipping" => array("Order before 20:00 delivery tomorrow", "Optional, same day delivery", "We deliver till 22:00"),
-            "global" => array("24 hour helpdesk", "Try first, pay later")
-        );
-
-
-        $store_data->languages = $metadata;
-
-        $store_data->stock_updates = true;
-        $store_data->including_tax = false;
-        $store_data->require_shipping = true;
-        $store_data->base_url = $store->getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK);
-        $store_data->order_push_url = $store->getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK) . 'msp/standard/notification/';
-        $store_data->coc = '12345678';
-        $store_data->email = 'webmaster@example.com';
-        $store_data->contact_phone = '0208500500';
-        $store_data->address = 'raanspoor';
-        $store_data->housenumber = '39';
-        $store_data->zipcode = '1033 SC';
-        $store_data->city = 'Amsterdam';
-        $store_data->country = 'NL';
-        $store_data->vat_nr = "NL123456789B01";
-        $store_data->coc = '12345678';
-        $store_data->terms_and_conditions = $store->getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK);
-        $store_data->faq = $store->getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK);
-        $store_data->open = "08:00";
-        $store_data->closed = '23:00';
-
-        $store_data->days = array("sunday" => false, "monday" => true, "tuesday" => true, "wednesday" => true, "thursday" => true, "friday" => true, "saturday" => true);
-        $store_data->social = array(
-            "facebook" => $store->getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK),
-            "twitter" => $store->getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK),
-            "linkedin" => $store->getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK)
-        );
-
-
-
-
-
-
-        //add store data to feed structure
-        $stores = $store_data;
-
-        //}
-
-        return json_encode($stores);
+        return json_encode($store_data);
     }
 
     /*
@@ -763,7 +1896,6 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
         foreach ($storeCollection as $store) {
             $languages[] = Mage::getStoreConfig('general/locale/code', $store->getId());
         }
-
         return json_encode($languages);
     }
 
@@ -775,11 +1907,9 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
     {
         $allowed = explode(",", Mage::getStoreConfig('general/country/allow'), $store->getId());
         $countries = array();
-
         foreach ($allowed as $key => $value) {
             $countries[] = $value;
         }
-
         return json_encode($countries);
     }
 
@@ -791,7 +1921,6 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
     {
         $metadata = array();
         $storeCollection = Mage::getModel('core/store')->getCollection();
-
         foreach ($storeCollection as $store) {
             $metadata[Mage::getStoreConfig('general/locale/code', $store->getId())]['title'] = Mage::getStoreConfig('design/head/default_title', $store->getId());
 
@@ -804,7 +1933,6 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
             $metadata[Mage::getStoreConfig('general/locale/code', $store->getId())]['keywords'] = $keywordsdata;
             $metadata[Mage::getStoreConfig('general/locale/code', $store->getId())]['description'] = Mage::getStoreConfig('design/head/default_description', $store->getId());
         }
-
         return json_encode($metadata);
     }
 
@@ -863,63 +1991,224 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
     public function feedAction()
     {
         $storeId = Mage::app()->getStore()->getStoreId();
-        $config = Mage::getStoreConfig('mspcheckout' . "/settings", $storeId);
-        $api_key = $this->getRequest()->getQuery('api_key');
-        $config_api_key = $config["api_key"];
+        $store = $storeId = Mage::app()->getStore();
+        $config = Mage::getStoreConfig('qwindo' . "/settings", $storeId);
+        $headers = $this->emu_getallheaders();
 
-        if (strtoupper($api_key) == strtoupper($config_api_key)) {
-            $keys_match = true;
-        } else {
+        $api_key = Mage::getStoreConfig('qwindo/settings/qwindo_key', $store->getId());
+        $url = html_entity_decode(Mage::helper('core/url')->getCurrentUrl());
+
+        $hash_id = Mage::getStoreConfig('qwindo/settings/hash_id', $store->getId());
+        $timestamp = $this->microtime_float();
+        $auth = explode('|', base64_decode($headers['Auth']));
+        $message = $url . $auth[0] . $hash_id;
+        $token = hash_hmac('sha512', $message, $api_key);
+        $message = $url . $auth[0] . $hash_id;
+
+        $this->getResponse()->clearHeaders()->setHeader('Content-Type', 'application/json', true);
+        $this->getResponse()->setHeader('X-Feed-Version', '1.0', true);
+        $this->getResponse()->setHeader('Shop-Type', 'Magento', true);
+        $this->getResponse()->setHeader('Shop-Version', Mage::getVersion(), true);
+        $this->getResponse()->setHeader('Plugin-Version', '2.3.6', true);
+        $identifier = $this->getRequest()->getQuery('identifier');
+        
+        if ($token !== $auth[1] and round($timestamp - $auth[0]) > 10) {
             $keys_match = false;
+             //For shipping request no auth is needed so this is disabled to get working compatibility with FCO system
+            if($identifier == 'shipping'){
+	          	$keys_match = true;  
+            }
+        } else {
+            $keys_match = true;
+        }
+//$keys_match = true;
+
+        if (!$config["allow_fcofeed"]) {
+            echo '{
+                "success": false, 
+                "data": {
+                    "error_code": "QW-2000",
+                    "error": "You are not allowed to request the product feed."
+                    }
+                }'
+            ;
+            exit;
         }
 
-        //Check if feed is enabled and api keys match
-        if ($config["allow_fcofeed"] && $keys_match) {
+
+        if ($config["allow_fcofeed"] && $keys_match == true) {
             $identifier = $this->getRequest()->getQuery('identifier');
-            if (empty($identifier)) {
-                echo 'Identifier not set';
+            if ($identifier == null) {
+                echo '{
+                    "success": false, 
+                    "data": {
+                        "error_code": "QW-1000",
+                        "error": "Identifier not set."
+                        }
+                    }'
+                ;
                 exit;
             }
+
             $json = '';
 
             switch ($identifier) {
                 case "products":
-                    $json = $this->getProductsFeed();
+                    try {
+                        $json = $this->getProductsFeed();
+                    } catch (Exception $e) {
+                        echo '{
+                        "success": false, 
+                        "data": {
+                            "error_code": "QW-4000",
+                            "error": "Error generating product feed."
+                            }
+                        }'
+                        ;
+                        exit;
+                    }
+                    break;
+                case "total_products":
+                    try {
+                        $json = $this->getTotalProductsFeed();
+                    } catch (Exception $e) {
+                        echo '{
+                        "success": false, 
+                        "data": {
+                            "error_code": "QW-4001",
+                            "error": "Error requesting product totals count."
+                            }
+                        }'
+                        ;
+                        exit;
+                    }
                     break;
                 case "categories":
-                    $json = $this->getCategoriesFeed();
+                    try {
+                        $json = $this->getCategoriesFeed();
+                    } catch (Exception $e) {
+                        echo '{
+                        "success": false, 
+                        "data": {
+                            "error_code": "QW-6000",
+                            "error": "Error generating category data feed."
+                            }
+                        }'
+                        ;
+                        exit;
+                    }
                     break;
                 case "stock":
-                    $json = $this->getStockFeed();
+                    try {
+                        $json = $this->getStockFeed();
+                    } catch (Exception $e) {
+                        echo '{
+                        "success": false, 
+                        "data": {
+                            "error_code": "QW-7000",
+                            "error": "Error generating stock data feed."
+                            }
+                        }'
+                        ;
+                        exit;
+                    }
                     break;
                 case "tax":
-                    $json = $this->getTaxFeed();
+                    echo '{
+                        "success": false, 
+                        "data": {
+                            "error_code": "QW-9000",
+                            "error": "Deprecated request."
+                            }
+                        }'
+                    ;
+                    exit;
                     break;
                 case "shipping":
-                    $json = $this->getShippingFeed();
+                    try {
+                        $json = $this->getShippingFeed();
+                    } catch (Exception $e) {
+                        echo '{
+                        "success": false, 
+                        "data": {
+                            "error_code": "QW-8000",
+                            "error": "Error generating shipping data feed."
+                            }
+                        }'
+                        ;
+                        exit;
+                    }
                     break;
                 case "languages":
-                    $json = "Deprecated"; //$this->getLanguagesFeed();
+                    echo '{
+                        "success": false, 
+                        "data": {
+                            "error_code": "QW-9000",
+                            "error": "Deprecated request."
+                            }
+                        }'
+                    ;
+                    exit;
                     break;
                 case "countries":
-                    $json = "Deprecated"; // $this->getCountriesFeed();
+                    echo '{
+                        "success": false, 
+                        "data": {
+                            "error_code": "QW-9000",
+                            "error": "Deprecated request."
+                            }
+                        }'
+                    ;
+                    exit;
                     break;
                 case "metadata":
-                    $json = "Deprecated"; //$this->getMetadataFeed();
+                    echo '{
+                        "success": false, 
+                        "data": {
+                            "error_code": "QW-9000",
+                            "error": "Deprecated request."
+                            }
+                        }'
+                    ;
+                    exit;
                     break;
                 case "stores":
-                    $json = $this->getStoresFeed();
+                    try {
+                        $json = $this->getStoresFeed();
+                    } catch (Exception $e) {
+                        echo '{
+                        "success": false, 
+                        "data": {
+                            "error_code": "QW-5000",
+                            "error": "Error generating shop data feed."
+                            }
+                        }'
+                        ;
+                        exit;
+                    }
                     break;
             }
 
-            $this->getResponse()->clearHeaders()->setHeader('Content-type', 'application/json', true);
-            $this->getResponse()->setHeader('X-Feed-Version', '1.0', true);
-            $this->getResponse()->setHeader('Connection', 'close', true);
-            $this->getResponse()->setBody($json);
+            $contents = gzcompress($json);
+            echo $contents;
+            //$this->getResponse()->setBody($json);
         } else {
-            echo Mage::helper("msp")->__("You are not allowed to request the product feed!");
+            echo '{
+                    "success": false, 
+                    "data": {
+                        "error_code": "QW-3000",
+                        "error": "Signature error."
+                        }
+                    }'
+            ;
             exit;
         }
+    }
+
+    function microtime_float()
+    {
+        list($usec, $sec) = explode(" ", microtime());
+        return ((float) $usec + (float) $sec);
     }
 
     function json_readable_encode($in, $indent = 0, Closure $_escape = null)
@@ -969,6 +2258,22 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
         $out .= "\n" . str_repeat("\t", $indent) . "}";
 
         return $out;
+    }
+
+    public
+            function emu_getallheaders()
+    {
+        foreach ($_SERVER as $name => $value) {
+            if (substr($name, 0, 5) == 'HTTP_') {
+                $name = str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))));
+                $headers[$name] = $value;
+            } else if ($name == "CONTENT_TYPE") {
+                $headers["Content-Type"] = $value;
+            } else if ($name == "CONTENT_LENGTH") {
+                $headers["Content-Length"] = $value;
+            }
+        }
+        return $headers;
     }
 
 }

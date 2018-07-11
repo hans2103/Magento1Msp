@@ -78,6 +78,7 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
         'msp_directdebit',
         'msp_fastcheckout',
         'msp_amex',
+        'msp_alipay',
         'msp_yourgift',
         'msp_wijncadeau',
         'msp_lief',
@@ -129,6 +130,7 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
         'msp_kbc',
         'msp_belfius',
         'msp_amex',
+        'msp_alipay',
         /* Start Paysafecard */
         'msp_paysafecard'
             /* End Paysafecard */
@@ -136,7 +138,7 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
 
     public function __construct()
     {
-
+        $storeId = Mage::app()->getStore()->getId();
         if ($this->_code == 'msp') {
             $currencies = explode(',', $this->getConfigData('allowed_currency'));
             $isAllowConvert = $this->getConfigData('allow_convert_currency');
@@ -156,12 +158,12 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
             if (in_array($this->_code, $this->gateways)) {
                 $this->_configCode = 'msp_gateways';
                 $this->_module = 'msp_gateways';
-                $currencies = explode(',', Mage::getStoreConfig('msp_gateways/' . $this->_code . '/allowed_currency'));
+                $currencies = explode(',', Mage::getStoreConfig('msp_gateways/' . $this->_code . '/allowed_currency', $storeId));
                 $isAllowConvert = Mage::getStoreConfigFlag('msp/settings/allow_convert_currency');
             } elseif (in_array($this->_code, $this->giftcards)) {
                 $this->_configCode = 'msp_giftcards';
                 $this->_module = 'msp_giftcards';
-                $currencies = explode(',', Mage::getStoreConfig('msp_giftcards/' . $this->_code . '/allowed_currency'));
+                $currencies = explode(',', Mage::getStoreConfig('msp_giftcards/' . $this->_code . '/allowed_currency', $storeId));
                 $isAllowConvert = Mage::getStoreConfigFlag('msp/settings/allow_convert_currency');
             }
 
@@ -597,6 +599,8 @@ abstract class MultiSafepay_Msp_Model_Gateway_Abstract extends Mage_Payment_Mode
             }
             return $this;
         }
+
+
 
         // build request
         $mapi = new MultiSafepay();

@@ -45,6 +45,7 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object
         'MAESTRO' => 'msp_maestro',
         'PAYPAL' => 'msp_paypal',
         'AMEX' => 'msp_amex',
+        'ALIPAY' => 'msp_alipay',
         'WEBSHOPGIFTCARD' => 'msp_webgift',
         'EBON' => 'msp_ebon',
         'BABYGIFTCARD' => 'msp_babygiftcard',
@@ -636,6 +637,328 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object
     }
 
     /**
+     * Update an order according to the specified MultiSafepay status
+     */
+    public function updateQwindoStatus($mspStatus, $mspDetails = array())
+    {
+        $order = Mage::getSingleton('sales/order')->loadByAttribute('ext_order_id', $mspDetails['transaction_id']);
+        $orderSaved = false;
+        $statusInitialized = $this->getConfigData("initialized_status");
+        $statusBanktransferInitialized = $this->getConfigData("initialized_banktransfer_status");
+        $statusComplete = $this->getConfigData("complete_status");
+        $statusUncleared = $this->getConfigData("uncleared_status");
+        $statusVoid = $this->getConfigData("void_status");
+        $statusDeclined = $this->getConfigData("declined_status");
+        $statusExpired = $this->getConfigData("expired_status");
+        $statusRefunded = $this->getConfigData("refunded_status");
+        $statusPartialRefunded = $this->getConfigData("partial_refunded_status");
+        $autocreateInvoice = $this->getConfigData("autocreate_invoice");
+
+        $creditmemo_enabled = $this->getConfigData("use_refund_credit_memo");
+
+        if ($creditmemo_enabled && ($mspStatus == 'refunded' || $mspStatus == 'partial_refunded')) {
+            return true;
+        }
+
+        $usedMethod = $this->methodMap[strtoupper($mspDetails['payment_details']['type'])];
+
+        $this->mspDetails = $mspDetails;
+        /*
+         * We need to update the shippingmethods for FCO transactions because these can still change after the order is created
+         */
+        $details = $mspDetails;
+        $quoteid = $order->getQuoteId();
+        $quote = Mage::getModel('sales/quote')->load($quoteid);
+
+        $complete = false;
+        $cancel = false;
+        $newState = null;
+        $newStatus = true; // makes Magento use the default status belonging to state
+        $statusMessage = '';
+
+        //If the order already has in invoice than it was paid for using another method? So if our transaction expires we shouldn't update it to cancelled because it was already invoiced.
+        if ($order->hasInvoices() && $mspStatus == 'expired') {
+            return true;
+        }
+
+        if (($usedMethod == 'PAYAFTER' || $usedMethod == 'KLARNA' || $usedMethod == 'EINVOICE') && ($mspStatus == 'cancelled' || $mspStatus == 'void')) {
+            return true;
+        }
+
+        //$payment_method_quote = $quote->getPayment();
+        $payment = $order->getPayment();
+
+        if ($usedMethod != $payment->getMethod() && !empty($usedMethod)) {
+            $payment->setMethod($usedMethod);
+            $payment->save();
+            //$payment_method_quote->setMethod($usedMethod);
+            //$payment_method_quote->save();
+        }
+
+
+
+        switch ($mspStatus) {
+            case "initialized":
+
+                if ($mspDetails['payment_details']['type'] == 'BANKTRANS') {
+                    $newState = Mage_Sales_Model_Order::STATE_NEW;
+                    $newStatus = $statusBanktransferInitialized;
+                    $statusMessage = Mage::helper("msp")->__("Banktransfer transaction started, waiting for payment");
+                } else {
+                    $newState = Mage_Sales_Model_Order::STATE_NEW;
+                    $newStatus = $statusInitialized;
+                    $statusMessage = Mage::helper("msp")->__("Transaction started, waiting for payment");
+                }
+
+                break;
+            case "completed":
+                $complete = true;
+                $newState = Mage_Sales_Model_Order::STATE_PROCESSING;
+                $newStatus = $statusComplete;
+                $statusMessage = Mage::helper("msp")->__("Payment Completed");
+                //order is paid so set it to paid
+                $order->setTotalPaid($order->getGrandTotal());
+
+                $payment = $order->getPayment();
+                $transaction = $payment->getTransaction($this->mspDetails['transaction_id']);
+                break;
+            case "uncleared":
+                $newState = Mage_Sales_Model_Order::STATE_NEW;
+                $newStatus = $statusUncleared;
+                $statusMessage = Mage::helper("msp")->__("Transaction started, waiting for payment");
+                break;
+            case "void":
+                $newState = Mage_Sales_Model_Order::STATE_CANCELED;
+                $statusMessage = Mage::helper("msp")->__("Transaction voided");
+                $newStatus = $statusVoid;
+                if ($order->getState() != 'complete' && !$order->hasInvoices()) {
+                    $order->cancel(); // this trigers stock updates
+                    $cancel = true;
+                    $order->setState($newState, $newStatus, $statusMessage)->save();
+                    $orderSaved = true;
+                }
+                break;
+            case "declined":
+                $newState = Mage_Sales_Model_Order::STATE_CANCELED;
+                $statusMessage = Mage::helper("msp")->__("Transaction declined");
+                $newStatus = $statusDeclined;
+                if ($order->getState() != 'complete' && !$order->hasInvoices()) {
+                    $order->cancel(); // this trigers stock updates
+                    $cancel = true;
+                    $order->setState($newState, $newStatus, $statusMessage)->save();
+                    $orderSaved = true;
+                }
+                break;
+            case "expired":
+                $newState = Mage_Sales_Model_Order::STATE_CANCELED;
+                $statusMessage = Mage::helper("msp")->__("Transaction is expired");
+                $newStatus = $statusExpired;
+                if ($order->getState() != 'complete' && !$order->hasInvoices()) {
+                    $order->cancel(); // this trigers stock updates
+                    $cancel = true;
+                    $order->setState($newState, $newStatus, $statusMessage)->save();
+                    $orderSaved = true;
+                }
+                break;
+            case "cancelled":
+                $newState = Mage_Sales_Model_Order::STATE_CANCELED;
+                $statusMessage = Mage::helper("msp")->__("Transaction canceled");
+                $newStatus = $statusVoid;
+                if ($order->getState() != 'complete' && !$order->hasInvoices()) {
+                    $order->cancel(); // this trigers stock updates
+                    $cancel = true;
+                    $order->setState($newState, $newStatus, $statusMessage)->save();
+                    $orderSaved = true;
+                }
+                break;
+            case "refunded":
+                $statusMessage = Mage::helper("msp")->__("Transaction refunded");
+                $newState = Mage_Sales_Model_Order::STATE_CANCELED;
+                $newStatus = $statusRefunded;
+                $payment = $order->getPayment();
+                $payment->setTransactionId($mspDetails['transaction_id']);
+                $transaction = $payment->addTransaction('refund', null, false, $statusMessage);
+                $transaction->setParentTxnId($mspDetails['transaction_id']);
+                $transaction->setIsClosed(1);
+                $transaction->setAdditionalInformation(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS, $transdetails);
+                $transaction->save();
+                break;
+            case "partial_refunded":
+                $statusMessage = Mage::helper("msp")->__("Transaction partially refunded");
+                $newState = Mage_Sales_Model_Order::STATE_PROCESSING;
+                $newStatus = $statusPartialRefunded;
+                $payment = $order->getPayment();
+                $payment->setTransactionId($mspDetails['transaction_id']);
+                $transaction = $payment->addTransaction('refund', null, false, $statusMessage);
+                $transaction->setParentTxnId($mspDetails['transaction_id']);
+                $transaction->setIsClosed(1);
+                $transaction->setAdditionalInformation(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS, $transdetails);
+                $transaction->save();
+                break;
+            default:
+                $statusMessage = Mage::helper("msp")->__("Status not found " . $mspStatus);
+                return false;
+        }
+
+        // create the status message
+        $paymentType = '';
+        if (!empty($mspDetails['payment_details']['type'])) {
+            $paymentType = Mage::helper("msp")->__("Payment Type: <strong>%s</strong>", $mspDetails['payment_details']['type']) . '<br/>';
+        }
+
+        $statusMessage .= '<br/>' . Mage::helper("msp")->__("Status: <strong>%s</strong>", $mspStatus) . '<br/>' . $paymentType;
+
+        $current_state = $order->getState();
+        $canUpdate = false;
+
+
+        /**
+         *     TESTING UNDO CANCEL
+         *    Start undo cancel function
+         */
+        if ($current_state == Mage_Sales_Model_Order::STATE_CANCELED && $newState != Mage_Sales_Model_Order::STATE_CANCELED) {
+            foreach ($order->getItemsCollection() as $item) {
+                if ($item->getQtyCanceled() > 0) {
+                    $item->setQtyCanceled(0)->save();
+                }
+            }
+
+            $products = $order->getAllItems();
+
+            if (Mage::getStoreConfigFlag('cataloginventory/options/can_subtract')) {
+                $products = $order->getAllItems();
+
+                foreach ($products as $itemId => $product) {
+                    $id = $product->getProductId();
+                    $stock_obj = Mage::getModel('cataloginventory/stock_item')->loadByProduct($id);
+                    $stockData = $stock_obj->getData();
+
+                    $new = $stockData['qty'] - $product->getQtyOrdered();
+                    $stockData['qty'] = $new;
+                    $stock_obj->setData($stockData);
+                    $stock_obj->save();
+                }
+            }
+
+            $order->setBaseDiscountCanceled(0)
+                    ->setBaseShippingCanceled(0)
+                    ->setBaseSubtotalCanceled(0)
+                    ->setBaseTaxCanceled(0)
+                    ->setBaseTotalCanceled(0)
+                    ->setDiscountCanceled(0)
+                    ->setShippingCanceled(0)
+                    ->setSubtotalCanceled(0)
+                    ->setTaxCanceled(0)
+                    ->setTotalCanceled(0);
+
+            $state = 'new';
+            $status = 'pending';
+
+            $order->setStatus($status)->setState($state)->save();
+            $order->addStatusToHistory($status, 'Order has been reopened because a new transaction was started by the customer!');
+        }
+        /**
+         *    ENDING UNDO CANCEL CODE
+         */
+        if (!$this->isStatusInHistory($order, $mspStatus)) {
+            if ($order->hasInvoices()) {
+                $is_already_invoiced = true;
+            } else {
+                $is_already_invoiced = false;
+                if ($complete && $autocreateInvoice) {// && $this->_paid == round($order->getBaseGrandTotal(), 2) && !Mage::getStoreConfigFlag('msp/settings/allow_convert_currency')) {
+                    $payment = $order->getPayment();
+                    $payment->setTransactionId($mspDetails['transaction_id']);
+                    $transaction = $payment->addTransaction('capture', null, false, $statusMessage);
+                    $transaction->setParentTxnId($mspDetails['transaction_id']);
+                    $transaction->setIsClosed(1);
+                    //$transaction->setAdditionalInformation(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS, $transdetails);
+                    $transaction->save();
+                    $this->createInvoice($order, $mspDetails['transaction_id']); // Validate this function with 1.7.0.2 and lower
+                    $is_already_invoiced = true;
+                } elseif ($complete && $order->getState() == Mage_Sales_Model_Order::STATE_NEW) {
+                    $payment = $order->getPayment();
+                    $payment->setTransactionId($mspDetails['transaction_id']);
+                    $transaction = $payment->addTransaction('capture', null, false, $statusMessage);
+                    $transaction->setParentTxnId($mspDetails['transaction_id']);
+                    $transaction->setIsClosed(1);
+                    $transaction->save();
+                }
+            }
+
+
+            if ($order->getState() == Mage_Sales_Model_Order::STATE_NEW || $order->getState() != 'complete') {
+                $canUpdate = true;
+            } else {
+
+                $canUpdate = false;
+            }
+
+            // update the status if changed
+            if ($canUpdate && (($newState != $order->getState()) || ($newStatus != $order->getStatus()))) {
+                if (!$cancel) {
+                    $order->setState($newState, $newStatus, $statusMessage);
+                }
+
+                $send_update_email = $this->getConfigData("send_update_email");
+
+                if ($send_update_email) {
+                    $order->sendOrderUpdateEmail(true);
+                }
+            } else {
+                if (!$this->isStatusInHistory($order, $mspStatus) && (ucfirst($order->getState()) != ucfirst(Mage_Sales_Model_Order::STATE_CANCELED))) {
+                    $order->addStatusToHistory($order->getStatus(), $statusMessage);
+                }
+            }
+
+            /**
+             *    Fix to activate new order email function to be activated
+             */
+            $send_order_email = $this->getConfigData("new_order_mail");
+
+            if ($order->getCanSendNewEmailFlag()) {
+                if ($send_order_email == 'after_payment') {
+                    if (!$order->getEmailSent() && ((ucfirst($order->getState()) == ucfirst(Mage_Sales_Model_Order::STATE_PROCESSING)) || (ucfirst($order->getState()) == ucfirst(Mage_Sales_Model_Order::STATE_COMPLETE)))) {
+                        $order->sendNewOrderEmail();
+                        $order->setEmailSent(true);
+                        $order->save();
+                        $orderSaved = true;
+                    } elseif (!$order->getEmailSent() && $mspDetails['payment_details']['type'] == 'BANKTRANS') {
+                        $order->sendNewOrderEmail();
+                        $order->setEmailSent(true);
+                        $order->save();
+                    }
+                } elseif ($send_order_email == 'after_notify_without_cancel' && (ucfirst($order->getState()) != ucfirst(Mage_Sales_Model_Order::STATE_CANCELED))) {
+                    if (!$order->getEmailSent()) {
+                        $order->sendNewOrderEmail();
+                        $order->setEmailSent(true);
+                        $order->save();
+                        $orderSaved = true;
+                    }
+                } elseif ($send_order_email == 'after_notify_with_cancel') {
+                    if (!$order->getEmailSent()) {
+                        $order->sendNewOrderEmail();
+                        $order->setEmailSent(true);
+                        $order->save();
+                        $orderSaved = true;
+                    }
+                }
+            }
+
+            if ($mspStatus == 'completed' && $mspDetails['payment_details']['type'] == 'KLARNA') {
+                $order->addStatusToHistory($order->getStatus(), Mage::helper("msp")->__("Klarna Reservation number: ") . $mspDetails['payment_details']['external_transaction_id']);
+            }
+
+            // save order if we haven't already
+            if (!$orderSaved) {
+                $order->save();
+            }
+        }
+
+        // success
+        return true;
+    }
+
+    /**
      * Check if a certain MultiSafepay status is already in the order history (to prevent doubles)
      */
     public function isStatusInHistory($order, $mspStatus)
@@ -655,7 +978,6 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object
     public function isCancellationFinal($order, $mspStatus)
     {
         $history = $order->getAllStatusHistory();
-
         foreach ($history as $status) {
             if (strpos($status->getComment(), $mspStatus) !== false) {
                 return true;
@@ -677,9 +999,8 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object
     /**
      *  Create invoice for order
      */
-    protected function createInvoice(Mage_Sales_Model_Order $order)
+    protected function createInvoice(Mage_Sales_Model_Order $order, $transactionid = null)
     {
-
         if ($order->getState() == Mage_Sales_Model_Order::STATE_NEW) {
             try {
                 if (!$order->canInvoice()) {
@@ -714,7 +1035,12 @@ class MultiSafepay_Msp_Model_Base extends Varien_Object
                     $msp->merchant['account_id'] = $this->_config["account_id"];
                     $msp->merchant['site_id'] = $this->_config["site_id"];
                     $msp->merchant['site_code'] = $this->_config["secure_code"];
-                    $msp->transaction['id'] = $_GET['transactionid'];
+                    if ($transactionid) {
+                        $msp->transaction['id'] = $transactionid;
+                    } else {
+                        $msp->transaction['id'] = $_GET['transactionid'];
+                    }
+
                     $msp->transaction['invoice_id'] = $invoiceId;
                     $msp->updateInvoice();
 

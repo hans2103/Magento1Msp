@@ -68,6 +68,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object
         'msp_directebanking',
         'msp_directdebit',
         'msp_amex',
+        'msp_alipay',
     );
 
     /**
@@ -280,7 +281,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object
 
         // currency check
         $isAllowConvert = Mage::getStoreConfigFlag('msp/settings/allow_convert_currency');
-        $currencies = explode(',', Mage::getStoreConfig('msp_gateways/' . strtolower($gateway_data['method']) . '/allowed_currency'));
+        $currencies = explode(',', Mage::getStoreConfig('msp_gateways/' . strtolower($gateway_data['method']) . '/allowed_currency', Mage::app()->getStore()->getId()));
         $canUseCurrentCurrency = in_array(Mage::app()->getStore()->getCurrentCurrencyCode(), $currencies);
 
         $currentCurrencyCode = Mage::app()->getStore()->getCurrentCurrencyCode();
@@ -386,6 +387,8 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object
             $this->api->delivery['country'] = $shipping->getCountry();
             $this->api->delivery['phone'] = $shipping->getTelephone();
         }
+
+
 
         $this->api->gatewayinfo['email'] = $this->getOrder()->getCustomerEmail();
         $this->api->gatewayinfo['phone'] = $billing->getTelephone();
@@ -548,7 +551,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object
         //Code blow added to recalculate excluding tax for the shipping cost. Older Magento installations round differently, causing a 1 cent mismatch. This is why we recalculate it.
         $diff = $this->getOrder()->getShippingInclTax() - $this->getOrder()->getShippingAmount();
 
-        if ($this->getOrder()->getShippingAmount() > 0) { 
+        if ($this->getOrder()->getShippingAmount() > 0) {
             $cost = ($diff / $this->getOrder()->getShippingAmount()) * 100;
         } else {
             $cost = $diff * 100;
@@ -604,6 +607,7 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object
 
         //ALL data available? Then request the transaction link
         $url = $this->api->startCheckout();
+
         $this->getBase($orderId)->log($this->api->request_xml);
         $this->getBase($orderId)->log($this->api->reply_xml);
 
@@ -973,9 +977,9 @@ class MultiSafepay_Msp_Model_Payment extends Varien_Object
         $isAllowConvert = Mage::getStoreConfigFlag('msp/settings/allow_convert_currency');
 
         if ($gateway_data['method'] == 'msp') {
-            $currencies = explode(',', Mage::getStoreConfig('payment/msp/allowed_currency'));
+            $currencies = explode(',', Mage::getStoreConfig('payment/msp/allowed_currency', Mage::app()->getStore()->getId()));
         } else {
-            $currencies = explode(',', Mage::getStoreConfig($this->_configCode . '/' . strtolower($gateway_data['method']) . '/allowed_currency'));
+            $currencies = explode(',', Mage::getStoreConfig($this->_configCode . '/' . strtolower($gateway_data['method']) . '/allowed_currency', Mage::app()->getStore()->getId()));
         }
 
         $canUseCurrentCurrency = in_array(Mage::app()->getStore()->getCurrentCurrencyCode(), $currencies);

@@ -5,7 +5,7 @@
  * @category MultiSafepay
  * @package  MultiSafepay_Msp
  */
-class MultiSafepay_Msp_Model_Config_Sources_Accounts
+class MultiSafepay_Msp_Model_Config_Sources_Qwindo
 {
 
     const TEST_MODE = 'test';
@@ -19,11 +19,11 @@ class MultiSafepay_Msp_Model_Config_Sources_Accounts
         return array(
             array(
                 "value" => self::TEST_MODE,
-                "label" => "Test account"
+                "label" => "Test"
             ),
             array(
                 "value" => self::LIVE_MODE,
-                "label" => "Live account"
+                "label" => "Live"
             ),
         );
     }

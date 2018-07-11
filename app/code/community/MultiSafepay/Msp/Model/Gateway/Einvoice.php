@@ -58,6 +58,7 @@ class MultiSafepay_Msp_Model_Gateway_Einvoice extends MultiSafepay_Msp_Model_Gat
         'msp_directebanking',
         'msp_directdebit',
         'msp_amex',
+        'msp_alipay',
     );
 
     public function __construct()
@@ -79,17 +80,17 @@ class MultiSafepay_Msp_Model_Gateway_Einvoice extends MultiSafepay_Msp_Model_Gat
 
 
 
-
+        $storeId = Mage::app()->getStore()->getId();
 
         if (in_array($this->_code, $this->gateways)) {
             $this->_configCode = 'msp_gateways';
             $this->_module = 'msp_gateways';
-            $currencies = explode(',', Mage::getStoreConfig('msp_gateways/' . $this->_code . '/allowed_currency'));
+            $currencies = explode(',', Mage::getStoreConfig('msp_gateways/' . $this->_code . '/allowed_currency', $storeId));
             $isAllowConvert = Mage::getStoreConfigFlag('msp/settings/allow_convert_currency');
         } elseif (in_array($this->_code, $this->giftcards)) {
             $this->_configCode = 'msp_giftcards';
             $this->_module = 'msp_giftcards';
-            $currencies = explode(',', Mage::getStoreConfig('msp_giftcards/' . $this->_code . '/allowed_currency'));
+            $currencies = explode(',', Mage::getStoreConfig('msp_giftcards/' . $this->_code . '/allowed_currency', $storeId));
             $isAllowConvert = Mage::getStoreConfigFlag('msp/settings/allow_convert_currency');
         }
 

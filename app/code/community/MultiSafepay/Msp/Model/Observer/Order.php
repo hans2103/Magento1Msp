@@ -52,6 +52,7 @@ class MultiSafepay_Msp_Model_Observer_Order extends MultiSafepay_Msp_Model_Obser
         'msp_wijncadeau',
         'msp_lief',
         'msp_amex',
+        'msp_alipay',
         'msp_paypal',
         'msp_gezondheidsbon',
         'msp_fashioncheque',
@@ -134,6 +135,11 @@ class MultiSafepay_Msp_Model_Observer_Order extends MultiSafepay_Msp_Model_Obser
 
         if (!$api->isPaymentLinkCreated($order)) {
             if ($payment->getCode() == self::MSP_GENERAL_PAD_CODE || $payment->getCode() == self::MSP_GENERAL_KLARNA_CODE || $payment->getCode() == self::MSP_GENERAL_EINVOICE_CODE) {
+
+
+
+
+
                 $api->test = ($config['test_api_pad'] == 'test');
                 $suffix = '';
 
@@ -145,7 +151,7 @@ class MultiSafepay_Msp_Model_Observer_Order extends MultiSafepay_Msp_Model_Obser
                 $api->merchant['site_id'] = $config['site_id_pad' . $suffix];
                 $api->merchant['security_code'] = $config['secure_code_pad' . $suffix];
                 $api->merchant['api_key'] = $configMain['api_key'];
-                
+                $api->transaction['id'] = $configMain['daysactive'];
                 $api->debug = $configMain['debug'];
             } else {
                 $api->test = ($config['test_api'] == 'test');
@@ -153,11 +159,12 @@ class MultiSafepay_Msp_Model_Observer_Order extends MultiSafepay_Msp_Model_Obser
                 $api->merchant['site_id'] = $config['site_id'];
                 $api->merchant['security_code'] = $config['secure_code'];
                 $api->merchant['api_key'] = $config['api_key'];
+                $api->transaction['id'] = $configMain['daysactive'];
                 $api->debug = $config['debug'];
             }
             $api->transaction['gateway_reset'] = $configMain['gateway_reset'];
 
-            
+
             if ($payment->getCode() == self::MSP_FASTCHECKOUT_CODE) {
                 $api->transaction['id'] = $order->getQuoteId();
             } else {
