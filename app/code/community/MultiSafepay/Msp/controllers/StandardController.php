@@ -164,10 +164,20 @@ class MultiSafepay_Msp_StandardController extends Mage_Core_Controller_Front_Act
         $order_id = $checkout->getLastRealOrderId();
         $order = Mage::getSingleton('sales/order')->loadByIncrementId($order_id);
 
-        if ($order_id) {
+	    /**
+	     * 17-08-2018 fix applied by Jasper Nadi - developer at MultiSafepay
+	     * Dutch comment by developer:
+	     * Bij het annuleren van een transactie gebeuren er 2 acties:
+	     * 1) Consument komt op de annuleerpagina -> annuleren binnen Magento
+	     * 2) Onze systemen versturen een annuleer signaal richting de webshop -> annuleren binnen Magento
+	     * Met de aanpassing schakelen wij alleen de annuleeractie uit bij 1).
+	     *
+	     * fix applied awaiting results
+	     */
+        /*if ($order_id) {
             $order->cancel();
             $order->save();
-        }
+        }*/
 
 
         $quote = Mage::getModel('sales/quote')->load($checkout->getLastQuoteId());
